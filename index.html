@@ -3,1482 +3,1197 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>C Logic Tutor — Elite Version</title>
+<title>C Academy: The Interactive Adventure</title>
 <style>
-:root{
-  --bg:#0a0f14;
-  --card:#111820;
-  --surface:#1a232e;
-  --text:#e6edf3;
-  --muted:#8b949e;
-  --accent:#58a6ff;
-  --success:#2ea043;
-  --error:#f85149;
-  --mistake:#f59e0b;
-  --page-ref:#3b82f6;
-  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
-  --radius:12px;
-  --gap:16px;
-  --pad:16px;
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  background:linear-gradient(180deg,#071018 0%, #07121a 60%);
-  color:var(--text);
-  padding:18px;
-  display:flex;
-  justify-content:center;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-}
-.app{
-  width:100%;
-  max-width:1100px;
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
-.header{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  justify-content:space-between;
-}
-.brand{
-  display:flex;
-  gap:12px;
-  align-items:center;
-}
-.logo{
-  width:56px;height:56px;border-radius:12px;
-  background:linear-gradient(135deg,var(--accent),#2dd4bf);
-  display:flex;align-items:center;justify-content:center;
-  color:#042018;font-weight:800;font-family:var(--mono);
-  box-shadow:0 8px 30px rgba(0,0,0,0.6);
-}
-.title{font-size:18px;margin:0}
-.header-meta{display:flex;gap:12px;align-items:center;color:var(--muted);font-size:13px}
-.controls{display:flex;gap:8px;align-items:center}
-.btn{
-  background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--text);
-  padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer;
-}
-.btn.primary{background:linear-gradient(90deg,var(--accent),#2dd4bf);color:#042018;border:none}
-.progress-wrap{flex:1;margin-left:12px;margin-right:12px}
-.progress-bar{height:10px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),#2dd4bf);width:0%}
-.container{
-  background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
-  border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:14px;
-  box-shadow:0 12px 40px rgba(2,6,10,0.6);
-  backdrop-filter: blur(6px);
-}
-.top-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
-.left-col{flex:1;min-width:280px}
-.right-col{width:360px;min-width:260px}
-.card{background:var(--surface);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
-.concept{display:flex;flex-direction:column;gap:8px}
-.concept .topic{font-weight:800;color:var(--accent)}
-.concept .concept-text{color:var(--text)}
-.analogy{color:var(--muted);background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;font-size:13px}
-.code-block{background:#07121a;border-radius:8px;padding:12px;font-family:var(--mono);font-size:13px;color:#dbeef6;overflow:auto;border:1px solid rgba(255,255,255,0.03)}
-.code-actions{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px}
-.toggle{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:13px}
-.line-table{width:100%;border-collapse:collapse;margin-top:8px}
-.line-table th,.line-table td{padding:8px;border-bottom:1px dashed rgba(255,255,255,0.03);text-align:left;font-size:13px}
-.line-table th{color:var(--muted);font-weight:700}
-.predict{display:flex;flex-direction:column;gap:8px}
-.predict label{font-weight:800;color:var(--accent);font-size:13px}
-.input, textarea{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:10px;border-radius:8px;color:var(--text);font-family:var(--mono);font-size:14px;outline:none}
-.textarea{min-height:120px;resize:vertical}
-.actions-row{display:flex;gap:8px;align-items:center}
-.feedback{font-weight:800;padding:8px 12px;border-radius:8px;display:inline-block}
-.feedback.correct{background:rgba(46,160,67,0.12);color:var(--success);border:1px solid rgba(46,160,67,0.06)}
-.feedback.wrong{background:rgba(248,81,73,0.06);color:var(--error);border:1px solid rgba(248,81,73,0.06)}
-.result{margin-top:8px;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border:1px solid rgba(255,255,255,0.03)}
-.trace{margin-top:10px}
-.trace li{margin-bottom:6px;color:var(--muted);font-size:13px}
-.key-concepts{background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;color:var(--muted)}
-.small{font-size:13px;color:var(--muted)}
-.completion{display:flex;flex-direction:column;gap:12px;align-items:center;padding:20px;text-align:center}
-.footer{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px;padding-top:6px}
-.badge{background:rgba(255,255,255,0.02);padding:6px 8px;border-radius:8px;color:var(--muted);font-weight:700}
-.switch{display:flex;gap:8px;align-items:center}
-.hint{color:var(--page-ref);font-size:13px}
-.controls .icon{opacity:0.9}
-.table-compact td, .table-compact th{padding:6px;font-size:13px}
-.fade{transition:all 0.18s ease;opacity:1}
-.hidden{display:none;opacity:0}
-@media (max-width:900px){
-  .right-col{width:100%}
-  .top-row{flex-direction:column}
-}
+  :root{
+    --bg:#0a0f14;
+    --card:#111820;
+    --surface:#1a232e;
+    --text:#e6edf3;
+    --muted:#8b949e;
+    --accent:#58a6ff;
+    --success:#2ea043;
+    --error:#f85149;
+    --glass: rgba(255,255,255,0.03);
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
+    --radius:12px;
+    --gap:16px;
+    --pad:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background:linear-gradient(180deg,#071018 0%, #07121a 60%);
+    color:var(--text);
+    padding:18px;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    display:flex;justify-content:center;
+  }
+  .app{width:100%;max-width:1200px;display:flex;flex-direction:column;gap:18px}
+  header.top{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#2dd4bf);display:flex;align-items:center;justify-content:center;color:#042018;font-weight:900;font-family:var(--mono)}
+  h1{margin:0;font-size:18px}
+  .status{display:flex;gap:12px;align-items:center;color:var(--muted);font-size:13px}
+  .controls{display:flex;gap:8px;align-items:center}
+  .btn{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--text);padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),#2dd4bf);color:#042018;border:none}
+  .glass-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.04);backdrop-filter: blur(8px);box-shadow:0 12px 40px rgba(2,6,10,0.6)}
+  .layout{display:flex;gap:18px;flex-direction:column}
+  .nav{display:flex;gap:8px;align-items:center}
+  .tabs{display:flex;gap:8px}
+  .tab{padding:10px 14px;border-radius:10px;cursor:pointer;background:transparent;border:1px solid rgba(255,255,255,0.02);color:var(--muted);font-weight:700}
+  .tab.active{background:linear-gradient(90deg,var(--accent),#2dd4bf);color:#042018}
+  .main{display:flex;gap:18px;flex-direction:column}
+  .split{display:flex;gap:18px;flex-direction:column}
+  @media(min-width:900px){ .split{flex-direction:row} }
+  .left{flex:1;display:flex;flex-direction:column;gap:12px}
+  .right{width:360px;min-width:260px;display:flex;flex-direction:column;gap:12px}
+  .world-map{display:flex;flex-wrap:wrap;gap:8px}
+  .chapter{padding:10px;border-radius:10px;background:var(--card);border:1px solid rgba(255,255,255,0.03);cursor:pointer;min-width:140px}
+  .chapter.locked{opacity:0.5}
+  .section{display:flex;flex-direction:column;gap:8px}
+  .code{background:#07121a;border-radius:8px;padding:12px;font-family:var(--mono);font-size:13px;color:#dbeef6;overflow:auto;border:1px solid rgba(255,255,255,0.03)}
+  pre{margin:0;white-space:pre-wrap}
+  .visualizer{display:flex;gap:12px;flex-direction:column}
+  .memory-map{display:flex;gap:8px;flex-wrap:wrap}
+  .mem-box{min-width:80px;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);text-align:center}
+  .ascii{max-height:180px;overflow:auto;background:rgba(255,255,255,0.02);padding:8px;border-radius:8px}
+  .operator-chart{display:flex;flex-direction:column;gap:6px}
+  .practice{display:flex;flex-direction:column;gap:12px}
+  .question-card{padding:12px;border-radius:10px;background:var(--card);border:1px solid rgba(255,255,255,0.03)}
+  .input, textarea{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:10px;border-radius:8px;color:var(--text);font-family:var(--mono);font-size:14px;outline:none}
+  .textarea{min-height:120px;resize:vertical}
+  .small{font-size:13px;color:var(--muted)}
+  .badge{padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.02);color:var(--muted);font-weight:700}
+  .xp-bar{height:10px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
+  .xp-fill{height:100%;background:linear-gradient(90deg,#ffd166,var(--accent));width:0%}
+  .flex-row{display:flex;gap:8px;align-items:center}
+  .hidden{display:none}
+  .fade{transition:all 0.18s ease;opacity:1}
+  .muted{color:var(--muted)}
+  .kbd{background:rgba(255,255,255,0.03);padding:4px 6px;border-radius:6px;font-family:var(--mono);font-size:12px}
+  .badge-success{background:rgba(46,160,67,0.12);color:var(--success);padding:6px;border-radius:8px}
+  .badge-error{background:rgba(248,81,73,0.06);color:var(--error);padding:6px;border-radius:8px}
+  .world-map .chapter{flex:1}
+  .controls .icon{opacity:0.9}
+  .center{display:flex;align-items:center;justify-content:center}
+  /* responsive */
+  @media(max-width:720px){
+    .right{width:100%}
+    .chapter{min-width:120px}
+  }
+  /* subtle hover */
+  .chapter:hover{transform:translateY(-3px);transition:all 0.18s ease}
+  .btn:active{transform:translateY(1px)}
+  /* syntax highlight simple */
+  .tok-key{color:#7dd3fc;font-weight:700}
+  .tok-func{color:#ffd166}
+  .tok-num{color:#fca5a5}
+  .tok-str{color:#a7f3d0}
+  .tok-comment{color:#6b7280;font-style:italic}
+  /* accessibility focus */
+  button:focus,input:focus,textarea:focus{outline:2px solid rgba(88,166,255,0.12);outline-offset:2px}
 </style>
 </head>
 <body>
-<div class="app" id="app" role="application" aria-labelledby="app-title">
-  <header class="header" role="banner">
+<div class="app" id="app" role="application" aria-labelledby="title">
+  <header class="top">
     <div class="brand">
-      <div class="logo" aria-hidden="true">CL</div>
+      <div class="logo" aria-hidden="true">CA</div>
       <div>
-        <h1 id="app-title" class="title">C Logic Tutor — Elite Version</h1>
-        <div class="header-meta">
-          <div id="progressText">Question 1 of 40</div>
-          <div id="scoreText">Score: 0</div>
+        <h1 id="title">C Academy: The Interactive Adventure</h1>
+        <div class="status">
+          <div class="small">Level <span id="level">1</span></div>
+          <div class="small">XP: <span id="xp">0</span></div>
+          <div class="small">Gold: <span id="gold">0</span></div>
         </div>
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:12px;width:48%">
-      <div class="progress-wrap" aria-hidden="true">
-        <div class="progress-bar" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
-      </div>
-      <div class="controls">
-        <button class="btn" id="resetBtn" title="Reset progress">Reset</button>
-        <button class="btn" id="exportBtn" title="Export progress">Export</button>
-        <div class="switch small">
-          <label class="small" for="modeToggle">Practice Mode</label>
-          <input type="checkbox" id="modeToggle" />
-        </div>
-      </div>
+    <div class="controls">
+      <div class="small">Streak: <strong id="streak">0</strong></div>
+      <button class="btn" id="resetBtn">Reset Progress</button>
+      <button class="btn" id="exportBtn">Export</button>
     </div>
   </header>
 
-  <main class="container" id="main" role="main">
-    <div class="top-row">
-      <div class="left-col">
-        <section class="card concept" aria-live="polite">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start">
-            <div>
-              <div class="topic" id="topicTitle">Topic</div>
-              <div class="small" id="tagList">tags</div>
-            </div>
-            <div style="text-align:right">
-              <div class="badge" id="streakBadge">Streak: 0</div>
-              <div class="small" id="accuracyBadge">Accuracy: 0%</div>
-            </div>
-          </div>
-          <div id="conceptText" class="concept-text">Concept explanation</div>
-          <div id="analogyText" class="analogy">Analogy</div>
-        </section>
-
-        <section style="margin-top:12px">
-          <div class="card">
-            <div class="code-block" id="codeBlock" tabindex="0" aria-label="Code snippet">
-              <pre id="codeArea" style="margin:0;white-space:pre-wrap;"></pre>
-            </div>
-            <div class="code-actions">
-              <label class="toggle"><input type="checkbox" id="toggleLines" /> Show Line Explanations</label>
-              <div class="small" id="snippetInfo">Snippet</div>
-            </div>
-            <div id="lineExplanationsWrap" style="display:none;margin-top:8px">
-              <table class="line-table" id="lineTable" aria-live="polite">
-                <thead><tr><th style="width:6%">Line</th><th style="width:36%">Code</th><th>What it means</th></tr></thead>
-                <tbody id="lineTableBody"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <section style="margin-top:12px" id="interactionArea">
-          <!-- dynamic content -->
-        </section>
-
-        <section id="resultSection" style="display:none;margin-top:12px">
-          <div class="card result" id="resultBox">
-            <div id="feedbackBanner" class="feedback"></div>
-            <div style="margin-top:10px">
-              <strong>Memory & Execution Trace</strong>
-              <ol class="trace" id="traceList"></ol>
-            </div>
-            <div style="margin-top:10px">
-              <strong>Key Concepts</strong>
-              <div class="key-concepts" id="keyConcepts"></div>
-            </div>
-            <div id="analysisPanel" style="margin-top:10px"></div>
-            <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
-              <button class="btn" id="nextBtn">Next</button>
-            </div>
-          </div>
-        </section>
-
-        <section id="completion" class="completion" style="display:none;margin-top:12px">
-          <div style="font-size:20px;font-weight:800">Session Complete</div>
-          <div id="finalScore" style="font-size:16px"></div>
-          <div id="finalPercent" class="small"></div>
-          <div style="display:flex;gap:8px">
-            <button class="btn primary" id="restartBtn">Restart</button>
-            <button class="btn" id="reviewBtn">Review</button>
-          </div>
-        </section>
+  <div class="layout">
+    <nav class="glass-card nav" aria-label="Navigation">
+      <div class="tabs" role="tablist" aria-label="Main tabs">
+        <button class="tab active" data-tab="read" role="tab" id="tab-read">📖 Read Theory</button>
+        <button class="tab" data-tab="visual" role="tab" id="tab-visual">👁️ Visualizer</button>
+        <button class="tab" data-tab="practice" role="tab" id="tab-practice">🎮 Practice</button>
       </div>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <div class="small muted">Mode</div>
+        <select id="modeSelect" class="input" style="width:140px;padding:6px 8px">
+          <option value="adventure">Adventure</option>
+          <option value="practice">Practice</option>
+          <option value="review">Review</option>
+        </select>
+      </div>
+    </nav>
 
-      <aside class="right-col">
-        <div class="card" style="display:flex;flex-direction:column;gap:8px">
+    <main class="main split">
+      <section class="left">
+        <div class="glass-card section">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <div class="small">Mode</div>
-            <div id="modeLabel" class="small">Learn</div>
+            <div>
+              <div class="small muted">World Map</div>
+              <div style="font-weight:800">Chapters</div>
+            </div>
+            <div class="small muted">Progress: <span id="progressPercent">0%</span></div>
           </div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <div class="small">Timer</div>
-            <div id="timerDisplay" class="small">--</div>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <div class="small">Question Type</div>
-            <div id="typeLabel" class="small">predict</div>
+          <div class="world-map" id="worldMap" style="margin-top:12px"></div>
+        </div>
+
+        <div id="contentArea" class="glass-card section" style="min-height:320px">
+          <!-- dynamic content: read/visual/practice -->
+        </div>
+
+        <div class="glass-card section small" style="display:flex;justify-content:space-between;align-items:center">
+          <div>Keyboard: <span class="kbd">Shift+Enter</span> newline • <span class="kbd">Ctrl/Cmd+Enter</span> submit • <span class="kbd">Enter</span> does nothing</div>
+          <div class="small muted">Offline • Single-file</div>
+        </div>
+      </section>
+
+      <aside class="right">
+        <div class="glass-card section">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong>Lesson Info</strong></div>
+            <div class="small muted" id="topicTag">Basics</div>
           </div>
           <div style="margin-top:8px">
-            <strong class="small">Hints</strong>
-            <div id="hintBox" class="small" style="margin-top:6px;color:var(--page-ref)"></div>
+            <div class="small muted">Topic</div>
+            <div style="font-weight:800" id="topicTitle">Select a chapter</div>
+            <div style="margin-top:8px" class="small">XP Bar</div>
+            <div class="xp-bar" style="margin-top:6px"><div id="xpFill" class="xp-fill" style="width:0%"></div></div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px">
+              <div class="small">XP: <strong id="xpSmall">0</strong></div>
+              <div class="small">Level: <strong id="levelSmall">1</strong></div>
+            </div>
           </div>
         </div>
 
-        <div class="card" style="margin-top:12px">
-          <strong class="small">Progress</strong>
-          <table style="width:100%;margin-top:8px" class="table-compact">
-            <tr><td class="small">Current</td><td id="currentQ" class="small" style="text-align:right">1</td></tr>
-            <tr><td class="small">Total</td><td id="totalQ" class="small" style="text-align:right">40</td></tr>
-            <tr><td class="small">Correct</td><td id="correctQ" class="small" style="text-align:right">0</td></tr>
-            <tr><td class="small">Streak</td><td id="streak" class="small" style="text-align:right">0</td></tr>
-          </table>
+        <div class="glass-card section">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong>Badges</strong></div>
+            <div class="small muted">Earned</div>
+          </div>
+          <div id="badges" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"></div>
         </div>
 
-        <div class="card" style="margin-top:12px">
-          <strong class="small">Quick Controls</strong>
-          <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
-            <button class="btn" id="showAnswerBtn">Reveal Answer</button>
-            <button class="btn" id="analyzeBtn">Analyze Code</button>
-            <button class="btn" id="copyCodeBtn">Copy Code</button>
+        <div class="glass-card section small">
+          <div><strong>Quick Practice</strong></div>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:8px">
+            <button class="btn primary" id="quickPractice">Start Quick Challenge</button>
+            <button class="btn" id="openVisualizer">Open Visualizer</button>
+            <button class="btn" id="openRead">Open Theory</button>
           </div>
         </div>
       </aside>
-    </div>
-  </main>
+    </main>
+  </div>
 
-  <footer class="footer">
-    <div class="small">Offline • Dark theme • Local progress saved</div>
-    <div class="small">Keyboard: Shift+Enter newline • Ctrl/Cmd+Enter check</div>
+  <footer style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+    <div class="small muted">C Academy — Offline • Dark Mode • Single-file</div>
+    <div class="small muted">Made for focused learning</div>
   </footer>
 </div>
 
 <script>
-/* C Logic Tutor — Elite Version
-   Single-file offline-first app.
-   Modular functions: state, rendering, events, validation, analysis.
+/*
+  C Academy: The Interactive Adventure
+  Single-file offline-first learning app.
+  - Modular structure inside IIFE to avoid global pollution.
+  - LocalStorage persistence.
+  - Tabs: Read, Visualizer, Practice.
+  - World map with chapters and topics.
+  - Visual variable tracker, ASCII table, operator chart.
+  - Practice engine with MCQ, predict, debug, pattern.
+  - Gamification: XP, Level, Badges, Streak.
+  - Keyboard shortcuts and editor niceties.
 */
 
-/* ===========================
-   Data: 40+ questions array
-   Each object follows the strict schema required.
-   Mix of types: predict, mcq, code-complete, error-find, free-response, pattern
-   =========================== */
+(function(){
+  'use strict';
 
-const questions = [
-  /* 1 */ {
-    id:1, type:'predict', topic:'Basic Printing', concept:'Printing text and newline with printf.',
-    analogy:'printf is a stamp; \\n moves to next line.',
-    code:'#include <stdio.h>\n\nint main() {\n    printf(\"Hello\\nWorld\\n\");\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'Hello World',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['Start main','printf prints Hello then newline','printf prints World then newline','Exit'],
-    lineExplanations:[
-      {line:1, code:'#include <stdio.h>', meaning:'Includes printf.'},
-      {line:3, code:'int main() {', meaning:'Entry point.'},
-      {line:4, code:'printf("Hello\\nWorld\\n");', meaning:'Prints Hello and World on separate lines.'}
-    ],
-    keyConcepts:['printf outputs text','\\n is newline'], commonMistake:'Forgetting \\n', tags:['basics','printing','easy']
-  },
+  /* -------------------------
+     Data: Chapters & Topics
+     Each chapter contains lessons (topics).
+     Each topic includes theory, visual examples, and practice items.
+     ------------------------- */
 
-  /* 2 */ {
-    id:2, type:'predict', topic:'Variables & Assignment', concept:'Variables store values; assignment sets them.',
-    analogy:'Variables are labeled boxes in memory.',
-    code:'#include <stdio.h>\n\nint main() {\n    int x = 5;\n    int y = x + 3;\n    printf(\"%d %d\\n\", x, y);\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'5 8',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['x=5','y=x+3 → 8','printf prints 5 8'], 
-    lineExplanations:[
-      {line:4, code:'int x = 5;', meaning:'Declare x=5.'},
-      {line:5, code:'int y = x + 3;', meaning:'y becomes 8.'}
-    ],
-    keyConcepts:['Assignment','Expressions evaluated before assignment'], commonMistake:'Confusing = and ==', tags:['basics','variables','easy']
-  },
+  const curriculum = [
+    {
+      id:1, title:'Chapter 1: Basics', tag:'basics',
+      lessons:[
+        {
+          id:'1-1', title:'Printing & Escape Sequences',
+          theory: `Printing text uses printf from stdio.h. Use escape sequences like \\n for newline and \\t for tab.`,
+          analogy: `Think of printf as a stamp; \\n moves the paper to the next line.`,
+          syntax: `#include <stdio.h>\nint main(){\n    printf("Hello\\n");\n    return 0;\n}`,
+          proTips: ['Use %d for integers, %f for floats, %c for chars','\\n moves to new line; \\t adds a tab'],
+          visualExamples: [
+            {code:'printf("A\\nB\\n");', trace:['printf prints A then newline','printf prints B then newline']},
+            {code:'printf("1\\t2\\n");', trace:['prints 1, tab, 2, newline']}
+          ],
+          practice:[
+            {type:'predict', prompt:'What does printf("Hi\\nThere\\n"); print?', answer:'Hi There'},
+            {type:'mcq', prompt:'Which escape sequence creates a new line?', options:['\\n','\\t','\\\\','\\0'], answer:'\\n'}
+          ]
+        },
+        {
+          id:'1-2', title:'Variables: int, float, char',
+          theory: `Variables are labeled containers in memory that hold values. int for integers, float for decimals, char for single characters.`,
+          analogy: `Variables = labeled boxes in memory.`,
+          syntax: `int x = 5;\nfloat f = 3.14;\nchar c = 'a';`,
+          proTips: ['Variable names cannot start with digits','Initialize variables before use'],
+          visualExamples:[
+            {code:'int x = 5;', trace:['x box created with value 5']},
+            {code:'x = x + 6;', trace:['read x (5), compute 5+6=11, store 11 in x']}
+          ],
+          practice:[
+            {type:'predict', prompt:'Given int x=2; x = x + 3; printf("%d", x); What prints?', answer:'5'},
+            {type:'mcq', prompt:'Which type stores a single character?', options:['int','float','char','double'], answer:'char'}
+          ]
+        },
+        {
+          id:'1-3', title:'Variable Naming Rules & Keywords',
+          theory: `Identifiers must start with a letter or underscore and cannot be C keywords like int, return.`,
+          analogy: `Variable names are like file names with rules.`,
+          syntax: `int _count = 10;\nint totalCount = 5;`,
+          proTips: ['Avoid using keywords as names','Use meaningful names'],
+          visualExamples:[],
+          practice:[
+            {type:'mcq', prompt:'Which is invalid?', options:['_value','2nd','value2','total_sum'], answer:'2nd'}
+          ]
+        },
+        {
+          id:'1-4', title:'Comments & Documentation',
+          theory: `Comments explain code and are ignored by compiler. Use // for single-line and /* */ for multi-line.`,
+          analogy: `Comments are sticky notes for humans.`,
+          syntax: `// single-line comment\n/* multi-line comment */`,
+          proTips: ['Keep comments concise','Explain why, not what'],
+          visualExamples:[],
+          practice:[
+            {type:'predict', prompt:'Does a comment affect program output?', answer:'no'}
+          ]
+        },
+        {
+          id:'1-5', title:'Input with scanf and & operator',
+          theory: `scanf reads input; pass variable addresses using & so scanf can store values in memory.`,
+          analogy: `scanf needs the box address to put the typed value into the correct box.`,
+          syntax: `int n; scanf("%d", &n);`,
+          proTips: ['Omitting & causes undefined behavior','Use %d for int, %f for float'],
+          visualExamples:[
+            {code:'int n; scanf("%d", &n);', trace:['scanf reads value and stores at address of n']}
+          ],
+          practice:[
+            {type:'error-find', prompt:'Find the bug: scanf("%d", n);', answer:'Missing & before n'}
+          ]
+        },
+        {
+          id:'1-6', title:'Modulus Operator %',
+          theory: `% returns remainder after integer division.`,
+          analogy: `Leftover candies after dividing into piles.`,
+          syntax: `int r = a % b;`,
+          proTips: ['Use n%2 to check even/odd'],
+          visualExamples:[
+            {code:'17 % 5', trace:['17 divided by 5 is 3 remainder 2 → result 2']}
+          ],
+          practice:[
+            {type:'predict', prompt:'What is 17 % 5?', answer:'2'}
+          ]
+        },
+        {
+          id:'1-7', title:'Typecasting & Integer Division',
+          theory: `Casting converts types. Casting float to int truncates decimals. Integer division drops fractional part.`,
+          analogy: `Pouring from wide cup to small cup spills fraction.`,
+          syntax: `int x = (int)3.9; // x=3\nint y = 5/2; // y=2`,
+          proTips: ['Use (float) to force float division'],
+          visualExamples:[
+            {code:'float f=5.9; int x=(int)f;', trace:['f=5.9; cast to int → 5']},
+            {code:'5/2', trace:['integer division → 2']}
+          ],
+          practice:[
+            {type:'predict', prompt:'What is result of 5/2 when both are ints?', answer:'2'}
+          ]
+        },
+        {
+          id:'1-8', title:'Char & ASCII Values',
+          theory: `char stores a single character; it maps to ASCII numeric codes (a=97).`,
+          analogy: `A char is a tiny box holding a letter with a numeric code.`,
+          syntax: `char c='a'; printf("%c %d", c, c);`,
+          proTips: ['%c prints char, %d prints ASCII code'],
+          visualExamples:[
+            {code:"char c='a'; printf(\"%c %d\", c, c);", trace:["prints a and 97"]}
+          ],
+          practice:[
+            {type:'predict', prompt:"What does printf(\"%c %d\", 'a', 'a'); print?", answer:'a 97'}
+          ]
+        }
+      ]
+    },
 
-  /* 3 */ {
-    id:3, type:'mcq', topic:'Variable Naming', concept:'Identifiers rules in C.',
-    analogy:'Names are like filenames with rules.',
-    code:'', question:'Which of these is an invalid variable name in C?',
-    options:['_count','2ndValue','total_sum','value2'],
-    correctAnswer:'2ndValue',
-    starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['Identifiers cannot start with a digit'], 
-    lineExplanations:[],
-    keyConcepts:['Start with letter or underscore','No keywords'], commonMistake:'Starting with digit', tags:['basics','naming','mcq']
-  },
+    {
+      id:2, title:'Chapter 2: Conditionals', tag:'conditionals',
+      lessons:[
+        {
+          id:'2-1', title:'if / if-else',
+          theory:'if executes block when condition is true (non-zero). Use else for alternative.',
+          analogy:'A gate that opens only when condition satisfied.',
+          syntax:'if (x>0) { ... } else { ... }',
+          proTips:['Use == for comparison, not ='],
+          visualExamples:[{code:'if(x>0) printf("pos"); else printf("non-pos");', trace:['check condition, branch accordingly']}],
+          practice:[{type:'predict', prompt:'If x=4 and if(x>3) printf("Yes"); what prints?', answer:'Yes'}]
+        },
+        {
+          id:'2-2', title:'Nested if-else & else-if ladder',
+          theory:'Use nested ifs or else-if ladder for multiple checks.',
+          analogy:'A ladder of checks: climb until one rung matches.',
+          syntax:'if(...){} else if(...){} else {}',
+          proTips:['Only first true branch runs in else-if ladder'],
+          visualExamples:[],
+          practice:[{type:'predict', prompt:'n=3; else-if ladder checks n==3 prints?', answer:'three'}]
+        },
+        {
+          id:'2-3', title:'Ternary Operator',
+          theory:'condition ? expr1 : expr2 is shorthand for simple if-else.',
+          analogy:'Quick decision: pick left if true else right.',
+          syntax:'int b = (a>0)?a:-a;',
+          proTips:['Keep ternary simple and readable'],
+          visualExamples:[],
+          practice:[{type:'mcq', prompt:'What does (a>0)?a:-a compute?', options:['Absolute value','Sign','Negation','Square'], answer:'Absolute value'}]
+        },
+        {
+          id:'2-4', title:'switch statement',
+          theory:'switch selects a case based on integer expression; use break to avoid fall-through.',
+          analogy:'Menu selection.',
+          syntax:'switch(x){case 1:...;break;default:...;}',
+          proTips:['Use default for fallback'],
+          visualExamples:[],
+          practice:[{type:'predict', prompt:'x=2; case 2 prints?', answer:'two'}]
+        },
+        {
+          id:'2-5', title:'Logical & Relational Operators',
+          theory:'Use && (AND), || (OR), ! (NOT) and relational operators ==, !=, <, >, <=, >=.',
+          analogy:'AND needs both keys; OR accepts either key.',
+          syntax:'if(a<10 && b>5) ...',
+          proTips:['Use parentheses to clarify complex conditions'],
+          visualExamples:[],
+          practice:[{type:'mcq', prompt:'Which is true: 0 or -1?', options:['0','-1','both','none'], answer:'-1'}]
+        },
+        {
+          id:'2-6', title:'Practical: Even/Odd, Leap Year',
+          theory:'Use modulus and logical operators to solve practical checks.',
+          analogy:'Remainder tells leftover items.',
+          syntax:'if(n%2==0) even else odd',
+          proTips:['Leap year rules: divisible by 4, not by 100 unless by 400'],
+          visualExamples:[],
+          practice:[
+            {type:'predict', prompt:'Is 2000 a leap year?', answer:'yes'},
+            {type:'predict', prompt:'Is 1900 a leap year?', answer:'no'}
+          ]
+        }
+      ]
+    },
 
-  /* 4 */ {
-    id:4, type:'predict', topic:'Comments', concept:'Comments are ignored by compiler.',
-    analogy:'Sticky notes for humans.',
-    code:'#include <stdio.h>\n\nint main() {\n    // prints number\n    printf(\"%d\\n\", 42); /* answer */\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'42',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['Comments ignored','printf prints 42'], 
-    lineExplanations:[
-      {line:4, code:'// prints number', meaning:'Single-line comment.'},
-      {line:5, code:'printf("%d\\n", 42);', meaning:'Prints 42.'}
-    ],
-    keyConcepts:['Comments ignored by compiler'], commonMistake:'Thinking comments execute', tags:['basics','comments','easy']
-  },
+    {
+      id:3, title:'Chapter 3: Loops', tag:'loops',
+      lessons:[
+        {
+          id:'3-1', title:'for loop',
+          theory:'for(init; cond; incr) runs a block repeatedly while cond true.',
+          analogy:'Recipe step repeated for each ingredient.',
+          syntax:'for(int i=0;i<n;i++){}',
+          proTips:['Avoid off-by-one errors'],
+          visualExamples:[{code:'for(int i=0;i<3;i++) printf("%d ",i);', trace:['prints 0 1 2']}],
+          practice:[{type:'predict', prompt:'What prints for i=0;i<3;i++ printf("%d ",i);', answer:'0 1 2'}]
+        },
+        {
+          id:'3-2', title:'while vs do-while',
+          theory:'while checks before; do-while runs body at least once.',
+          analogy:'Try once then decide to repeat.',
+          syntax:'do{...}while(cond);',
+          proTips:['Ensure loop variable changes to avoid infinite loop'],
+          visualExamples:[],
+          practice:[{type:'predict', prompt:'do {print 0; i++;} while(i<1); prints?', answer:'0'}]
+        },
+        {
+          id:'3-3', title:'break & continue',
+          theory:'break exits loop; continue skips to next iteration.',
+          analogy:'break leaves the room; continue skips this turn.',
+          syntax:'if(cond) break; if(cond) continue;',
+          proTips:['Use sparingly for clarity'],
+          visualExamples:[],
+          practice:[{type:'predict', prompt:'Loop with if(i==1) continue; prints 0 2?', answer:'0 2'}]
+        },
+        {
+          id:'3-4', title:'Pattern Printing & Nested Loops',
+          theory:'Nested loops control rows and columns for patterns.',
+          analogy:'Printer head moves row by row.',
+          syntax:'for(i) for(j) printf("*");',
+          proTips:['Visualize rows and columns'],
+          visualExamples:[{code:'for(i=1;i<=4;i++){for(j=1;j<=i;j++) printf("*"); printf("\\n");}', trace:['prints triangle pattern']}],
+          practice:[{type:'pattern', prompt:'What pattern prints for i<=3 inner j<=i?', answer:'*\\n**\\n***'}]
+        }
+      ]
+    },
 
-  /* 5 */ {
-    id:5, type:'error-find', topic:'scanf & operator', concept:'scanf needs address of variable.',
-    analogy:'scanf needs the box address to put input into the box.',
-    code:'#include <stdio.h>\n\nint main() {\n    int n;\n    scanf(\"%d\", n);\n    printf(\"%d\\n\", n);\n    return 0;\n}',
-    question:'Find and fix the error.',
-    correctAnswer:'scanf("%d", &n);',
-    options:[], starterCode:'', errorLocation:{line:4, description:'scanf missing & before n'}, fixedCode:'#include <stdio.h>\n\nint main() {\n    int n;\n    scanf(\"%d\", &n);\n    printf(\"%d\\n\", n);\n    return 0;\n}',
-    traceExplanation:['scanf passed value not address → undefined behavior','Fix by passing &n so scanf can store input'], 
-    lineExplanations:[
-      {line:4, code:'scanf("%d", n);', meaning:'Incorrect: passes value not address.'}
-    ],
-    keyConcepts:['Use & with scanf for non-array variables'], commonMistake:'Omitting &', tags:['basics','io','debug']
-  },
+    {
+      id:4, title:'Chapter 4: Functions & Pointers', tag:'functions',
+      lessons:[
+        {
+          id:'4-1', title:'Function Syntax & Return Types',
+          theory:'Functions encapsulate logic; declare return type and parameters.',
+          analogy:'Functions are machines: feed inputs, get outputs.',
+          syntax:'int add(int a,int b){return a+b;}',
+          proTips:['Keep functions small and focused'],
+          visualExamples:[],
+          practice:[{type:'predict', prompt:'add(2,3) returns?', answer:'5'}]
+        },
+        {
+          id:'4-2', title:'Pass-by-value vs Pass-by-reference',
+          theory:'C passes by value; use pointers to modify caller variables.',
+          analogy:'Passing a copy vs giving the address to edit original.',
+          syntax:'void inc(int *p){*p = *p + 1;}',
+          proTips:['Use & to pass address, * to dereference'],
+          visualExamples:[{code:'int a=5; inc(&a); // a becomes 6', trace:['inc receives address, increments value at address']}],
+          practice:[{type:'predict', prompt:'After inc(&a) where a=5, what is a?', answer:'6'}]
+        },
+        {
+          id:'4-3', title:'Pointer Basics & Arithmetic',
+          theory:'Pointers store addresses; pointer arithmetic moves by element size.',
+          analogy:'Pointer is a sticky note with an address.',
+          syntax:'int *p = &x; *(p+1) accesses next element',
+          proTips:['Pointer arithmetic depends on type size'],
+          visualExamples:[],
+          practice:[{type:'predict', prompt:'*(p+1) for int a[]={10,20,30}; p=a; prints?', answer:'20'}]
+        },
+        {
+          id:'4-4', title:'Recursion Basics',
+          theory:'Recursion solves problems by calling function itself with smaller input; needs base case.',
+          analogy:'Climbing down stairs until ground floor.',
+          syntax:'int fact(int n){ if(n==0) return 1; return n*fact(n-1);} ',
+          proTips:['Ensure base case to avoid infinite recursion'],
+          visualExamples:[],
+          practice:[{type:'predict', prompt:'fact(4) returns?', answer:'24'}]
+        }
+      ]
+    },
 
-  /* 6 */ {
-    id:6, type:'predict', topic:'Modulus Operator', concept:'% returns remainder.',
-    analogy:'Leftover candies after dividing into piles.',
-    code:'#include <stdio.h>\n\nint main() {\n    int a = 17;\n    int r = a % 5;\n    printf(\"%d\\n\", r);\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'2',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['17 % 5 = 2','printf prints 2'], 
-    lineExplanations:[
-      {line:4, code:'int r = a % 5;', meaning:'Remainder of a/5.'}
-    ],
-    keyConcepts:['% is remainder operator'], commonMistake:'Confusing with division', tags:['basics','operators','easy']
-  },
+    {
+      id:5, title:'Chapter 5: Arrays & Strings', tag:'arrays',
+      lessons:[
+        {
+          id:'5-1', title:'1D Arrays & Indexing',
+          theory:'Arrays are sequences indexed from 0.',
+          analogy:'Row of boxes numbered from 0.',
+          syntax:'int a[3] = {2,4,6}; a[1] is 4',
+          proTips:['Avoid out-of-bounds access'],
+          visualExamples:[],
+          practice:[{type:'predict', prompt:'a[1] for {2,4,6}?', answer:'4'}]
+        },
+        {
+          id:'5-2', title:'Strings & Null Terminator',
+          theory:'Strings are char arrays ending with \\0.',
+          analogy:'Stop sign at end of chain.',
+          syntax:'char s[] = "hi"; // h i \\0',
+          proTips:['strlen counts before \\0'],
+          visualExamples:[],
+          practice:[{type:'predict', prompt:'strlen("hi")?', answer:'2'}]
+        },
+        {
+          id:'5-3', title:'string.h Functions',
+          theory:'Use strlen, strcpy, strcat for common string ops.',
+          analogy:'Library of helpers for strings.',
+          syntax:'#include <string.h>',
+          proTips:['Ensure destination buffers are large enough'],
+          visualExamples:[],
+          practice:[{type:'mcq', prompt:'Which copies strings?', options:['strlen','strcpy','strcmp','strcat'], answer:'strcpy'}]
+        },
+        {
+          id:'5-4', title:'2D Arrays / Matrices',
+          theory:'2D arrays are arrays of arrays with row/column indexing.',
+          analogy:'Spreadsheet rows and columns.',
+          syntax:'int m[2][2] = {{1,2},{3,4}}; m[1][0] is 3',
+          proTips:['Remember row-major order in C'],
+          visualExamples:[],
+          practice:[{type:'predict', prompt:'m[1][0] for {{1,2},{3,4}}?', answer:'3'}]
+        }
+      ]
+    },
 
-  /* 7 */ {
-    id:7, type:'predict', topic:'Typecasting', concept:'Casting float to int truncates decimals.',
-    analogy:'Pouring from wide cup to small cup spills fraction.',
-    code:'#include <stdio.h>\n\nint main() {\n    float f = 5.9;\n    int x = (int)f;\n    printf(\"%d\\n\", x);\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'5',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['(int)5.9 → 5','printf prints 5'], 
-    lineExplanations:[
-      {line:4, code:'int x = (int)f;', meaning:'Truncates fractional part.'}
-    ],
-    keyConcepts:['Casting truncates'], commonMistake:'Expecting rounding', tags:['basics','types','medium']
-  },
-
-  /* 8 */ {
-    id:8, type:'predict', topic:'Operator Precedence', concept:'* and / before + and -.',
-    analogy:'BODMAS order.',
-    code:'#include <stdio.h>\n\nint main() {\n    int a = 2 + 3 * 4;\n    printf(\"%d\\n\", a);\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'14',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['3*4=12; 2+12=14','printf prints 14'], 
-    lineExplanations:[
-      {line:4, code:'int a = 2 + 3 * 4;', meaning:'Multiplication before addition.'}
-    ],
-    keyConcepts:['Operator precedence'], commonMistake:'Left-to-right without precedence', tags:['basics','operators','easy']
-  },
-
-  /* 9 */ {
-    id:9, type:'predict', topic:'Char & ASCII', concept:'char stores character and ASCII code.',
-    analogy:'A char is a tiny box holding a letter with numeric code.',
-    code:'#include <stdio.h>\n\nint main() {\n    char c = \'a\';\n    printf(\"%c %d\\n\", c, c);\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'a 97',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['c=\'a\' (ASCII 97)','printf prints a and 97'], 
-    lineExplanations:[
-      {line:4, code:'char c = \'a\';', meaning:'Stores character a.'}
-    ],
-    keyConcepts:['char is numeric under the hood'], commonMistake:'Thinking char is string', tags:['basics','char','easy']
-  },
-
-  /* 10 */ {
-    id:10, type:'mcq', topic:'if statement', concept:'if executes block when condition true.',
-    analogy:'A gate that opens only when condition satisfied.',
-    code:'',
-    question:'Which condition is true in C?',
-    options:['0','1','-1','Both 1 and -1'],
-    correctAnswer:'Both 1 and -1',
-    starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['In C any non-zero is true; 1 and -1 are true'], 
-    lineExplanations:[],
-    keyConcepts:['Non-zero is true'], commonMistake:'Assuming only 1 is true', tags:['conditionals','mcq']
-  },
-
-  /* 11 */ {
-    id:11, type:'predict', topic:'Nested if-else', concept:'Nested checks allow multi-step decisions.',
-    analogy:'Checking nested doors.',
-    code:'#include <stdio.h>\n\nint main() {\n    int x = 0;\n    if (x > 0) {\n        printf(\"positive\\n\");\n    } else {\n        if (x == 0) printf(\"zero\\n\");\n        else printf(\"negative\\n\");\n    }\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'zero',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['x=0 → else → nested if x==0 true → prints zero'], 
-    lineExplanations:[
-      {line:4, code:'int x = 0;', meaning:'x initialized to 0.'}
-    ],
-    keyConcepts:['Nested ifs for multiple checks'], commonMistake:'Assuming else covers only one condition', tags:['conditionals','medium']
-  },
-
-  /* 12 */ {
-    id:12, type:'mcq', topic:'Ternary Operator', concept:'condition ? a : b',
-    analogy:'Quick decision: pick left if true else right.',
-    code:'',
-    question:'What does (a>0)?a:-a compute?',
-    options:['Absolute value of a','Sign of a','Negation of a','a squared'],
-    correctAnswer:'Absolute value of a',
-    starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['If a>0 returns a else -a → absolute value'], 
-    lineExplanations:[],
-    keyConcepts:['Ternary shorthand for if-else'], commonMistake:'Confusing order of ? and :', tags:['conditionals','mcq']
-  },
-
-  /* 13 */ {
-    id:13, type:'predict', topic:'switch statement', concept:'switch selects matching case.',
-    analogy:'Menu selection.',
-    code:'#include <stdio.h>\n\nint main() {\n    int x = 2;\n    switch(x) {\n        case 1: printf(\"one\\n\"); break;\n        case 2: printf(\"two\\n\"); break;\n        default: printf(\"other\\n\");\n    }\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'two',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['x=2 → case 2 matches → prints two'], 
-    lineExplanations:[
-      {line:5, code:'switch(x) {', meaning:'Begin switch.'}
-    ],
-    keyConcepts:['Use break to avoid fall-through'], commonMistake:'Forgetting break', tags:['conditionals','medium']
-  },
-
-  /* 14 */ {
-    id:14, type:'predict', topic:'Logical Operators', concept:'&& is AND, || is OR, ! negates.',
-    analogy:'AND needs both keys; OR accepts either.',
-    code:'#include <stdio.h>\n\nint main() {\n    int a = 5, b = 10;\n    if (a < 10 && b > 5) printf(\"ok\\n\");\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'ok',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['a<10 true and b>5 true → prints ok'], 
-    lineExplanations:[
-      {line:4, code:'int a = 5, b = 10;', meaning:'Declare a and b.'}
-    ],
-    keyConcepts:['&& requires both true','|| requires one true'], commonMistake:'Using & instead of &&', tags:['conditionals','operators','medium']
-  },
-
-  /* 15 */ {
-    id:15, type:'predict', topic:'Relational Operators', concept:'== checks equality and returns 0 or 1.',
-    analogy:'They answer true or false.',
-    code:'#include <stdio.h>\n\nint main() {\n    int x = 4;\n    printf(\"%d\\n\", x == 4);\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'1',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['x==4 true → prints 1'], 
-    lineExplanations:[
-      {line:4, code:'int x = 4;', meaning:'x set to 4.'}
-    ],
-    keyConcepts:['== compares values'], commonMistake:'Using = instead of ==', tags:['conditionals','easy']
-  },
-
-  /* 16 */ {
-    id:16, type:'predict', topic:'Even/Odd Practical', concept:'Use % to check parity.',
-    analogy:'If remainder 0 it fits into pairs.',
-    code:'#include <stdio.h>\n\nint main() {\n    int n = 7;\n    if (n % 2 == 0) printf(\"even\\n\");\n    else printf(\"odd\\n\");\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'odd',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['7%2=1 → odd printed'], 
-    lineExplanations:[
-      {line:4, code:'int n = 7;', meaning:'n set to 7.'}
-    ],
-    keyConcepts:['% 2 checks parity'], commonMistake:'Using / instead of %', tags:['conditionals','practical','easy']
-  },
-
-  /* 17 */ {
-    id:17, type:'predict', topic:'for loop', concept:'for(init;cond;inc) controls iterations.',
-    analogy:'Recipe step repeated for each ingredient.',
-    code:'#include <stdio.h>\n\nint main() {\n    for (int i = 0; i < 3; i++) {\n        printf(\"%d \", i);\n    }\n    printf(\"\\n\");\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'0 1 2',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['i=0 prints 0','i=1 prints 1','i=2 prints 2'], 
-    lineExplanations:[
-      {line:4, code:'for (int i = 0; i < 3; i++) {', meaning:'Loop i from 0 to 2.'}
-    ],
-    keyConcepts:['Loop boundaries','i++ increments after iteration'], commonMistake:'Off-by-one errors', tags:['loops','for','easy']
-  },
-
-  /* 18 */ {
-    id:18, type:'predict', topic:'while loop', concept:'while checks condition before each iteration.',
-    analogy:'Keep doing until condition false.',
-    code:'#include <stdio.h>\n\nint main() {\n    int i = 0;\n    while (i < 3) {\n        printf(\"%d \", i);\n        i++;\n    }\n    printf(\"\\n\");\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'0 1 2',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['i increments from 0 to 2 printing each'], 
-    lineExplanations:[
-      {line:5, code:'while (i < 3) {', meaning:'Loop while i<3.'}
-    ],
-    keyConcepts:['Ensure loop variable changes to avoid infinite loop'], commonMistake:'Forgetting increment', tags:['loops','while','easy']
-  },
-
-  /* 19 */ {
-    id:19, type:'predict', topic:'do-while', concept:'do-while runs body at least once.',
-    analogy:'Try once then decide to repeat.',
-    code:'#include <stdio.h>\n\nint main() {\n    int i = 0;\n    do {\n        printf(\"%d \", i);\n        i++;\n    } while (i < 1);\n    printf(\"\\n\");\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'0',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['Body runs once printing 0 then condition false'], 
-    lineExplanations:[
-      {line:5, code:'do {', meaning:'Body runs before condition check.'}
-    ],
-    keyConcepts:['do-while guarantees one execution'], commonMistake:'Expecting condition checked first', tags:['loops','do-while','medium']
-  },
-
-  /* 20 */ {
-    id:20, type:'predict', topic:'break & continue', concept:'break exits loop; continue skips to next iteration.',
-    analogy:'break leaves the room; continue skips this turn.',
-    code:'#include <stdio.h>\n\nint main() {\n    for (int i=0;i<5;i++){\n        if (i==3) break;\n        if (i==1) continue;\n        printf(\"%d\", i);\n    }\n    printf(\"\\n\");\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'0 2',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['i=0 prints 0','i=1 continue skip','i=2 prints 2','i=3 break exit'], 
-    lineExplanations:[
-      {line:5, code:'if (i==3) break;', meaning:'Exit loop when i==3.'}
-    ],
-    keyConcepts:['break stops loop','continue skips iteration'], commonMistake:'Expecting continue to stop loop', tags:['loops','control','medium']
-  },
-
-  /* 21 */ {
-    id:21, type:'predict', topic:'Factorial', concept:'Use loop to multiply sequence.',
-    analogy:'Multiply chain of numbers.',
-    code:'#include <stdio.h>\n\nint main() {\n    int n = 4;\n    int fact = 1;\n    for (int i = 1; i <= n; i++) fact *= i;\n    printf(\"%d\\n\", fact);\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'24',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['fact accumulates 1*2*3*4=24'], 
-    lineExplanations:[
-      {line:6, code:'for (int i = 1; i <= n; i++) fact *= i;', meaning:'Multiply fact by i each iteration.'}
-    ],
-    keyConcepts:['Accumulator pattern'], commonMistake:'Starting i at 0', tags:['loops','practical','medium']
-  },
-
-  /* 22 */ {
-    id:22, type:'predict', topic:'Function basics', concept:'Functions take inputs and return outputs.',
-    analogy:'Functions are machines: feed inputs, get outputs.',
-    code:'#include <stdio.h>\n\nint add(int a, int b) { return a + b; }\n\nint main() {\n    printf(\"%d\\n\", add(2,3));\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'5',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['add(2,3) returns 5 printed'], 
-    lineExplanations:[
-      {line:1, code:'#include <stdio.h>', meaning:'printf available.'}
-    ],
-    keyConcepts:['Functions encapsulate logic'], commonMistake:'Confusing parameter names with globals', tags:['functions','easy']
-  },
-
-  /* 23 */ {
-    id:23, type:'predict', topic:'Pass-by-value vs reference', concept:'C passes by value; use pointers to modify caller.',
-    analogy:'Passing a copy vs giving the address to edit original.',
-    code:'#include <stdio.h>\n\nvoid inc(int x) { x = x + 1; }\nvoid incRef(int *p) { *p = *p + 1; }\n\nint main() {\n    int a = 5;\n    inc(a);\n    incRef(&a);\n    printf(\"%d\\n\", a);\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'6',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['inc(a) does not change a','incRef(&a) increments original a to 6'], 
-    lineExplanations:[
-      {line:1, code:'void inc(int x) { x = x + 1; }', meaning:'Modifies local copy.'},
-      {line:2, code:'void incRef(int *p) { *p = *p + 1; }', meaning:'Modifies value at address.'}
-    ],
-    keyConcepts:['Pass-by-value vs pointers'], commonMistake:'Expecting pass-by-value to change caller', tags:['functions','pointers','medium']
-  },
-
-  /* 24 */ {
-    id:24, type:'predict', topic:'Pointer basics', concept:'Pointers store addresses; * dereferences.',
-    analogy:'Pointer is a sticky note with an address.',
-    code:'#include <stdio.h>\n\nint main() {\n    int x = 10;\n    int *p = &x;\n    printf(\"%d %d\\n\", x, *p);\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'10 10',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['p points to x; *p reads 10'], 
-    lineExplanations:[
-      {line:5, code:'int *p = &x;', meaning:'p stores address of x.'}
-    ],
-    keyConcepts:['& gets address','* dereferences pointer'], commonMistake:'Confusing pointer type', tags:['pointers','basics','medium']
-  },
-
-  /* 25 */ {
-    id:25, type:'predict', topic:'1D arrays', concept:'Arrays indexed from 0.',
-    analogy:'Row of boxes numbered from 0.',
-    code:'#include <stdio.h>\n\nint main() {\n    int a[3] = {2,4,6};\n    printf(\"%d\\n\", a[1]);\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'4',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['a[1] is second element 4'], 
-    lineExplanations:[
-      {line:4, code:'int a[3] = {2,4,6};', meaning:'Array with three elements.'}
-    ],
-    keyConcepts:['Indexing starts at 0'], commonMistake:'Thinking arrays start at 1', tags:['arrays','basics','easy']
-  },
-
-  /* 26 */ {
-    id:26, type:'predict', topic:'Strings & null terminator', concept:'Strings end with \\0.',
-    analogy:'Stop sign at end of chain.',
-    code:'#include <stdio.h>\n#include <string.h>\n\nint main() {\n    char s[] = \"hi\";\n    printf(\"%zu %c\\n\", strlen(s), s[1]);\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'2 i',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['strlen(s)=2; s[1]=i'], 
-    lineExplanations:[
-      {line:5, code:'char s[] = \"hi\";', meaning:'Stores h,i,\\0.'}
-    ],
-    keyConcepts:['\\0 terminator','strlen counts before \\0'], commonMistake:'Expecting \\0 counted', tags:['strings','arrays','medium']
-  },
-
-  /* 27 */ {
-    id:27, type:'predict', topic:'2D arrays', concept:'Rows and columns indexing.',
-    analogy:'Spreadsheet rows and columns.',
-    code:'#include <stdio.h>\n\nint main() {\n    int m[2][2] = {{1,2},{3,4}};\n    printf(\"%d\\n\", m[1][0]);\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'3',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['m[1][0] is 3'], 
-    lineExplanations:[
-      {line:4, code:'int m[2][2] = {{1,2},{3,4}};', meaning:'2x2 matrix.'}
-    ],
-    keyConcepts:['a[row][col] indexing'], commonMistake:'Mixing row/col', tags:['arrays','2d','medium']
-  },
-
-  /* 28 */ {
-    id:28, type:'predict', topic:'struct basics', concept:'struct groups related fields.',
-    analogy:'Form with labeled fields.',
-    code:'#include <stdio.h>\n\nstruct Point { int x; int y; };\n\nint main(){\n    struct Point p = {3,4};\n    printf(\"%d %d\\n\", p.x, p.y);\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'3 4',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['p.x=3 p.y=4 printed'], 
-    lineExplanations:[
-      {line:2, code:'struct Point { int x; int y; };', meaning:'Defines struct type.'}
-    ],
-    keyConcepts:['struct groups fields'], commonMistake:'Forgetting semicolon after struct', tags:['structs','basics','medium']
-  },
-
-  /* 29 */ {
-    id:29, type:'predict', topic:'File I/O basics', concept:'fopen, fprintf, fclose basics.',
-    analogy:'Open notebook, write, close.',
-    code:'#include <stdio.h>\n\nint main(){\n    FILE *f = fopen(\"tmp.txt\",\"w\");\n    if(f){ fprintf(f, \"%d\", 9); fclose(f); }\n    printf(\"%d\\n\", 9);\n    return 0;\n}',
-    question:'What will this program print (ignore file)?',
-    correctAnswer:'9',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['Writes 9 to file then prints 9'], 
-    lineExplanations:[
-      {line:3, code:'FILE *f = fopen("tmp.txt","w");', meaning:'Open file for writing.'}
-    ],
-    keyConcepts:['Check fopen result','fclose when done'], commonMistake:'Not checking fopen', tags:['io','advanced','medium']
-  },
-
-  /* 30 */ {
-    id:30, type:'predict', topic:'Dynamic memory', concept:'malloc allocates memory; free releases it.',
-    analogy:'Rent a box from warehouse and return it.',
-    code:'#include <stdio.h>\n#include <stdlib.h>\n\nint main(){\n    int *p = malloc(sizeof(int));\n    *p = 11;\n    printf(\"%d\\n\", *p);\n    free(p);\n    return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'11',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['malloc allocates memory; *p=11; prints 11; free releases memory'], 
-    lineExplanations:[
-      {line:5, code:'int *p = malloc(sizeof(int));', meaning:'Allocate memory for one int.'}
-    ],
-    keyConcepts:['malloc and free'], commonMistake:'Using memory after free', tags:['memory','advanced','medium']
-  },
-
-  /* 31 */ {
-    id:31, type:'mcq', topic:'Integer division', concept:'Integer division truncates decimals.',
-    analogy:'Pouring water into integer cup spills fraction.',
-    code:'',
-    question:'What is result of 5/2 in C when both are ints?',
-    options:['2.5','2','3','0'],
-    correctAnswer:'2',
-    starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['Integer division truncates fractional part → 2'], 
-    lineExplanations:[],
-    keyConcepts:['Integer division truncates'], commonMistake:'Expecting 2.5', tags:['basics','operators','mcq']
-  },
-
-  /* 32 */ {
-    id:32, type:'code-complete', topic:'Pattern printing (triangle)', concept:'Nested loops for patterns.',
-    analogy:'Printer head moves row by row.',
-    code:'for(int i=1; i<=4; i++) {\n  for(int j=1; j<=i; j++) {\n    printf(\"*\");\n  }\n  printf(\"\\n\");\n}',
-    question:'Fill the blank: inner loop condition should be ___ to print increasing stars.',
-    correctAnswer:'j<=i',
-    options:[], starterCode:'for(int i=1; i<=4; i++) { for(int j=1; j<=___; j++) { printf("*"); } printf("\\n"); }',
-    errorLocation:null, fixedCode:'',
-    traceExplanation:['i controls rows; j<=i prints i stars per row'], 
-    lineExplanations:[],
-    keyConcepts:['Outer loop rows, inner loop columns'], commonMistake:'Using j<=4 for rectangle', tags:['loops','pattern','code-complete']
-  },
-
-  /* 33 */ {
-    id:33, type:'error-find', topic:'Missing semicolon', concept:'Semicolons terminate statements.',
-    analogy:'Period at end of sentence.',
-    code:'#include <stdio.h>\n\nint main() {\n    int x = 5\n    printf(\"%d\\n\", x);\n    return 0;\n}',
-    question:'Find the syntax error.',
-    correctAnswer:'Missing semicolon after int x = 5',
-    options:[], starterCode:'', errorLocation:{line:4, description:'Missing semicolon after declaration'}, fixedCode:'#include <stdio.h>\n\nint main() {\n    int x = 5;\n    printf(\"%d\\n\", x);\n    return 0;\n}',
-    traceExplanation:['Line 4 missing ; causes compile error'], 
-    lineExplanations:[
-      {line:4, code:'int x = 5', meaning:'Missing semicolon at end of statement.'}
-    ],
-    keyConcepts:['Statements end with ;'], commonMistake:'Omitting semicolon', tags:['basics','syntax','debug']
-  },
-
-  /* 34 */ {
-    id:34, type:'free-response', topic:'Pointer arithmetic', concept:'Pointers can be incremented to traverse arrays.',
-    analogy:'Pointer moves to next box address.',
-    code:'#include <stdio.h>\n\nint main(){\n  int a[3] = {10,20,30};\n  int *p = a;\n  printf(\"%d\\n\", *(p+1));\n  return 0;\n}',
-    question:'Explain what *(p+1) prints and why.',
-    correctAnswer:'20',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['p points to a[0]; p+1 points to a[1] which is 20'], 
-    lineExplanations:[
-      {line:5, code:'int *p = a;', meaning:'Array decays to pointer to first element.'}
-    ],
-    keyConcepts:['Pointer arithmetic moves by element size'], commonMistake:'Thinking p+1 adds 1 byte', tags:['pointers','arrays','free']
-  },
-
-  /* 35 */ {
-    id:35, type:'predict', topic:'Post vs Pre increment', concept:'x++ returns old value then increments; ++x increments then returns.',
-    analogy:'Post-increment is like using then updating; pre-increment updates then uses.',
-    code:'#include <stdio.h>\n\nint main(){\n  int x = 5;\n  printf(\"%d %d\\n\", x++, ++x);\n  return 0;\n}',
-    question:'What will this program print?',
-    correctAnswer:'5 7',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['x++ yields 5 then x becomes 6; ++x increments to 7 and yields 7; prints 5 7'], 
-    lineExplanations:[
-      {line:4, code:'printf("%d %d\\n", x++, ++x);', meaning:'Demonstrates post and pre increment evaluation order.'}
-    ],
-    keyConcepts:['Post vs pre increment','Sequence points and undefined behavior caution'], commonMistake:'Assuming left-to-right evaluation always', tags:['operators','medium']
-  },
-
-  /* 36 */ {
-    id:36, type:'mcq', topic:'Char constants', concept:'Char constants are single characters in single quotes.',
-    analogy:'Single Scrabble tile.',
-    code:'',
-    question:'Which is NOT a valid char constant?',
-    options:["'A'","'\\n'","'ab'","'0'"],
-    correctAnswer:"'ab'",
-    starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['Char constant must be single character; \'ab\' is multi-character'], 
-    lineExplanations:[],
-    keyConcepts:['char single character only'], commonMistake:'Confusing strings and chars', tags:['basics','mcq','chars']
-  },
-
-  /* 37 */ {
-    id:37, type:'pattern', topic:'Pattern printing', concept:'Nested loops create triangular patterns.',
-    analogy:'Printer head moves rows and columns.',
-    code:'for(int i=1;i<=4;i++){\n  for(int j=1;j<=i;j++) printf(\"*\");\n  printf(\"\\n\");\n}',
-    question:'What pattern will this print?',
-    correctAnswer:'*\n**\n***\n****',
-    options:['****\n***\n**\n*','*\n**\n***\n****','*\n*\n*\n*','****\n****\n****\n****'],
-    starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['i=1 prints 1 star; i=2 prints 2; etc.'], 
-    lineExplanations:[],
-    keyConcepts:['Outer loop rows, inner loop columns'], commonMistake:'Confusing <=i with <=n', tags:['loops','pattern','visual']
-  },
-
-  /* 38 */ {
-    id:38, type:'error-find', topic:'Format specifier mismatch', concept:'Use correct printf specifier for types.',
-    analogy:'Using wrong label on a box.',
-    code:'#include <stdio.h>\n\nint main(){\n  float f = 3.14;\n  printf(\"%d\\n\", f);\n  return 0;\n}',
-    question:'Find the bug and fix it.',
-    correctAnswer:'Use %f for float: printf("%f\\n", f);',
-    options:[], starterCode:'', errorLocation:{line:4, description:'Using %d for float'}, fixedCode:'#include <stdio.h>\n\nint main(){\n  float f = 3.14;\n  printf(\"%f\\n\", f);\n  return 0;\n}',
-    traceExplanation:['%d expects int; using %f prints float correctly'], 
-    lineExplanations:[
-      {line:4, code:'printf("%d\\n", f);', meaning:'Wrong specifier for float.'}
-    ],
-    keyConcepts:['Match format specifier to type'], commonMistake:'Using %d for floats', tags:['io','debug','medium']
-  },
-
-  /* 39 */ {
-    id:39, type:'code-complete', topic:'Array reverse', concept:'Reverse array by swapping ends.',
-    analogy:'Flip items from both ends towards center.',
-    code:'for(int i=0;i<n/2;i++){\n  int tmp = a[i];\n  a[i] = a[n-1-i];\n  a[n-1-i] = tmp;\n}',
-    question:'Fill blank: swap uses index n-1-i to access opposite element. What is blank? (n-1-i)',
-    correctAnswer:'n-1-i',
-    options:[], starterCode:'for(int i=0;i<n/2;i++){ int tmp = a[i]; a[i] = a[___]; a[___] = tmp; }',
-    errorLocation:null, fixedCode:'',
-    traceExplanation:['Swapping a[i] with a[n-1-i] reverses array'], 
-    lineExplanations:[],
-    keyConcepts:['Swap pattern for reverse'], commonMistake:'Off-by-one in index', tags:['arrays','code-complete','medium']
-  },
-
-  /* 40 */ {
-    id:40, type:'free-response', topic:'Recursion basics', concept:'Recursive function must have base case.',
-    analogy:'Climbing down stairs until you reach ground floor.',
-    code:'#include <stdio.h>\n\nint fact(int n){\n  if(n==0) return 1;\n  return n * fact(n-1);\n}\n\nint main(){\n  printf(\"%d\\n\", fact(4));\n  return 0;\n}',
-    question:'Explain the base case and recursive case for fact.',
-    correctAnswer:'Base case: n==0 returns 1. Recursive case: return n*fact(n-1) reduces problem size.',
-    options:[], starterCode:'', errorLocation:null, fixedCode:'',
-    traceExplanation:['fact(4)=4*fact(3)=4*3*fact(2)=...=24'], 
-    lineExplanations:[
-      {line:2, code:'if(n==0) return 1;', meaning:'Base case stops recursion.'}
-    ],
-    keyConcepts:['Base case and recursive reduction'], commonMistake:'Missing base case leads to infinite recursion', tags:['recursion','functions','advanced']
-  }
-
-]; // end questions array
-
-/* ===========================
-   State management
-   =========================== */
-
-const STORAGE_KEY = 'clt_elite_state_v1';
-
-let state = {
-  currentIndex: 0,
-  score: 0,
-  streak: 0,
-  answers: {}, // id -> {correct:boolean,attempts:number}
-  lastVisit: null,
-  mode: 'learn', // 'learn' or 'practice'
-  timerEnd: null
-};
-
-/* Load state from localStorage */
-function loadState(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw){
-      const parsed = JSON.parse(raw);
-      if(parsed && typeof parsed === 'object'){
-        state = Object.assign(state, parsed);
-      }
+    {
+      id:6, title:'Chapter 6: Structures & Advanced', tag:'structs',
+      lessons:[
+        {
+          id:'6-1', title:'struct Basics',
+          theory:'struct groups related fields into one type.',
+          analogy:'A form with labeled fields.',
+          syntax:'struct Point { int x; int y; };',
+          proTips:['Use typedef for convenience'],
+          visualExamples:[],
+          practice:[{type:'predict', prompt:'p.x for Point p={3,4}?', answer:'3'}]
+        },
+        {
+          id:'6-2', title:'typedef & Nested structs',
+          theory:'typedef creates alias; structs can nest other structs.',
+          analogy:'Named templates for grouped data.',
+          syntax:'typedef struct {int x; int y;} Point;',
+          proTips:['Use clear names for readability'],
+          visualExamples:[],
+          practice:[{type:'mcq', prompt:'What does typedef do?', options:['Creates alias','Allocates memory','Defines function','None'], answer:'Creates alias'}]
+        },
+        {
+          id:'6-3', title:'File I/O Basics',
+          theory:'Use fopen, fprintf, fscanf to read/write files.',
+          analogy:'Open notebook, write, close.',
+          syntax:'FILE *f = fopen("out.txt","w"); fprintf(f,"%d",9); fclose(f);',
+          proTips:['Always check fopen result'],
+          visualExamples:[],
+          practice:[{type:'predict', prompt:'What prints if printf("%d",9); executed?', answer:'9'}]
+        },
+        {
+          id:'6-4', title:'Dynamic Memory: malloc & free',
+          theory:'malloc allocates memory at runtime; free releases it.',
+          analogy:'Rent a box from warehouse and return it.',
+          syntax:'int *p = malloc(sizeof(int)); *p=11; free(p);',
+          proTips:['Avoid use-after-free and memory leaks'],
+          visualExamples:[],
+          practice:[{type:'predict', prompt:'What prints for *p after *p=11?', answer:'11'}]
+        }
+      ]
     }
-  }catch(e){
-    console.warn('loadState error', e);
-  }
-}
+  ];
 
-/* Save state */
-function saveState(){
-  try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }catch(e){
-    console.warn('saveState error', e);
-  }
-}
+  /* -------------------------
+     State & Persistence
+     ------------------------- */
 
-/* Update streak based on lastVisit */
-function updateStreakOnLoad(){
-  try{
-    const today = new Date().toDateString();
-    if(state.lastVisit !== today){
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate()-1);
-      if(state.lastVisit === yesterday.toDateString()){
-        state.streak = (state.streak || 0) + 1;
-      } else {
-        state.streak = 1;
+  const STORAGE_KEY = 'cacademy_state_v1';
+  let state = {
+    currentChapter: 1,
+    currentLessonId: null,
+    xp: 0,
+    level: 1,
+    gold: 0,
+    streak: 0,
+    lastVisit: null,
+    badges: [],
+    answers: {}, // lessonId -> {attempts, correct}
+    mode: 'adventure' // or practice/review
+  };
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        if(parsed && typeof parsed === 'object'){
+          state = Object.assign(state, parsed);
+        }
       }
-      state.lastVisit = today;
+    }catch(e){
+      console.warn('loadState error', e);
+    }
+  }
+  function saveState(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      renderStatus();
+    }catch(e){
+      console.warn('saveState error', e);
+    }
+  }
+
+  function resetState(){
+    if(!confirm('Reset all progress?')) return;
+    state = {
+      currentChapter:1,currentLessonId:null,xp:0,level:1,gold:0,streak:0,lastVisit:null,badges:[],answers:{},mode:'adventure'
+    };
+    saveState();
+    renderAll();
+  }
+
+  function exportState(){
+    try{
+      const data = JSON.stringify(state, null, 2);
+      const blob = new Blob([data], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'cacademy_progress.json';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    }catch(e){
+      alert('Export failed');
+    }
+  }
+
+  /* Streak logic */
+  function updateStreak(){
+    const today = new Date().toDateString();
+    if(state.lastVisit === today) return;
+    const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+    if(state.lastVisit === yesterday.toDateString()){
+      state.streak = (state.streak || 0) + 1;
+    } else {
+      state.streak = 1;
+    }
+    state.lastVisit = today;
+    saveState();
+  }
+
+  /* XP & Level */
+  function addXP(amount){
+    state.xp = (state.xp || 0) + amount;
+    // level up every 100 XP
+    const newLevel = Math.floor(state.xp / 100) + 1;
+    if(newLevel > state.level){
+      state.level = newLevel;
+      state.gold = (state.gold || 0) + 10 * (newLevel - state.level + 1);
+      // award level badge
+      awardBadge('Level ' + newLevel);
+    }
+    saveState();
+  }
+
+  function awardBadge(name){
+    if(!state.badges.includes(name)){
+      state.badges.push(name);
       saveState();
     }
-  }catch(e){}
-}
+  }
 
-/* Reset progress */
-function resetProgress(){
-  if(confirm('Reset progress and streak?')){
-    state = {currentIndex:0, score:0, streak:0, answers:{}, lastVisit:null, mode:'learn', timerEnd:null};
+  /* -------------------------
+     Rendering
+     ------------------------- */
+
+  const el = id => document.getElementById(id);
+
+  function renderWorldMap(){
+    const container = el('worldMap');
+    container.innerHTML = '';
+    curriculum.forEach(ch=>{
+      const div = document.createElement('div');
+      div.className = 'chapter';
+      div.tabIndex = 0;
+      div.innerHTML = `<div style="font-weight:800">${ch.title}</div><div class="small muted">${ch.lessons.length} lessons</div>`;
+      div.addEventListener('click', ()=>{ openChapter(ch.id); });
+      container.appendChild(div);
+    });
+  }
+
+  function openChapter(chapterId){
+    state.currentChapter = chapterId;
+    // default to first lesson
+    const ch = curriculum.find(c=>c.id===chapterId);
+    if(ch && ch.lessons && ch.lessons.length) state.currentLessonId = ch.lessons[0].id;
     saveState();
-    render();
-  }
-}
-
-/* Export progress as JSON */
-function exportProgress(){
-  const data = JSON.stringify(state, null, 2);
-  const blob = new Blob([data], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'clt_progress.json';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-}
-
-/* ===========================
-   Utility helpers
-   =========================== */
-
-const el = id => document.getElementById(id);
-
-function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
-
-/* Normalize user input for comparison */
-function normalizeAnswer(s){
-  if(typeof s !== 'string') return '';
-  return s.trim().toLowerCase().replace(/,/g,' ').replace(/\s+/g,' ').replace(/\n/g,' ').trim();
-}
-
-/* Compare answers for different types */
-function validateAnswer(question, userAnswer){
-  const type = question.type;
-  if(type === 'mcq'){
-    return userAnswer === question.correctAnswer;
-  }
-  if(type === 'predict' || type === 'free-response'){
-    return isAnswerCorrect(userAnswer, question.correctAnswer);
-  }
-  if(type === 'code-complete'){
-    return normalizeAnswer(userAnswer) === normalizeAnswer(question.correctAnswer);
-  }
-  if(type === 'error-find'){
-    // Accept if user mentions the key phrase or line number
-    const ua = normalizeAnswer(userAnswer);
-    if(question.errorLocation && ua.includes(String(question.errorLocation.line))) return true;
-    if(question.correctAnswer && ua.includes(normalizeAnswer(question.correctAnswer))) return true;
-    return false;
-  }
-  return false;
-}
-
-/* Flexible matching for predict answers */
-function isAnswerCorrect(userRaw, correctRaw){
-  const u = normalizeAnswer(userRaw);
-  const c = normalizeAnswer(correctRaw);
-  if(u === c) return true;
-  const uTokens = u.split(' ').filter(Boolean);
-  const cTokens = c.split(' ').filter(Boolean);
-  if(uTokens.length === cTokens.length){
-    let allMatch = true;
-    for(let i=0;i<uTokens.length;i++){
-      if(uTokens[i] !== cTokens[i]) { allMatch = false; break; }
-    }
-    if(allMatch) return true;
-  }
-  return false;
-}
-
-/* ===========================
-   Static analysis engine (heuristic)
-   Returns array of {line,type,message}
-   =========================== */
-
-function analyzeCode(code){
-  const issues = [];
-  if(!code || typeof code !== 'string') return issues;
-  const lines = code.split(/\r?\n/);
-  // Missing semicolon heuristic
-  lines.forEach((ln, idx)=>{
-    const t = ln.trim();
-    if(t.length === 0) return;
-    // ignore preprocessor and block starts/ends and comments
-    if(t.startsWith('#') || t.endsWith('{') || t.endsWith('}') || t.startsWith('//') || t.startsWith('/*') || t.endsWith('*/')) return;
-    // if line ends with alnum or ) but not ; then suspect missing semicolon
-    if(/[A-Za-z0-9\)\"]$/.test(t) && !t.endsWith(';') && !t.endsWith(')') && !t.includes('for(') && !t.includes('if(') && !t.includes('while(')){
-      // but avoid function headers like int main()
-      if(!/^\w+\s+\w+\s*\(.*\)\s*$/.test(t)){
-        issues.push({line: idx+1, type:'syntax', message:'Possible missing semicolon at end of statement.'});
-      }
-    }
-  });
-
-  // Unbalanced braces/parens
-  const openers = {'{':0,'(':0,'[':0};
-  for(let ch of code){
-    if(ch === '{') openers['{']++;
-    if(ch === '}') openers['{']--;
-    if(ch === '(') openers['(']++;
-    if(ch === ')') openers['(']--;
-    if(ch === '[') openers['[']++;
-    if(ch === ']') openers['[']--;
-  }
-  if(openers['{'] !== 0) issues.push({line:null,type:'syntax',message:'Unbalanced braces { } detected.'});
-  if(openers['('] !== 0) issues.push({line:null,type:'syntax',message:'Unbalanced parentheses ( ) detected.'});
-  if(openers['['] !== 0) issues.push({line:null,type:'syntax',message:'Unbalanced brackets [ ] detected.'});
-
-  // scanf missing & heuristic
-  if(/scanf\s*\(/.test(code)){
-    // find scanf lines
-    const re = /scanf\s*\(\s*["'][^"']*["']\s*,\s*([^\)]+)\)/g;
-    let m;
-    while((m = re.exec(code)) !== null){
-      const args = m[1];
-      // if args doesn't contain & and not an array (like s) then warn
-      if(!/&/.test(args) && !/\w+\s*\+\s*\d+/.test(args) && !/\"/.test(args)){
-        issues.push({line:null,type:'logic',message:'scanf likely missing & before variable (pass address).'});
-      }
-    }
+    renderAll();
   }
 
-  // Wrong format specifier heuristic: look for printf with %d and float var nearby
-  const varDecls = {};
-  lines.forEach((ln, idx)=>{
-    const m = ln.match(/(int|float|double|char)\s+([A-Za-z_]\w*)/);
-    if(m) varDecls[m[2]] = m[1];
-  });
-  // find printf occurrences
-  const printfRe = /printf\s*\(\s*`[Looks like the result wasn't safe to show. Let's switch things up and try something else!]`["']\s*,\s*([^\)]+)\)/g;
-  let pm;
-  while((pm = printfRe.exec(code)) !== null){
-    const fmt = pm[1];
-    const args = pm[2].split(',').map(s=>s.trim());
-    const specs = (fmt.match(/%[0-9\.\-]*[dfcszu]/g) || []);
-    for(let i=0;i<specs.length;i++){
-      const spec = specs[i];
-      const arg = args[i] || '';
-      const varName = arg.replace(/[\*\&\(\)]/g,'').trim().split(/\s+/)[0];
-      if(varName && varDecls[varName]){
-        const vtype = varDecls[varName];
-        if(spec.endsWith('d') && (vtype === 'float' || vtype === 'double')) {
-          issues.push({line:null,type:'logic',message:`Format specifier %d used for ${vtype} variable ${varName}. Use %f.`});
-        }
-        if(spec.endsWith('f') && vtype === 'int'){
-          issues.push({line:null,type:'logic',message:`Format specifier %f used for int variable ${varName}. Use %d.`});
-        }
-      }
-    }
+  function renderAll(){
+    renderWorldMap();
+    renderContent();
+    renderRightPanel();
+    renderStatus();
   }
 
-  // Common typos
-  const typos = ['prinft','scanff','retun','intg','floatt'];
-  typos.forEach(t=>{
-    if(code.includes(t)) issues.push({line:null,type:'typo',message:`Possible typo detected: ${t}`});
-  });
-
-  // Infinite loop risk
-  if(/while\s*\(\s*1\s*\)|while\s*\(\s*true\s*\)|for\s*\(\s*;\s*;\s*\)/i.test(code)){
-    issues.push({line:null,type:'logic',message:'Potential infinite loop detected (no exit condition).'});
-  }
-
-  // Assignment vs equality in condition
-  if(/if\s*\(.*=[^=].*\)/.test(code)){
-    issues.push({line:null,type:'logic',message:'Assignment (=) used in conditional; did you mean == ?'});
-  }
-
-  return issues;
-}
-
-/* ===========================
-   Rendering functions
-   =========================== */
-
-function render(){
-  const total = questions.length;
-  const idx = state.currentIndex;
-  if(idx >= total){
-    showCompletion();
-    return;
-  }
-  const q = questions[idx];
-  // Header
-  el('progressText').textContent = `Question ${idx+1} of ${total}`;
-  el('scoreText').textContent = `Score: ${state.score}`;
-  el('progressFill').style.width = `${Math.round(((idx)/total)*100)}%`;
-  el('topicTitle').textContent = q.topic;
-  el('conceptText').textContent = q.concept;
-  el('analogyText').textContent = q.analogy;
-  el('tagList').textContent = (q.tags || []).join(', ');
-  el('codeArea').textContent = q.code || '// No code for this question';
-  el('snippetInfo').textContent = `ID ${q.id} • ${q.type}`;
-  el('typeLabel').textContent = q.type;
-  el('hintBox').textContent = q.commonMistake || '';
-  el('streakBadge').textContent = `Streak: ${state.streak || 0}`;
-  // line explanations
-  const show = el('toggleLines').checked;
-  el('lineExplanationsWrap').style.display = show ? 'block' : 'none';
-  const tbody = el('lineTableBody');
-  tbody.innerHTML = '';
-  (q.lineExplanations || []).forEach(item=>{
-    const tr = document.createElement('tr');
-    const tdLine = document.createElement('td'); tdLine.textContent = item.line;
-    const tdCode = document.createElement('td'); tdCode.textContent = item.code;
-    const tdMeaning = document.createElement('td'); tdMeaning.textContent = item.meaning;
-    tr.appendChild(tdLine); tr.appendChild(tdCode); tr.appendChild(tdMeaning);
-    tbody.appendChild(tr);
-  });
-
-  // Interaction area
-  renderInteraction(q);
-  // Right panel stats
-  el('currentQ').textContent = idx+1;
-  el('totalQ').textContent = total;
-  el('correctQ').textContent = state.score;
-  el('streak').textContent = state.streak || 0;
-  el('accuracyBadge').textContent = `Accuracy: ${computeAccuracy()}%`;
-  el('modeLabel').textContent = state.mode === 'practice' ? 'Practice' : 'Learn';
-  el('timerDisplay').textContent = state.mode === 'practice' ? formatTimerRemaining() : '--';
-}
-
-/* Compute accuracy */
-function computeAccuracy(){
-  const answered = Object.values(state.answers || {});
-  if(answered.length === 0) return 0;
-  const correct = answered.filter(a=>a.correct).length;
-  return Math.round((correct/answered.length)*100);
-}
-
-/* Render interaction UI based on question type */
-function renderInteraction(q){
-  const area = el('interactionArea');
-  area.innerHTML = '';
-  el('resultSection').style.display = 'none';
-  el('completion').style.display = 'none';
-
-  const container = document.createElement('div');
-  container.className = 'card';
-  const title = document.createElement('div');
-  title.style.display='flex'; title.style.justifyContent='space-between'; title.style.alignItems='center';
-  const qText = document.createElement('div'); qText.innerHTML = `<strong>${q.question}</strong>`;
-  const hint = document.createElement('div'); hint.className='small'; hint.textContent = q.tags ? q.tags.join(', ') : '';
-  title.appendChild(qText); title.appendChild(hint);
-  container.appendChild(title);
-
-  const body = document.createElement('div'); body.style.marginTop='10px';
-  // Different types
-  if(q.type === 'predict'){
-    const label = document.createElement('label'); label.className='predict'; label.textContent = 'What will this program print/output?';
-    const input = document.createElement('input'); input.className='input'; input.id='predictInput'; input.placeholder='Type exact output, e.g., 6 5 or Error';
-    input.autocomplete='off';
-    body.appendChild(label); body.appendChild(input);
-    const actions = document.createElement('div'); actions.className='actions-row'; actions.style.marginTop='8px';
-    const checkBtn = document.createElement('button'); checkBtn.className='btn primary'; checkBtn.id='checkBtn'; checkBtn.textContent='Check Answer'; checkBtn.disabled=true;
-    const revealBtn = document.createElement('button'); revealBtn.className='btn'; revealBtn.id='revealBtn'; revealBtn.textContent='Reveal Answer';
-    actions.appendChild(checkBtn); actions.appendChild(revealBtn);
-    body.appendChild(actions);
-    container.appendChild(body);
-    area.appendChild(container);
-
-    // events
-    input.addEventListener('input', (e)=>{ checkBtn.disabled = e.target.value.trim().length === 0; });
-    setupEditorShortcuts(input);
-    checkBtn.addEventListener('click', ()=>{ handleCheck(q, input.value); });
-    revealBtn.addEventListener('click', ()=>{ input.value = q.correctAnswer; checkBtn.disabled=false; el('hintBox').textContent='Answer revealed'; });
-  }
-  else if(q.type === 'mcq'){
-    const form = document.createElement('div');
-    (q.options || []).forEach((opt, i)=>{
-      const row = document.createElement('div'); row.style.display='flex'; row.style.alignItems='center'; row.style.gap='8px'; row.style.marginBottom='8px';
-      const radio = document.createElement('input'); radio.type='radio'; radio.name='mcq'; radio.value=opt; radio.id='opt'+i;
-      const label = document.createElement('label'); label.htmlFor='opt'+i; label.textContent=opt;
-      row.appendChild(radio); row.appendChild(label);
-      form.appendChild(row);
+  function renderStatus(){
+    el('xp').textContent = state.xp;
+    el('level').textContent = state.level;
+    el('gold').textContent = state.gold;
+    el('streak').textContent = state.streak;
+    el('xpSmall').textContent = state.xp;
+    el('levelSmall').textContent = state.level;
+    const xpPct = Math.min(100, (state.xp % 100));
+    el('xpFill').style.width = xpPct + '%';
+    el('progressPercent').textContent = Math.round(computeProgress()) + '%';
+    // badges
+    const badges = el('badges'); badges.innerHTML = '';
+    state.badges.forEach(b=>{
+      const d = document.createElement('div'); d.className='badge'; d.textContent = b; badges.appendChild(d);
     });
-    const actions = document.createElement('div'); actions.className='actions-row';
+  }
+
+  function computeProgress(){
+    const totalLessons = curriculum.reduce((s,c)=>s+c.lessons.length,0);
+    const done = Object.keys(state.answers).length;
+    return totalLessons ? (done/totalLessons)*100 : 0;
+  }
+
+  function renderRightPanel(){
+    const ch = curriculum.find(c=>c.id===state.currentChapter);
+    el('topicTag').textContent = ch ? ch.tag : '';
+    el('topicTitle').textContent = ch ? ch.title : 'Select a chapter';
+  }
+
+  /* -------------------------
+     Content rendering per tab
+     ------------------------- */
+
+  let activeTab = 'read';
+  function setActiveTab(tab){
+    activeTab = tab;
+    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+    renderContent();
+  }
+
+  function renderContent(){
+    const area = el('contentArea');
+    area.innerHTML = '';
+    const ch = curriculum.find(c=>c.id===state.currentChapter);
+    if(!ch){ area.innerHTML = '<div class="small">Select a chapter to begin.</div>'; return; }
+    const lesson = ch.lessons.find(l=>l.id===state.currentLessonId) || ch.lessons[0];
+    state.currentLessonId = lesson.id;
+    // header
+    const header = document.createElement('div'); header.style.display='flex'; header.style.justifyContent='space-between'; header.style.alignItems='center';
+    header.innerHTML = `<div><div class="small muted">${ch.title}</div><div style="font-weight:900">${lesson.title}</div></div><div class="small muted">Tag: ${ch.tag}</div>`;
+    area.appendChild(header);
+
+    if(activeTab === 'read'){
+      renderRead(area, lesson);
+    } else if(activeTab === 'visual'){
+      renderVisual(area, lesson);
+    } else if(activeTab === 'practice'){
+      renderPractice(area, lesson);
+    }
+  }
+
+  function renderRead(container, lesson){
+    const div = document.createElement('div'); div.className='section';
+    const theory = document.createElement('div'); theory.innerHTML = `<div style="font-weight:800">Theory</div><div class="small" style="margin-top:6px">${lesson.theory}</div>`;
+    div.appendChild(theory);
+    if(lesson.analogy){
+      const ana = document.createElement('div'); ana.innerHTML = `<div style="font-weight:800;margin-top:8px">Analogy</div><div class="small" style="margin-top:6px">${lesson.analogy}</div>`;
+      div.appendChild(ana);
+    }
+    if(lesson.syntax){
+      const syn = document.createElement('div'); syn.innerHTML = `<div style="font-weight:800;margin-top:8px">Syntax</div><div class="code" style="margin-top:6px">${highlightC(lesson.syntax)}</div>`;
+      div.appendChild(syn);
+    }
+    if(lesson.proTips && lesson.proTips.length){
+      const tips = document.createElement('div'); tips.innerHTML = `<div style="font-weight:800;margin-top:8px">Pro-Tips</div>`;
+      const ul = document.createElement('ul'); ul.className='small';
+      lesson.proTips.forEach(t=>{ const li=document.createElement('li'); li.textContent=t; ul.appendChild(li); });
+      tips.appendChild(ul); div.appendChild(tips);
+    }
+    container.appendChild(div);
+  }
+
+  function renderVisual(container, lesson){
+    const div = document.createElement('div'); div.className='visualizer';
+    // code examples
+    const codeWrap = document.createElement('div'); codeWrap.innerHTML = `<div style="font-weight:800">Interactive Example</div>`;
+    const codeBox = document.createElement('div'); codeBox.className='code'; codeBox.id='visualCode';
+    const example = (lesson.visualExamples && lesson.visualExamples[0]) || {code: lesson.syntax || '// example', trace: []};
+    codeBox.innerHTML = `<pre>${escapeHtml(example.code)}</pre>`;
+    codeWrap.appendChild(codeBox);
+    const controls = document.createElement('div'); controls.style.display='flex'; controls.style.gap='8px'; controls.style.marginTop='8px';
+    const runBtn = document.createElement('button'); runBtn.className='btn primary'; runBtn.textContent='Run Visual Trace';
+    const stepBtn = document.createElement('button'); stepBtn.className='btn'; stepBtn.textContent='Step';
+    controls.appendChild(runBtn); controls.appendChild(stepBtn);
+    codeWrap.appendChild(controls);
+    div.appendChild(codeWrap);
+
+    // memory map
+    const memWrap = document.createElement('div'); memWrap.innerHTML = `<div style="font-weight:800;margin-top:12px">Memory Map</div>`;
+    const memMap = document.createElement('div'); memMap.className='memory-map'; memMap.id='memoryMap';
+    memWrap.appendChild(memMap);
+    div.appendChild(memWrap);
+
+    // ascii & operator chart
+    const refWrap = document.createElement('div'); refWrap.style.display='flex'; refWrap.style.gap='12px'; refWrap.style.marginTop='12px';
+    const ascii = document.createElement('div'); ascii.style.flex='1'; ascii.innerHTML = `<div style="font-weight:800">ASCII Reference</div><div class="ascii small" id="asciiRef">${generateAsciiMini()}</div>`;
+    const op = document.createElement('div'); op.style.width='220px'; op.innerHTML = `<div style="font-weight:800">Operator Precedence</div><div class="operator-chart small" id="opChart">${generateOpChart()}</div>`;
+    refWrap.appendChild(ascii); refWrap.appendChild(op);
+    div.appendChild(refWrap);
+
+    container.appendChild(div);
+
+    // visual trace logic
+    let trace = example.trace || [];
+    let step = 0;
+    function renderMemory(stateObj){
+      memMap.innerHTML = '';
+      Object.keys(stateObj).forEach(k=>{
+        const box = document.createElement('div'); box.className='mem-box';
+        box.innerHTML = `<div style="font-weight:800">${k}</div><div style="font-size:14px">${stateObj[k]}</div>`;
+        memMap.appendChild(box);
+      });
+    }
+    runBtn.addEventListener('click', ()=>{
+      // animate trace
+      step = 0;
+      const mem = {};
+      renderMemory(mem);
+      if(trace.length===0){ alert('No trace available for this example'); return; }
+      const interval = setInterval(()=>{
+        if(step >= trace.length){ clearInterval(interval); return; }
+        const t = trace[step];
+        // simple parse: "x = 5" or "store x=5" or "remove 5 add 11"
+        applyTraceStep(t, mem);
+        renderMemory(mem);
+        step++;
+      }, 700);
+    });
+    stepBtn.addEventListener('click', ()=>{
+      const mem = {}; // reconstruct from previous steps
+      for(let i=0;i<=step && i<trace.length;i++) applyTraceStep(trace[i], mem);
+      renderMemory(mem);
+      step = Math.min(step+1, trace.length);
+    });
+  }
+
+  function applyTraceStep(text, mem){
+    // heuristics: "x = 5", "y = x + 3", "store x=5", "remove 5 add 11"
+    const t = text.toString();
+    const assign = t.match(/([A-Za-z_]\w*)\s*=\s*([0-9]+)/);
+    if(assign){ mem[assign[1]] = assign[2]; return; }
+    const store = t.match(/store\s+([A-Za-z_]\w*)\s+([0-9]+)/i);
+    if(store){ mem[store[1]] = store[2]; return; }
+    const change = t.match(/([A-Za-z_]\w*)\s*→\s*([0-9]+)/);
+    if(change){ mem[change[1]] = change[2]; return; }
+    // fallback: show message as pseudo variable
+    mem['step'] = t;
+  }
+
+  function renderPractice(container, lesson){
+    const div = document.createElement('div'); div.className='practice';
+    const qWrap = document.createElement('div'); qWrap.className='question-card';
+    const qTitle = document.createElement('div'); qTitle.innerHTML = `<div style="font-weight:800">Practice</div><div class="small muted" style="margin-top:6px">Attempt questions to earn XP</div>`;
+    qWrap.appendChild(qTitle);
+
+    // pick a practice item (rotate)
+    const item = (lesson.practice && lesson.practice[0]) || null;
+    if(!item){
+      qWrap.innerHTML += '<div class="small muted" style="margin-top:8px">No practice items for this lesson.</div>';
+      div.appendChild(qWrap); container.appendChild(div); return;
+    }
+
+    const prompt = document.createElement('div'); prompt.style.marginTop='8px'; prompt.innerHTML = `<div class="small muted">Question</div><div style="font-weight:800;margin-top:6px">${item.prompt}</div>`;
+    qWrap.appendChild(prompt);
+
+    // render input based on type
+    let inputEl = null;
+    if(item.type === 'mcq'){
+      const opts = item.options || [];
+      const form = document.createElement('div'); form.style.display='flex'; form.style.flexDirection='column'; form.style.gap='8px'; form.style.marginTop='8px';
+      opts.forEach((o,i)=>{
+        const row = document.createElement('label'); row.style.display='flex'; row.style.alignItems='center'; row.style.gap='8px';
+        const r = document.createElement('input'); r.type='radio'; r.name='mcq'; r.value=o;
+        row.appendChild(r); row.appendChild(document.createTextNode(o));
+        form.appendChild(row);
+      });
+      qWrap.appendChild(form);
+      inputEl = form;
+    } else if(item.type === 'predict' || item.type === 'pattern'){
+      const inp = document.createElement('input'); inp.className='input'; inp.placeholder='Type exact output, e.g., 6 5 or pattern';
+      qWrap.appendChild(inp); inputEl = inp;
+      setupEditorShortcuts(inp);
+    } else if(item.type === 'error-find'){
+      const ta = document.createElement('textarea'); ta.className='textarea'; ta.placeholder='Describe the error or line number';
+      qWrap.appendChild(ta); inputEl = ta; setupEditorShortcuts(ta);
+    } else if(item.type === 'code-complete'){
+      const ta = document.createElement('textarea'); ta.className='textarea'; ta.value = item.starter || '';
+      qWrap.appendChild(ta); inputEl = ta; setupEditorShortcuts(ta);
+    } else {
+      const ta = document.createElement('textarea'); ta.className='textarea';
+      qWrap.appendChild(ta); inputEl = ta; setupEditorShortcuts(ta);
+    }
+
+    const actions = document.createElement('div'); actions.style.display='flex'; actions.style.gap='8px'; actions.style.marginTop='8px';
     const checkBtn = document.createElement('button'); checkBtn.className='btn primary'; checkBtn.textContent='Check Answer';
-    const revealBtn = document.createElement('button'); revealBtn.className='btn'; revealBtn.textContent='Reveal Answer';
-    actions.appendChild(checkBtn); actions.appendChild(revealBtn);
-    body.appendChild(form); body.appendChild(actions);
-    container.appendChild(body); area.appendChild(container);
-
-    checkBtn.addEventListener('click', ()=>{
-      const sel = document.querySelector('input[name="mcq"]:checked');
-      if(!sel){ alert('Select an option'); return; }
-      handleCheck(q, sel.value);
-    });
-    revealBtn.addEventListener('click', ()=>{ alert('Correct answer: ' + q.correctAnswer); });
-  }
-  else if(q.type === 'code-complete'){
-    const label = document.createElement('div'); label.className='small'; label.textContent='Fill the blanks (replace ___)';
-    const ta = document.createElement('textarea'); ta.className='textarea'; ta.id='completeInput'; ta.value = q.starterCode || q.code || '';
-    body.appendChild(label); body.appendChild(ta);
-    const actions = document.createElement('div'); actions.className='actions-row';
-    const checkBtn = document.createElement('button'); checkBtn.className='btn primary'; checkBtn.textContent='Check';
     const hintBtn = document.createElement('button'); hintBtn.className='btn'; hintBtn.textContent='Hint';
     actions.appendChild(checkBtn); actions.appendChild(hintBtn);
-    body.appendChild(actions); container.appendChild(body); area.appendChild(container);
+    qWrap.appendChild(actions);
 
-    setupEditorShortcuts(ta);
-    checkBtn.addEventListener('click', ()=>{ handleCheck(q, ta.value); });
-    hintBtn.addEventListener('click', ()=>{ el('hintBox').textContent = 'Think about loop boundaries and indices.'; });
-  }
-  else if(q.type === 'error-find'){
-    const pre = document.createElement('pre'); pre.className='code-block'; pre.textContent = q.code;
-    body.appendChild(pre);
-    const label = document.createElement('div'); label.className='small'; label.textContent='Describe the error or provide line number';
-    const input = document.createElement('input'); input.className='input'; input.id='errorInput';
-    body.appendChild(label); body.appendChild(input);
-    const actions = document.createElement('div'); actions.className='actions-row';
-    const checkBtn = document.createElement('button'); checkBtn.className='btn primary'; checkBtn.textContent='Check';
-    const showFix = document.createElement('button'); showFix.className='btn'; showFix.textContent='Show Fix';
-    actions.appendChild(checkBtn); actions.appendChild(showFix);
-    body.appendChild(actions); container.appendChild(body); area.appendChild(container);
+    const feedback = document.createElement('div'); feedback.style.marginTop='8px'; qWrap.appendChild(feedback);
 
-    setupEditorShortcuts(input);
-    checkBtn.addEventListener('click', ()=>{ handleCheck(q, input.value); });
-    showFix.addEventListener('click', ()=>{ alert('Fix:\n' + (q.fixedCode || q.correctAnswer)); });
-  }
-  else if(q.type === 'free-response'){
-    const ta = document.createElement('textarea'); ta.className='textarea'; ta.id='freeInput'; ta.value = q.code || '';
-    body.appendChild(ta);
-    const actions = document.createElement('div'); actions.className='actions-row';
-    const checkBtn = document.createElement('button'); checkBtn.className='btn primary'; checkBtn.textContent='Submit';
-    actions.appendChild(checkBtn);
-    body.appendChild(actions); container.appendChild(body); area.appendChild(container);
-
-    setupEditorShortcuts(ta);
-    checkBtn.addEventListener('click', ()=>{ handleCheck(q, ta.value); });
-  }
-}
-
-/* Show completion */
-function showCompletion(){
-  el('main').scrollIntoView({behavior:'smooth'});
-  el('completion').style.display = 'flex';
-  el('finalScore').textContent = `Score: ${state.score} out of ${questions.length}`;
-  el('finalPercent').textContent = `Accuracy: ${computeAccuracy()}%`;
-  el('interactionArea').innerHTML = '';
-  el('resultSection').style.display = 'none';
-}
-
-/* Show result and trace */
-function showResult(q, correct, userAnswer){
-  el('resultSection').style.display = 'block';
-  const fb = el('feedbackBanner');
-  fb.className = 'feedback ' + (correct ? 'correct' : 'wrong');
-  fb.textContent = correct ? '✅ Correct!' : '❌ Not quite.';
-  // trace
-  const traceList = el('traceList'); traceList.innerHTML = '';
-  (q.traceExplanation || []).forEach(step=>{
-    const li = document.createElement('li'); li.textContent = step; traceList.appendChild(li);
-  });
-  // key concepts
-  el('keyConcepts').innerHTML = '';
-  (q.keyConcepts || []).forEach(k=>{
-    const d = document.createElement('div'); d.textContent = '• ' + k; el('keyConcepts').appendChild(d);
-  });
-  // analysis panel: static analysis of code if present
-  const analysis = analyzeCode(q.code || userAnswer || '');
-  const panel = el('analysisPanel'); panel.innerHTML = '';
-  if(analysis.length){
-    const h = document.createElement('div'); h.style.marginTop='8px'; h.innerHTML = '<strong>Static Analysis</strong>';
-    panel.appendChild(h);
-    analysis.forEach(it=>{
-      const p = document.createElement('div'); p.className='small'; p.style.color = it.type === 'syntax' ? 'var(--error)' : 'var(--mistake)'; p.textContent = `${it.type.toUpperCase()}: ${it.message}`; panel.appendChild(p);
+    checkBtn.addEventListener('click', ()=>{
+      let userVal = '';
+      if(item.type === 'mcq'){
+        const sel = qWrap.querySelector('input[name="mcq"]:checked');
+        if(!sel){ alert('Select an option'); return; }
+        userVal = sel.value;
+      } else {
+        userVal = (inputEl && inputEl.value) || '';
+        if(!userVal.trim()){ alert('Enter an answer'); return; }
+      }
+      const correct = validatePracticeAnswer(item, userVal);
+      if(correct){
+        feedback.innerHTML = `<div class="badge-success">✅ Correct! +10 XP</div>`;
+        addXP(10);
+        state.answers[lesson.id] = state.answers[lesson.id] || {attempts:0,correct:false};
+        state.answers[lesson.id].attempts += 1;
+        state.answers[lesson.id].correct = true;
+        awardBadge(lesson.title.split(' ')[0] + ' Master');
+        saveState();
+      } else {
+        feedback.innerHTML = `<div class="badge-error">❌ Not quite. Try again or view explanation.</div>`;
+        state.answers[lesson.id] = state.answers[lesson.id] || {attempts:0,correct:false};
+        state.answers[lesson.id].attempts += 1;
+        saveState();
+      }
+      renderStatus();
     });
-  }
-  // misconception hint if wrong
-  if(!correct){
-    const hint = detectMistake(userAnswer, q);
-    if(hint){
-      const h = document.createElement('div'); h.style.marginTop='8px'; h.style.color='var(--muted)'; h.textContent = 'Possible misconception: ' + hint;
-      panel.appendChild(h);
-    }
-  }
-}
 
-/* Handle check answer */
-function handleCheck(q, userAnswer){
-  // Normalize and validate
-  const correct = validateAnswer(q, userAnswer);
-  // Update state
-  const prev = state.answers[q.id];
-  if(!prev){
-    state.answers[q.id] = {correct: !!correct, attempts:1};
-  } else {
-    prev.attempts = (prev.attempts || 0) + 1;
-    if(correct) prev.correct = true;
+    hintBtn.addEventListener('click', ()=>{
+      const hintText = lesson.proTips && lesson.proTips[0] ? lesson.proTips[0] : 'Think about how values change in memory.';
+      alert('Hint: ' + hintText);
+    });
+
+    div.appendChild(qWrap);
+    container.appendChild(div);
   }
-  if(correct) state.score = (state.score || 0) + 1;
-  saveState();
-  showResult(q, correct, userAnswer);
-  // Next button handler
-  el('nextBtn').onclick = ()=>{
-    state.currentIndex = clamp(state.currentIndex + 1, 0, questions.length);
-    saveState();
-    render();
-    window.scrollTo({top:0,behavior:'smooth'});
-  };
-}
 
-/* Detect common mistakes for targeted feedback */
-function detectMistake(userRaw, q){
-  const u = normalizeAnswer(userRaw || '');
-  if(!u) return '';
-  // If question mentions integer division and user used decimal
-  if(q.topic && q.topic.toLowerCase().includes('integer') && u.includes('.')){
-    return 'Integer division truncates decimals in C; 5/2 yields 2, not 2.5.';
+  function validatePracticeAnswer(item, userVal){
+    const normalize = s => (s||'').toString().trim().toLowerCase().replace(/,/g,' ').replace(/\s+/g,' ');
+    if(item.type === 'mcq') return normalize(userVal) === normalize(item.answer);
+    return normalize(userVal) === normalize(item.answer);
   }
-  if(q.type === 'error-find' && q.commonMistake) return q.commonMistake;
-  // generic
-  if(u.includes('%d') && q.code && q.code.includes('float')) return 'Check format specifier: %d is for int, %f for float.';
-  return '';
-}
 
-/* ===========================
-   Keyboard & editor shortcuts
-   Shift+Enter inserts newline
-   Ctrl/Cmd+Enter triggers check
-   Enter alone does nothing
-   Auto-close brackets and smart backspace
-   =========================== */
+  /* -------------------------
+     Utilities: syntax highlight, ascii, op chart
+     ------------------------- */
 
-function setupEditorShortcuts(input){
-  if(!input) return;
-  input.addEventListener('keydown', function(e){
-    // Handle Shift+Enter FIRST
-    if(e.key === 'Enter' && e.shiftKey){
-      e.preventDefault();
-      const start = input.selectionStart;
-      const val = input.value;
-      input.value = val.slice(0,start) + '\n' + val.slice(input.selectionEnd);
-      input.selectionStart = input.selectionEnd = start + 1;
-      input.dispatchEvent(new Event('input'));
-      return;
-    }
-    // Ctrl/Cmd+Enter to check
-    if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
-      e.preventDefault();
-      // find check button in DOM and click
-      const check = document.getElementById('checkBtn') || document.querySelector('.btn.primary');
-      if(check) check.click();
-      return;
-    }
-    // Prevent Enter alone from submitting
-    if(e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey){
-      e.preventDefault();
-      return;
-    }
-    // Auto-close logic
-    const openers = {'(':')','[':']','{':'}','"':'"',"'" : "'"};
-    if(openers[e.key] && !e.ctrlKey && !e.metaKey && !e.altKey){
-      e.preventDefault();
-      const start = input.selectionStart;
-      const end = input.selectionEnd;
-      const val = input.value;
-      const close = openers[e.key];
-      input.value = val.slice(0,start) + e.key + close + val.slice(end);
-      input.selectionStart = input.selectionEnd = start + 1;
-      input.dispatchEvent(new Event('input'));
-      return;
-    }
-    // Smart backspace: if previous char is opener and next is matching closer, remove both
-    if(e.key === 'Backspace'){
-      const start = input.selectionStart;
-      const val = input.value;
-      if(start>0 && val[start-1] && val[start]){
-        const prev = val[start-1];
-        const next = val[start];
-        const pairs = {'(':')','[':']','{':'}','"':'"',"'" : "'"};
-        if(pairs[prev] === next){
+  function highlightC(code){
+    // very simple regex-based highlighting
+    const esc = escapeHtml(code);
+    return esc
+      .replace(/(\/\/.*?$)/gm, '<span class="tok-comment">$1</span>')
+      .replace(/(".*?")/g, '<span class="tok-str">$1</span>')
+      .replace(/\b(int|float|double|char|return|if|else|for|while|do|struct|typedef|switch|case|break|continue|void|sizeof)\b/g, '<span class="tok-key">$1</span>')
+      .replace(/\b([0-9]+)\b/g, '<span class="tok-num">$1</span>');
+  }
+
+  function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function generateAsciiMini(){
+    // show a small subset
+    const rows = [];
+    const chars = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','a','b','c','d','e','f',' ','!','"',"'",'(',')'];
+    chars.forEach(ch=>{
+      rows.push(`${ch} : ${ch.charCodeAt(0)}`);
+    });
+    return rows.join('  |  ');
+  }
+
+  function generateOpChart(){
+    const levels = [
+      '() [] -> .',
+      '! ~ ++ -- + - (type) * & sizeof',
+      '* / %',
+      '+ -',
+      '<< >>',
+      '< <= > >=',
+      '== !=',
+      '&',
+      '^',
+      '|',
+      '&&',
+      '||',
+      '? :',
+      '= += -= *= /= %=',
+      ','
+    ];
+    return levels.map(l=>`<div>${l}</div>`).join('');
+  }
+
+  /* -------------------------
+     Keyboard & Editor niceties
+     - Shift+Enter inserts newline
+     - Ctrl/Cmd+Enter triggers check (clicks first primary button)
+     - Enter alone does nothing
+     - Auto-close brackets and quotes
+     - Smart backspace
+     ------------------------- */
+
+  function setupGlobalShortcuts(){
+    document.addEventListener('keydown', function(e){
+      // Ctrl/Cmd+Enter -> click primary visible button
+      if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+        e.preventDefault();
+        const primary = document.querySelector('.btn.primary');
+        if(primary) primary.click();
+        return;
+      }
+      // Enter alone does nothing globally
+      if(e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey){
+        // prevent accidental form submits
+        const active = document.activeElement;
+        if(active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')){
           e.preventDefault();
-          input.value = val.slice(0,start-1) + val.slice(start+1);
-          input.selectionStart = input.selectionEnd = start-1;
-          input.dispatchEvent(new Event('input'));
-          return;
         }
       }
-    }
-  });
-}
-
-/* Copy code to clipboard */
-function copyCode(){
-  const code = el('codeArea').textContent || '';
-  navigator.clipboard && navigator.clipboard.writeText(code).then(()=>{ alert('Code copied'); }).catch(()=>{ alert('Copy failed'); });
-}
-
-/* Analyze current code snippet */
-function analyzeCurrent(){
-  const q = questions[state.currentIndex];
-  const code = q.code || '';
-  const issues = analyzeCode(code);
-  if(issues.length === 0) alert('No issues detected by static analyzer.');
-  else {
-    const msg = issues.map(i=>`${i.type.toUpperCase()}: ${i.message}`).join('\n');
-    alert('Static Analysis Results:\n' + msg);
+    });
   }
-}
 
-/* Format timer remaining (practice mode) */
-function formatTimerRemaining(){
-  if(!state.timerEnd) return '--';
-  const diff = Math.max(0, Math.floor((state.timerEnd - Date.now())/1000));
-  const mm = String(Math.floor(diff/60)).padStart(2,'0');
-  const ss = String(diff%60).padStart(2,'0');
-  return `${mm}:${ss}`;
-}
+  function setupEditorShortcuts(input){
+    if(!input) return;
+    input.addEventListener('keydown', function(e){
+      // Shift+Enter -> newline
+      if(e.key === 'Enter' && e.shiftKey){
+        e.preventDefault();
+        const start = input.selectionStart;
+        const val = input.value;
+        input.value = val.slice(0,start) + '\n' + val.slice(input.selectionEnd);
+        input.selectionStart = input.selectionEnd = start + 1;
+        input.dispatchEvent(new Event('input'));
+        return;
+      }
+      // Ctrl/Cmd+Enter -> submit
+      if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+        e.preventDefault();
+        const primary = document.querySelector('.btn.primary');
+        if(primary) primary.click();
+        return;
+      }
+      // Auto-close
+      const openers = {'(':')','[':']','{':'}','"':'"',"'" : "'"};
+      if(openers[e.key] && !e.ctrlKey && !e.metaKey && !e.altKey){
+        e.preventDefault();
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+        const val = input.value;
+        const close = openers[e.key];
+        input.value = val.slice(0,start) + e.key + close + val.slice(end);
+        input.selectionStart = input.selectionEnd = start + 1;
+        input.dispatchEvent(new Event('input'));
+        return;
+      }
+      // Smart backspace
+      if(e.key === 'Backspace'){
+        const start = input.selectionStart;
+        const val = input.value;
+        if(start>0 && val[start-1] && val[start]){
+          const prev = val[start-1];
+          const next = val[start];
+          const pairs = {'(':')','[':']','{':'}','"':'"',"'" : "'"};
+          if(pairs[prev] === next){
+            e.preventDefault();
+            input.value = val.slice(0,start-1) + val.slice(start+1);
+            input.selectionStart = input.selectionEnd = start-1;
+            input.dispatchEvent(new Event('input'));
+            return;
+          }
+        }
+      }
+    });
+  }
 
-/* Start practice timer for 90s per question */
-function startPracticeTimer(){
-  state.timerEnd = Date.now() + 90*1000;
-  saveState();
-  updateTimerInterval();
-}
+  /* -------------------------
+     Simple static analysis for debugging practice items
+     Heuristics:
+     - Missing semicolons
+     - Unbalanced braces/parentheses
+     - scanf missing &
+     - common typos
+     - assignment in condition
+     ------------------------- */
 
-/* Timer interval */
-let timerInterval = null;
-function updateTimerInterval(){
-  if(timerInterval) clearInterval(timerInterval);
-  timerInterval = setInterval(()=>{
-    if(state.mode !== 'practice'){ el('timerDisplay').textContent='--'; clearInterval(timerInterval); return; }
-    const remaining = state.timerEnd - Date.now();
-    if(remaining <= 0){
-      el('timerDisplay').textContent = '00:00';
-      clearInterval(timerInterval);
-      alert('Time up for this question.');
-      // auto move to next
-      state.currentIndex = clamp(state.currentIndex + 1, 0, questions.length);
-      saveState();
-      render();
-    } else {
-      el('timerDisplay').textContent = formatTimerRemaining();
+  function analyzeCode(code){
+    const issues = [];
+    if(!code) return issues;
+    const lines = code.split(/\r?\n/);
+    lines.forEach((ln,i)=>{
+      const t = ln.trim();
+      if(!t) return;
+      if(t.startsWith('#') || t.startsWith('//') || t.startsWith('/*') || t.endsWith('{') || t.endsWith('}')) return;
+      if(/[A-Za-z0-9\)\"]$/.test(t) && !t.endsWith(';') && !t.endsWith(')') && !t.includes('for(') && !t.includes('if(') && !t.includes('while(')){
+        // avoid function headers
+        if(!/^\w+\s+\w+\s*\(.*\)\s*$/.test(t)){
+          issues.push({line:i+1,type:'syntax',message:'Possible missing semicolon.'});
+        }
+      }
+      if(/scanf\s*\(.*[^\&]\)/.test(t) && /scanf/.test(t) && !t.includes('&')){
+        issues.push({line:i+1,type:'logic',message:'scanf likely missing & before variable.'});
+      }
+      if(/if\s*\(.*=[^=].*\)/.test(t)){
+        issues.push({line:i+1,type:'logic',message:'Assignment = used in conditional; did you mean == ?'});
+      }
+      const typos = ['prinft','scanff','retun','intg','floatt'];
+      typos.forEach(tp=>{ if(t.includes(tp)) issues.push({line:i+1,type:'typo',message:'Possible typo: '+tp}); });
+    });
+    // unbalanced braces/parens
+    const opens = {'{':0,'(':0,'[':0};
+    for(const ch of code){
+      if(ch==='{') opens['{']++; if(ch==='}') opens['{']--;
+      if(ch==='(') opens['(']++; if(ch===')') opens['(']--;
+      if(ch==='[') opens['[']++; if(ch===']') opens['[']--;
     }
-  }, 500);
-}
+    if(opens['{']!==0) issues.push({line:null,type:'syntax',message:'Unbalanced braces detected.'});
+    if(opens['(']!==0) issues.push({line:null,type:'syntax',message:'Unbalanced parentheses detected.'});
+    if(opens['[']!==0) issues.push({line:null,type:'syntax',message:'Unbalanced brackets detected.'});
+    return issues;
+  }
 
-/* ===========================
-   Event bindings
-   =========================== */
+  /* -------------------------
+     Event bindings
+     ------------------------- */
 
-function attachEvents(){
-  el('toggleLines').addEventListener('change', ()=>{ render(); });
-  el('resetBtn').addEventListener('click', resetProgress);
-  el('exportBtn').addEventListener('click', exportProgress);
-  el('copyCodeBtn').addEventListener('click', copyCode);
-  el('analyzeBtn').addEventListener('click', analyzeCurrent);
-  el('showAnswerBtn').addEventListener('click', ()=>{
-    const q = questions[state.currentIndex];
-    alert('Answer: ' + (q.correctAnswer || q.correctOption || 'See explanation'));
-  });
-  el('modeToggle').addEventListener('change', (e)=>{
-    state.mode = e.target.checked ? 'practice' : 'learn';
-    if(state.mode === 'practice') startPracticeTimer();
-    else { state.timerEnd = null; if(timerInterval) clearInterval(timerInterval); }
-    saveState(); render();
-  });
-  el('restartBtn').addEventListener('click', ()=>{
-    if(confirm('Restart session and reset score?')){
-      state.currentIndex = 0; state.score = 0; state.answers = {}; saveState(); render();
-    }
-  });
-  el('reviewBtn').addEventListener('click', ()=>{ state.currentIndex = 0; saveState(); render(); });
-}
+  function attachEvents(){
+    document.querySelectorAll('.tab').forEach(t=>{
+      t.addEventListener('click', ()=>{ setActiveTab(t.dataset.tab); });
+    });
+    el('resetBtn').addEventListener('click', resetState);
+    el('exportBtn').addEventListener('click', exportState);
+    el('quickPractice').addEventListener('click', ()=>{
+      // open first chapter practice
+      state.currentChapter = 1; state.currentLessonId = curriculum[0].lessons[0].id; setActiveTab('practice'); renderAll();
+    });
+    el('openVisualizer').addEventListener('click', ()=>{ setActiveTab('visual'); renderAll(); });
+    el('openRead').addEventListener('click', ()=>{ setActiveTab('read'); renderAll(); });
+    el('modeSelect').addEventListener('change', (e)=>{ state.mode = e.target.value; saveState(); });
+    // global keyboard
+    setupGlobalShortcuts();
+    // initial editor shortcuts for dynamic inputs will be attached when inputs are created
+  }
 
-/* ===========================
-   Init
-   =========================== */
+  /* -------------------------
+     Initialization
+     ------------------------- */
 
-function init(){
-  loadState();
-  updateStreakOnLoad();
-  attachEvents();
-  render();
-  // ensure no console errors on load
-  window.addEventListener('error', function(e){ /* swallow to keep learner console clean */ });
-}
+  function init(){
+    loadState();
+    updateStreak();
+    attachEvents();
+    renderAll();
+    // set default tab
+    setActiveTab('read');
+    // ensure no console errors on load
+    window.addEventListener('error', function(e){ /* swallow to keep console clean for learners */ });
+  }
 
-document.addEventListener('DOMContentLoaded', init);
+  /* -------------------------
+     Helper: validate practice answers (simple)
+     ------------------------- */
 
+  function validatePracticeAnswer(item, userVal){
+    const normalize = s => (s||'').toString().trim().toLowerCase().replace(/,/g,' ').replace(/\s+/g,' ');
+    if(item.type === 'mcq') return normalize(userVal) === normalize(item.answer);
+    return normalize(userVal) === normalize(item.answer);
+  }
+
+  /* -------------------------
+     Start
+     ------------------------- */
+
+  init();
+
+  /* Expose some functions for debugging in dev console (safe) */
+  window.CAcademy = {
+    state, curriculum, analyzeCode, addXP, awardBadge
+  };
+
+})();
 </script>
 </body>
 </html>
