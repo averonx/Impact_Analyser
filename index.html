@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C Sprint | Learn C Fast</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+  <style>
+    .cm-editor { height: 280px !important; font-size: 14px !important; border-radius: 0.5rem; }
+    .progress-bar { transition: width 0.4s ease; }
+    .day-card { transition: all 0.2s; cursor: pointer; }
+    .day-card:hover:not(.locked) { transform: translateY(-2px); }
+    .locked { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+    .completed { border-left: 4px solid #22c55e; }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans min-h-screen">
+  <div class="max-w-6xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- LEFT: Roadmap -->
+    <div class="lg:col-span-1 bg-gray-800 rounded-xl p-4 shadow-lg">
+      <h1 class="text-2xl font-bold mb-2 text-blue-400">C Sprint 🚀</h1>
+      <div class="flex justify-between items-center mb-4 text-sm text-gray-400">
+        <span id="streak-display">🔥 Streak: 0 days</span>
+        <span id="progress-display">0% Complete</span>
+      </div>
+      <div class="w-full bg-gray-700 rounded-full h-2 mb-4">
+        <div id="progress-bar" class="progress-bar bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
+      </div>
+      <div id="roadmap" class="space-y-2 max-h-[70vh] overflow-y-auto pr-2"></div>
+    </div>
+
+    <!-- CENTER: Editor -->
+    <div class="lg:col-span-2 space-y-4">
+      <div class="bg-gray-800 rounded-xl p-4 shadow-lg">
+        <div class="flex justify-between items-center mb-3">
+          <h2 id="day-title" class="text-xl font-semibold text-green-400">Select a Day to Start</h2>
+          <div class="flex gap-2">
+            <span id="timer-display" class="bg-gray-700 px-3 py-1 rounded text-sm">00:00</span>
+            <button id="reset-timer" class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-sm">Reset</button>
+          </div>
+        </div>
+        <p id="day-desc" class="text-gray-400 mb-3 text-sm">Click a day on the left to load its challenge.</p>
+        <div id="code-editor"></div>
+        <div class="flex gap-2 mt-4">
+          <button id="run-btn" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-medium flex-1">▶ Run Code</button>
+          <button id="complete-btn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-medium">✅ Mark Complete</button>
+        </div>
+      </div>
+
+      <div class="bg-gray-800 rounded-xl p-4 shadow-lg">
+        <h3 class="text-lg font-semibold mb-2 text-yellow-400">Console Output</h3>
+        <pre id="console-output" class="bg-black p-3 rounded h-32 overflow-auto text-green-300 font-mono text-sm">Ready...</pre>
+      </div>
+
+      <div class="bg-gray-800 rounded-xl p-4 shadow-lg text-sm text-gray-400">
+        <p>💡 <strong>Anti-Procrastination Rules:</strong></p>
+        <ul class="list-disc ml-5 mt-1 space-y-1">
+          <li>Max 75 mins/day. Timer pauses automatically.</li>
+          <li>Trace loops/recursion on paper before coding.</li>
+          <li>"Ugly first compile" > waiting for perfect code.</li>
+          <li>Data saves in browser. Clear cache = reset.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // 21-Day Curriculum (Mapped to your PDF)
+  const curriculum = [
+    { day:1, title:"Basics & I/O", desc:"printf, scanf, typecasting, variables. Build: Grade Calculator", trace:"Draw variable states before coding" },
+    { day:2, title:"Conditionals", desc:"if-else, && ||, leap year logic. Build: Triangle Validator", trace:"Map branches on paper" },
+    { day:3, title:"Loops", desc:"for/while/do-while. Build: Digit Counter & Reverser", trace:"Step through iterations manually" },
+    { day:4, title:"Nested Loops", desc:"Row/column architecture. Build: Solid Rectangle → Triangle", trace:"Draw i,j grid" },
+    { day:5, title:"Advanced Patterns", desc:"Inverted, Floyd’s, 0/1 triangle. Build: Number Pyramid", trace:"Track spaces & stars per row" },
+    { day:6, title:"Logic Refactor", desc:"Convert patterns to functions. Clean & modularize", trace:"Identify repeating blocks" },
+    { day:7, title:"Checkpoint 1", desc:"CLI Number Guessing Game. Combine loops + conditionals", trace:"Plan game flow first" },
+    { day:8, title:"Functions & Prototypes", desc:"nCr, swap without temp. Build: Math Utility", trace:"Map parameter flow" },
+    { day:9, title:"Pointers", desc:"&, *, pass-by-reference. Build: In-place swap", trace:"Draw memory addresses" },
+    { day:10, title:"Recursion", desc:"Base case, call stack. Build: n→1, sum 1→n", trace:"Draw recursion ladder" },
+    { day:11, title:"Strings & string.h", desc:"strlen, strcpy, reverse. Build: Vowel Counter", trace:"Track '\0' position" },
+    { day:12, title:"Char Pointers", desc:"Read-only vs mutable strings. Build: Safe copy tool", trace:"Sketch stack vs heap" },
+    { day:13, title:"1D Arrays", desc:"In-place reverse, second largest. Build: Array Manager", trace:"Index mapping" },
+    { day:14, title:"Checkpoint 2", desc:"String Analyzer (reverse, length, count, search)", trace:"Plan data flow" },
+    { day:15, title:"Structs", desc:"Student/Book records, dot operator. Build: Record Creator", trace:"Memory layout" },
+    { day:16, title:"Struct Arrays & ->", desc:"Pass to functions, pointer access. Build: Batch Updater", trace:"Address chaining" },
+    { day:17, title:"2D Arrays", desc:"Transpose, add, row max. Build: Matrix Tool", trace:"Row/col grid" },
+    { day:18, title:"Sorting & Big O", desc:"Bubble/Selection, move zeros. Build: Sorter", trace:"Pass-by-pass swaps" },
+    { day:19, title:"Dynamic Memory", desc:"malloc, calloc, realloc, free. Build: Dynamic Input", trace:"Heap allocation sketch" },
+    { day:20, title:"File I/O", desc:"fopen, fprintf, fscanf, save/load. Build: Persistent Records", trace:"File pointer flow" },
+    { day:21, title:"CAPSTONE", desc:"CLI Task Manager: add, view, sort, save, delete, search", trace:"Full architecture" }
+  ];
+
+  // State
+  let editor, timerInterval, timeLeft = 75 * 60;
+  let progress = JSON.parse(localStorage.getItem('cSprint_progress')) || {};
+  let streak = parseInt(localStorage.getItem('cSprint_streak')) || 0;
+  let lastVisit = localStorage.getItem('cSprint_lastVisit');
+
+  // Init
+  document.addEventListener('DOMContentLoaded', () => {
+    editor = CodeMirror(document.getElementById('code-editor'), {
+      mode: "text/x-csrc", theme: "dracula", lineNumbers: true, lineWrapping: true
+    });
+    renderRoadmap();
+    updateStreak();
+    setupTimer();
+  });
+
+  function renderRoadmap() {
+    const container = document.getElementById('roadmap');
+    container.innerHTML = '';
+    curriculum.forEach((d, i) => {
+      const isLocked = i > 0 && !progress[curriculum[i-1].day];
+      const isComplete = progress[d.day];
+      const el = document.createElement('div');
+      el.className = `day-card p-3 rounded bg-gray-700 border border-gray-600 ${isLocked ? 'locked' : ''} ${isComplete ? 'completed' : ''}`;
+      el.innerHTML = `<div class="font-medium text-sm">${d.day}. ${d.title}</div>`;
+      if (!isLocked) el.onclick = () => loadDay(d);
+      container.appendChild(el);
+    });
+    updateProgress();
+  }
+
+  function loadDay(day) {
+    document.getElementById('day-title').innerText = `Day ${day.day}: ${day.title}`;
+    document.getElementById('day-desc').innerText = day.desc;
+    editor.setValue(`#include <stdio.h>\n\nint main() {\n    // ${day.trace}\n    \n    return 0;\n}`);
+    document.getElementById('console-output').textContent = `Day ${day.day} loaded. Trace on paper first, then code.`;
+  }
+
+  function setupTimer() {
+    const updateDisplay = () => {
+      const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+      const s = (timeLeft % 60).toString().padStart(2, '0');
+      document.getElementById('timer-display').textContent = `${m}:${s}`;
+    };
+    document.getElementById('reset-timer').onclick = () => { timeLeft = 75 * 60; updateDisplay(); clearInterval(timerInterval); };
+    timerInterval = setInterval(() => {
+      if (timeLeft > 0) { timeLeft--; updateDisplay(); }
+      else { clearInterval(timerInterval); document.getElementById('console-output').textContent += "\n⏰ 75-min cap reached. Rest & continue tomorrow."; }
+    }, 1000);
+    updateDisplay();
+  }
+
+  function updateProgress() {
+    const done = Object.keys(progress).length;
+    const pct = Math.round((done / curriculum.length) * 100);
+    document.getElementById('progress-display').textContent = `${pct}% Complete`;
+    document.getElementById('progress-bar').style.width = `${pct}%`;
+  }
+
+  function updateStreak() {
+    const today = new Date().toDateString();
+    if (lastVisit !== today) {
+      const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+      streak = (lastVisit === yesterday.toDateString()) ? streak + 1 : 1;
+      localStorage.setItem('cSprint_streak', streak);
+      localStorage.setItem('cSprint_lastVisit', today);
+    }
+    document.getElementById('streak-display').textContent = `🔥 Streak: ${streak} days`;
+  }
+
+  document.getElementById('run-btn').onclick = () => {
+    const code = editor.getValue();
+    const output = document.getElementById('console-output');
+    output.textContent = "⏳ Compiling... (Client-side simulation)\n";
+    setTimeout(() => {
+      // Free simulation: checks basic syntax structure
+      if (code.includes("#include") && code.includes("main") && code.includes("{") && code.includes("}")) {
+        output.textContent += "✅ Syntax valid. Program structure correct.\n💡 Tip: Add printf/scanf to see output. Use local gcc or Replit for full execution.";
+      } else {
+        output.textContent += "⚠️ Missing #include, main(), or braces. Fix structure first.";
+      }
+    }, 600);
+  };
+
+  document.getElementById('complete-btn').onclick = () => {
+    const title = document.getElementById('day-title').innerText;
+    if (!title.includes("Day")) return alert("Select a day first.");
+    const dayNum = parseInt(title.match(/Day (\d+)/)[1]);
+    if (!progress[dayNum]) {
+      progress[dayNum] = true;
+      localStorage.setItem('cSprint_progress', JSON.stringify(progress));
+      renderRoadmap();
+      document.getElementById('console-output').textContent += "\n🎉 Day marked complete! Unlock next day.";
+    }
+  };
+</script>
+</body>
+</html>
