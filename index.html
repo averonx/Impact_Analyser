@@ -165,18 +165,41 @@
   }
 
   document.getElementById('run-btn').onclick = () => {
-    const code = editor.getValue();
-    const output = document.getElementById('console-output');
-    output.textContent = "⏳ Compiling... (Client-side simulation)\n";
-    setTimeout(() => {
-      // Free simulation: checks basic syntax structure
-      if (code.includes("#include") && code.includes("main") && code.includes("{") && code.includes("}")) {
-        output.textContent += "✅ Syntax valid. Program structure correct.\n💡 Tip: Add printf/scanf to see output. Use local gcc or Replit for full execution.";
-      } else {
-        output.textContent += "⚠️ Missing #include, main(), or braces. Fix structure first.";
-      }
-    }, 600);
-  };
+  const code = editor.getValue();
+  const output = document.getElementById('console-output');
+  output.textContent = "⏳ Compiling with Judge0...";
+  
+  fetch('https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-RapidAPI-Key': 'PASTE_YOUR_RAPIDAPI_KEY_HERE',
+      'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
+    },
+    body: JSON.stringify({ 
+      source_code: code, 
+      language_id: 50, // C (GCC 9.2.0)
+      stdin: "",
+      cpu_time_limit: "2",
+      memory_limit: 128000
+    })
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.stdout) {
+      output.textContent = "✅ Output:\n" + d.stdout;
+    } else if (d.stderr) {
+      output.textContent = "❌ Runtime Error:\n" + d.stderr;
+    } else if (d.compile_output) {
+      output.textContent = "🔧 Compile Error:\n" + d.compile_output;
+    } else {
+      output.textContent = "⚠️ No output. Check your code.";
+    }
+  })
+  .catch(e => {
+    output.textContent = "🌐 Network error: " + e.message + "\n💡 Try again or use local gcc.";
+  });
+};
 
   document.getElementById('complete-btn').onclick = () => {
     const title = document.getElementById('day-title').innerText;
