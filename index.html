@@ -1,377 +1,1400 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>C Logic Tutor | Predict & Learn</title>
-  <style>
-    :root {
-      --bg: #0b0f19;
-      --card: #151b2b;
-      --border: #2a3447;
-      --text: #e2e8f0;
-      --text-dim: #94a3b8;
-      --accent: #3b82f6;
-      --accent-hover: #2563eb;
-      --success: #22c55e;
-      --error: #ef4444;
-      --code-bg: #0f172a;
-      --font-mono: 'Courier New', Courier, monospace;
-      --font-sans: system-ui, -apple-system, sans-serif;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-sans);
-      line-height: 1.5;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .container { max-width: 800px; width: 100%; }
-    
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .logo { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
-    .stats { display: flex; gap: 16px; font-size: 0.9rem; color: var(--text-dim); }
-    .stats span { background: var(--card); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); }
-    .progress-bar {
-      width: 100%; height: 6px; background: var(--border); border-radius: 3px; margin-top: 8px; overflow: hidden;
-    }
-    .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s ease; }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-    .hidden { display: none !important; }
-
-    .concept-box {
-      background: rgba(59, 130, 246, 0.1);
-      border-left: 4px solid var(--accent);
-    }
-    .concept-box h3 { color: var(--accent); margin-bottom: 8px; font-size: 1.1rem; }
-    .concept-box p { color: var(--text-dim); }
-
-    .code-block {
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
-      font-family: var(--font-mono);
-      font-size: 0.95rem;
-      white-space: pre-wrap;
-      overflow-x: auto;
-      position: relative;
-    }
-    .code-label {
-      position: absolute; top: -10px; left: 12px; background: var(--card);
-      padding: 0 8px; font-size: 0.75rem; color: var(--text-dim); border: 1px solid var(--border); border-radius: 4px;
-    }
-
-    .input-section { text-align: center; }
-    .input-section p { margin-bottom: 12px; font-weight: 500; }
-    input[type="text"] {
-      width: 100%; max-width: 400px; padding: 12px; border-radius: 8px;
-      border: 2px solid var(--border); background: var(--bg); color: var(--text);
-      font-family: var(--font-mono); font-size: 1rem; outline: none; transition: border 0.2s;
-    }
-    input[type="text"]:focus { border-color: var(--accent); }
-    input[type="text"]:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    .btn {
-      padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
-      transition: all 0.2s; font-size: 0.95rem; margin-top: 12px;
-    }
-    .btn-primary { background: var(--accent); color: white; }
-    .btn-primary:hover { background: var(--accent-hover); }
-    .btn-primary:disabled { background: var(--border); cursor: not-allowed; }
-    .btn-secondary { background: transparent; border: 2px solid var(--border); color: var(--text); }
-    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
-
-    .result-section { text-align: center; }
-    .feedback { font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; padding: 12px; border-radius: 8px; }
-    .feedback.correct { background: rgba(34, 197, 94, 0.15); color: var(--success); }
-    .feedback.wrong { background: rgba(239, 68, 68, 0.15); color: var(--error); }
-    
-    .explanation { text-align: left; margin-top: 16px; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 8px; }
-    .explanation h4 { margin-bottom: 8px; color: var(--text-dim); }
-    .explanation ol { padding-left: 20px; color: var(--text-dim); }
-    .explanation li { margin-bottom: 6px; line-height: 1.6; }
-    .explanation li strong { color: var(--text); }
-
-    .completion { text-align: center; padding: 40px 20px; }
-    .completion h2 { font-size: 2rem; margin-bottom: 12px; color: var(--accent); }
-    .completion p { color: var(--text-dim); margin-bottom: 20px; }
-
-    @media (max-width: 600px) {
-      header { flex-direction: column; align-items: flex-start; }
-      .stats { width: 100%; justify-content: space-between; }
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>C Logic Tutor — Interactive C learning</title>
+<style>
+  :root{
+    --bg:#0b0f12;
+    --card:#0f1720;
+    --muted:#9aa6b2;
+    --text:#e6eef3;
+    --accent:#6ee7b7;
+    --danger:#ff6b6b;
+    --glass: rgba(255,255,255,0.03);
+    --mono: "SFMono-Regular",Consolas,Monaco,Menlo,monospace;
+    --radius:12px;
+    --gap:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background:linear-gradient(180deg,#071018 0%, #07121a 60%);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    padding:18px;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+  }
+  .app{
+    width:100%;
+    max-width:980px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+  header.app-header{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .title{
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+  .logo{
+    width:48px;height:48px;border-radius:10px;
+    background:linear-gradient(135deg,var(--accent),#4dd0e1);
+    display:flex;align-items:center;justify-content:center;
+    color:#042018;font-weight:700;font-family:var(--mono);
+    box-shadow:0 6px 18px rgba(0,0,0,0.6);
+  }
+  h1{font-size:18px;margin:0}
+  .meta{
+    display:flex;gap:10px;align-items:center;font-size:13px;color:var(--muted)
+  }
+  .controls{display:flex;gap:8px;align-items:center}
+  button.btn{
+    background:var(--glass);border:1px solid rgba(255,255,255,0.04);
+    color:var(--text);padding:8px 12px;border-radius:10px;font-weight:600;
+    cursor:pointer;
+  }
+  button.btn:active{transform:translateY(1px)}
+  .progress-wrap{flex:1;margin-left:12px;margin-right:12px}
+  .progress-bar{
+    height:10px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden;
+  }
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),#4dd0e1);width:0%}
+  main.card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:14px;
+    box-shadow:0 8px 30px rgba(2,6,10,0.6);
+  }
+  .concept{
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .concept-top{display:flex;gap:12px;align-items:center;justify-content:space-between}
+  .concept-text{font-size:15px;color:var(--text)}
+  .analogy{font-size:13px;color:var(--muted);background:rgba(255,255,255,0.02);padding:10px;border-radius:10px}
+  .code-block{
+    background:#07121a;border-radius:10px;padding:12px;font-family:var(--mono);font-size:14px;color:#dbeef6;
+    overflow:auto;border:1px solid rgba(255,255,255,0.03);
+  }
+  pre.code{margin:0;white-space:pre;line-height:1.5}
+  .code-actions{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px}
+  .toggle{
+    display:flex;gap:8px;align-items:center;color:var(--muted);font-size:13px;
+  }
+  .line-table{width:100%;border-collapse:collapse;margin-top:8px}
+  .line-table th,.line-table td{padding:8px;border-bottom:1px dashed rgba(255,255,255,0.03);text-align:left;font-size:13px}
+  .line-table th{color:var(--muted);font-weight:600}
+  .predict{
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .predict label{font-weight:700;color:var(--accent);font-size:13px}
+  input.predict-input{
+    background:transparent;border:1px solid rgba(255,255,255,0.04);padding:12px;border-radius:10px;color:var(--text);
+    font-family:var(--mono);font-size:14px;outline:none;
+  }
+  .actions-row{display:flex;gap:8px;align-items:center}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),#4dd0e1);color:#042018;border:none}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04)}
+  .result{
+    margin-top:8px;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+    border:1px solid rgba(255,255,255,0.03);
+  }
+  .feedback{font-weight:800;padding:8px 12px;border-radius:8px;display:inline-block}
+  .feedback.correct{background:rgba(110,231,183,0.12);color:var(--accent);border:1px solid rgba(110,231,183,0.08)}
+  .feedback.wrong{background:rgba(255,107,107,0.08);color:var(--danger);border:1px solid rgba(255,107,107,0.06)}
+  .trace{margin-top:10px}
+  .trace li{margin-bottom:6px;color:var(--muted);font-size:13px}
+  .key-concepts{background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;color:var(--muted)}
+  .completion{
+    display:flex;flex-direction:column;gap:12px;align-items:center;padding:20px;text-align:center;
+  }
+  .small{font-size:13px;color:var(--muted)}
+  footer{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px;padding-top:6px}
+  @media (max-width:720px){
+    body{padding:12px}
+    .title h1{font-size:16px}
+    .logo{width:44px;height:44px}
+    .app{gap:12px}
+    .code-block{font-size:13px}
+  }
+  /* accessibility focus */
+  button:focus, input:focus{outline:2px solid rgba(77,208,225,0.12);outline-offset:2px}
+  /* small helper */
+  .muted{color:var(--muted);font-size:13px}
+</style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="logo">🧠 C Logic Tutor</div>
-      <div class="stats">
-        <span id="progress-text">Question 1 of 5</span>
-        <span id="score-text">Score: 0</span>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-    </header>
-
-    <main id="app">
-      <div class="card concept-box">
-        <h3>💡 Concept</h3>
-        <p id="concept-text">Loading...</p>
-      </div>
-
-      <div class="card code-block">
-        <span class="code-label">C Code</span>
-        <pre id="code-display"></pre>
-      </div>
-
-      <div class="card input-section">
-        <p id="question-text">What will this program print?</p>
-        <input type="text" id="answer-input" placeholder="Type exact output (e.g., 5 8)..." autocomplete="off">
-        <button id="check-btn" class="btn btn-primary">Check Answer</button>
-      </div>
-
-      <div id="result-section" class="card result-section hidden">
-        <div id="feedback" class="feedback"></div>
-        <div class="explanation">
-          <h4>📖 Step-by-Step Execution</h4>
-          <ol id="explanation-list"></ol>
+<div class="app" id="app" role="application" aria-labelledby="app-title">
+  <header class="app-header" role="banner">
+    <div class="title" aria-hidden="false">
+      <div class="logo" aria-hidden="true">CL</div>
+      <div>
+        <h1 id="app-title">C Logic Tutor</h1>
+        <div class="meta">
+          <div id="progressText">Question 1 of 1</div>
+          <div id="scoreText">✅ Correct: 0</div>
         </div>
-        <button id="next-btn" class="btn btn-secondary">Next Question →</button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="progress-wrap" aria-hidden="true">
+        <div class="progress-bar" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="resetBtn" title="Reset progress">Reset Progress</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="card" id="mainCard" role="main">
+    <!-- Concept Card -->
+    <section class="concept" id="conceptCard" aria-live="polite">
+      <div class="concept-top">
+        <div>
+          <div id="topicTitle" style="font-weight:800;font-size:15px">Topic</div>
+          <div id="conceptText" class="concept-text muted">Concept explanation</div>
+        </div>
+        <div style="min-width:160px;text-align:right">
+          <div class="muted" id="tagList">Tags</div>
+        </div>
+      </div>
+      <div class="analogy" id="analogyText">Analogy</div>
+    </section>
+
+    <!-- Code Block -->
+    <section>
+      <div class="code-block" aria-label="Code snippet">
+        <pre class="code" id="codeArea" tabindex="0"></pre>
+      </div>
+      <div class="code-actions">
+        <div class="toggle">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="toggleLines" style="accent-color:var(--accent)" />
+            <span>Show Line Explanations</span>
+          </label>
+        </div>
+        <div class="muted" id="snippetInfo">C snippet</div>
       </div>
 
-      <div id="completion-screen" class="card completion hidden">
-        <h2>🎉 Session Complete!</h2>
-        <p>You scored <span id="final-score">0</span> out of <span id="total-questions">0</span></p>
-        <button id="restart-btn" class="btn btn-primary">Restart Session</button>
+      <div id="lineExplanationsWrap" style="display:none;margin-top:8px">
+        <table class="line-table" id="lineTable" aria-live="polite">
+          <thead><tr><th style="width:6%">Line</th><th style="width:36%">Code</th><th>What it means</th></tr></thead>
+          <tbody id="lineTableBody"></tbody>
+        </table>
       </div>
-    </main>
-  </div>
+    </section>
+
+    <!-- Prediction -->
+    <section class="predict" aria-labelledby="predictLabel">
+      <label id="predictLabel">What will this program print/output?</label>
+      <input id="predictInput" class="predict-input" placeholder="Type exact output, e.g., 6 5 or Error" aria-describedby="predictHelp" autocomplete="off" />
+      <div id="predictHelp" class="small muted">Type exactly what you expect the program to print. Use spaces or commas between outputs.</div>
+      <div class="actions-row">
+        <button class="btn primary" id="checkBtn" disabled>Check Answer</button>
+        <button class="btn ghost" id="showAnswerBtn">Reveal Answer (skip)</button>
+        <div style="flex:1"></div>
+        <div class="small muted" id="hintArea"></div>
+      </div>
+    </section>
+
+    <!-- Result & Explanation -->
+    <section id="resultSection" style="display:none" aria-live="polite">
+      <div class="result" id="resultBox">
+        <div id="feedbackBanner" class="feedback"></div>
+        <div style="margin-top:10px">
+          <strong>Memory & Execution Trace</strong>
+          <ol class="trace" id="traceList"></ol>
+        </div>
+        <div style="margin-top:10px">
+          <strong>Key Concepts</strong>
+          <div class="key-concepts" id="keyConcepts"></div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn" id="nextBtn">Next Question</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Completion Screen -->
+    <section id="completion" style="display:none" class="completion" role="status" aria-live="polite">
+      <div style="font-size:20px;font-weight:800">Session Complete</div>
+      <div id="finalScore" style="font-size:16px"></div>
+      <div id="finalPercent" class="muted"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn primary" id="restartBtn">Restart Session</button>
+        <button class="btn" id="reviewBtn">Review Questions</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="small">C Logic Tutor — Practice active recall & mental models</div>
+    <div class="small">Offline • Dark theme • Local progress saved</div>
+  </footer>
+</div>
 
 <script>
-  // ================= DATA =================
-  const questions = [
-    {
-      id: 1,
-      topic: "Variables & Assignment",
-      concept: "Variables are labeled boxes in memory. Assigning a new value replaces the old one completely.",
-      code: `int x = 5;\nx = x + 3;\nprintf("%d", x);`,
-      question: "What will be printed?",
-      answer: "8",
-      explanation: [
-        "<strong>int x = 5;</strong> → Memory box 'x' is created and stores <strong>5</strong>.",
-        "<strong>x = x + 3;</strong> → Take current value of x (5), add 3, store back in x. Now x = <strong>8</strong>.",
-        "<strong>printf(\"%d\", x);</strong> → Prints the current value of x, which is <strong>8</strong>."
-      ]
-    },
-    {
-      id: 2,
-      topic: "Post-increment vs Pre-increment",
-      concept: "x++ (post) uses current value first, then increases. ++x (pre) increases first, then uses new value.",
-      code: `int a = 5;\nint b = a++;\nprintf("%d %d", a, b);`,
-      question: "What will be printed?",
-      answer: "6 5",
-      explanation: [
-        "<strong>int a = 5;</strong> → a holds 5.",
-        "<strong>int b = a++;</strong> → Post-increment: b gets CURRENT value of a (<strong>5</strong>). THEN a increases to <strong>6</strong>.",
-        "<strong>printf</strong> → Prints a (6) and b (5). Output: <strong>6 5</strong>"
-      ]
-    },
-    {
-      id: 3,
-      topic: "Integer Division",
-      concept: "Dividing two integers always truncates decimals. No rounding occurs.",
-      code: `int x = 7;\nint y = 2;\nint z = x / y;\nprintf("%d", z);`,
-      question: "What will be printed?",
-      answer: "3",
-      explanation: [
-        "<strong>x = 7, y = 2</strong>",
-        "<strong>z = x / y</strong> → 7 / 2 = 3.5, but C drops .5 for integers → z = <strong>3</strong>",
-        "<strong>printf</strong> → Prints <strong>3</strong>"
-      ]
-    },
-    {
-      id: 4,
-      topic: "Modulus Operator",
-      concept: "% gives the remainder after division. Great for checking even/odd or cycling patterns.",
-      code: `int n = 17;\nint r = n % 5;\nprintf("%d", r);`,
-      question: "What will be printed?",
-      answer: "2",
-      explanation: [
-        "<strong>n = 17</strong>",
-        "<strong>r = n % 5</strong> → 17 ÷ 5 = 3 with remainder <strong>2</strong>",
-        "<strong>printf</strong> → Prints <strong>2</strong>"
-      ]
-    },
-    {
-      id: 5,
-      topic: "For Loop Execution",
-      concept: "For loop order: init → check condition → execute body → increment → repeat until false.",
-      code: `int sum = 0;\nfor(int i = 1; i <= 3; i++) {\n  sum = sum + i;\n}\nprintf("%d", sum);`,
-      question: "What will be printed?",
-      answer: "6",
-      explanation: [
-        "<strong>sum = 0</strong>",
-        "<strong>i=1:</strong> sum = 0+1 = 1",
-        "<strong>i=2:</strong> sum = 1+2 = 3",
-        "<strong>i=3:</strong> sum = 3+3 = 6",
-        "<strong>i=4:</strong> condition i<=3 fails → loop ends",
-        "<strong>printf</strong> → Prints <strong>6</strong>"
-      ]
+/*
+  C Logic Tutor
+  Single-file offline-first interactive app.
+  - State management, rendering, event handling, and validation separated into functions.
+  - Uses localStorage to persist progress and score.
+  - Auto-close brackets/quotes in prediction input.
+  - Keyboard support: Enter triggers check.
+*/
+
+/* ===========================
+   Data: questions array (25+ items)
+   Each object follows the required schema.
+   For brevity and clarity, each question includes:
+   - code: C snippet
+   - correctAnswer: expected printed output (exact string)
+   - traceExplanation: step-by-step memory/execution trace
+   - lineExplanations: array of {line, code, meaning}
+   - keyConcepts, commonMistake, tags
+   =========================== */
+
+const questions = [
+  {
+    id:1,
+    topic:"Basic Printing & Escape",
+    concept:"Printing text and using escape sequences like \\n to move to a new line.",
+    analogy:"Think of printf as a stamp that prints text onto paper; \\n moves the paper to the next line.",
+    code:'#include <stdio.h>\n\nint main() {\n    printf(\"Hello\\nWorld\\n\");\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"hello world",
+    traceExplanation:[
+      'Program starts; main() called.',
+      'printf prints "Hello" then newline; output buffer shows: Hello',
+      'printf prints "World" then newline; output buffer shows: Hello\\nWorld',
+      'Program returns 0 and exits.'
+    ],
+    lineExplanations:[
+      {line:1, code:'#include <stdio.h>', meaning:'Includes standard I/O functions like printf.'},
+      {line:3, code:'int main() {', meaning:'Entry point of the program.'},
+      {line:4, code:'printf("Hello\\nWorld\\n");', meaning:'Prints Hello then newline, then World then newline.'},
+      {line:5, code:'return 0;', meaning:'Returns 0 to the OS indicating success.'},
+      {line:6, code:'}', meaning:'Ends main function.'}
+    ],
+    keyConcepts:['printf prints text to standard output','\\n moves to a new line','main is the program entry point'],
+    commonMistake:'Forgetting that \\n creates a new line; expecting both words on same line.',
+    tags:['basics','printing','easy']
+  },
+
+  {
+    id:2,
+    topic:"Variables & Assignment",
+    concept:"Variables store values in memory; assignment puts a value into a variable.",
+    analogy:"Variables are labeled boxes; assignment puts an item into the box.",
+    code:'#include <stdio.h>\n\nint main() {\n    int x = 5;\n    int y = x + 3;\n    printf(\"%d %d\\n\", x, y);\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"5 8",
+    traceExplanation:[
+      "Start main.",
+      "Declare int x and store 5 in memory box 'x' (x = 5).",
+      "Declare int y and compute x + 3 → 5 + 3 = 8; store in 'y' (y = 8).",
+      "printf prints x then space then y then newline → '5 8'.",
+      "Return 0 and exit."
+    ],
+    lineExplanations:[
+      {line:1, code:'#include <stdio.h>', meaning:'Provides printf.'},
+      {line:3, code:'int main() {', meaning:'Program entry.'},
+      {line:4, code:'int x = 5;', meaning:'Creates integer x and stores 5.'},
+      {line:5, code:'int y = x + 3;', meaning:'Creates y and stores x+3 (8).'},
+      {line:6, code:'printf("%d %d\\n", x, y);', meaning:'Prints values of x and y separated by space.'},
+      {line:7, code:'return 0;', meaning:'Exit status.'}
+    ],
+    keyConcepts:['Variables hold values','Assignment uses =','Expressions compute values before assignment'],
+    commonMistake:'Mixing up assignment (=) with equality (==).',
+    tags:['basics','variables','easy']
+  },
+
+  {
+    id:3,
+    topic:"Variable Naming Rules",
+    concept:"Names must start with a letter or underscore and cannot be C keywords.",
+    analogy:"Variable names are like file names: they must follow rules and cannot be reserved words.",
+    code:'#include <stdio.h>\n\nint main() {\n    int _count = 10;\n    int totalCount = _count + 5;\n    printf(\"%d\\n\", totalCount);\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"15",
+    traceExplanation:[
+      "Start main.",
+      "_count declared and set to 10.",
+      "totalCount declared and set to _count + 5 → 15.",
+      "printf prints 15 then newline.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'int _count = 10;', meaning:'Variable name starts with underscore; stores 10.'},
+      {line:5, code:'int totalCount = _count + 5;', meaning:'CamelCase name valid; stores 15.'},
+      {line:6, code:'printf("%d\\n", totalCount);', meaning:'Prints totalCount.'}
+    ],
+    keyConcepts:['Identifiers rules: letters, digits, underscore','Cannot use keywords like int, return as names'],
+    commonMistake:'Starting a name with a digit or using a keyword as a name.',
+    tags:['basics','naming','easy']
+  },
+
+  {
+    id:4,
+    topic:"Comments",
+    concept:"Comments explain code and are ignored by the compiler.",
+    analogy:"Comments are sticky notes on code for humans; the compiler throws them away.",
+    code:'#include <stdio.h>\n\nint main() {\n    // This prints a number\n    printf(\"%d\\n\", 42); /* answer to everything */\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"42",
+    traceExplanation:[
+      "Start main.",
+      "Compiler ignores comments.",
+      "printf prints 42 then newline.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'// This prints a number', meaning:'Single-line comment ignored by compiler.'},
+      {line:5, code:'printf("%d\\n", 42); /* answer to everything */', meaning:'Prints 42; trailing comment ignored.'}
+    ],
+    keyConcepts:['Comments do not affect execution','Use // for single-line and /* */ for multi-line'],
+    commonMistake:'Thinking comments change program behavior.',
+    tags:['basics','comments','easy']
+  },
+
+  {
+    id:5,
+    topic:"scanf and & operator",
+    concept:"scanf reads input; use & to pass the address of variables to scanf.",
+    analogy:"scanf needs the box address to put the typed value into the correct box.",
+    code:'#include <stdio.h>\n\nint main() {\n    int n;\n    scanf(\"%d\", &n);\n    printf(\"%d\\n\", n);\n    return 0;\n}',
+    question:"If user inputs 7, what will the program print?",
+    correctAnswer:"7",
+    traceExplanation:[
+      "Start main.",
+      "Declare int n (uninitialized).",
+      "scanf reads integer 7 from input and stores it at address of n (n = 7).",
+      "printf prints 7 then newline.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'int n;', meaning:'Declares integer variable n.'},
+      {line:5, code:'scanf("%d", &n);', meaning:'Reads integer from input and stores at n\'s address.'},
+      {line:6, code:'printf("%d\\n", n);', meaning:'Prints the value stored in n.'}
+    ],
+    keyConcepts:['scanf needs variable addresses using &','Format specifier %d for integers'],
+    commonMistake:'Omitting & causes undefined behavior or crash.',
+    tags:['basics','io','medium']
+  },
+
+  {
+    id:6,
+    topic:"Modulus Operator %",
+    concept:"% gives the remainder after integer division.",
+    analogy:"Think of dividing candies into equal piles; % tells how many candies are left over.",
+    code:'#include <stdio.h>\n\nint main() {\n    int a = 17;\n    int r = a % 5;\n    printf(\"%d\\n\", r);\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"2",
+    traceExplanation:[
+      "Start main.",
+      "a = 17 stored.",
+      "r = 17 % 5 → remainder of 17/5 is 2; r = 2.",
+      "printf prints 2 then newline.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'int a = 17;', meaning:'Stores 17 in a.'},
+      {line:5, code:'int r = a % 5;', meaning:'Computes remainder of a divided by 5.'},
+      {line:6, code:'printf(\"%d\\n\", r);', meaning:'Prints remainder.'}
+    ],
+    keyConcepts:['% returns remainder','Useful for even/odd checks (n%2)'],
+    commonMistake:'Confusing % with modulus in other languages for negatives; in C sign follows dividend.',
+    tags:['basics','operators','easy']
+  },
+
+  {
+    id:7,
+    topic:"Typecasting",
+    concept:"Converting between types; casting float to int truncates decimals.",
+    analogy:"Typecasting is like pouring water from a wide cup (float) into a smaller cup (int) — the fractional part spills off.",
+    code:'#include <stdio.h>\n\nint main() {\n    float f = 5.9;\n    int x = (int)f;\n    printf(\"%d\\n\", x);\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"5",
+    traceExplanation:[
+      "Start main.",
+      "f = 5.9 stored as float.",
+      "x = (int)f truncates decimal part → x = 5.",
+      "printf prints 5 then newline.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'float f = 5.9;', meaning:'Stores 5.9 in float variable f.'},
+      {line:5, code:'int x = (int)f;', meaning:'Casts float to int, dropping fractional part.'},
+      {line:6, code:'printf(\"%d\\n\", x);', meaning:'Prints integer x.'}
+    ],
+    keyConcepts:['Casting changes type explicitly','Casting float to int truncates (not round)'],
+    commonMistake:'Expecting rounding instead of truncation.',
+    tags:['basics','types','medium']
+  },
+
+  {
+    id:8,
+    topic:"Operator Precedence",
+    concept:"Operators have priority; multiplication/division before addition/subtraction.",
+    analogy:"Like BODMAS: do multiplication before addition unless parentheses change order.",
+    code:'#include <stdio.h>\n\nint main() {\n    int a = 2 + 3 * 4;\n    printf(\"%d\\n\", a);\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"14",
+    traceExplanation:[
+      "Start main.",
+      "Compute 3 * 4 = 12 first, then 2 + 12 = 14; a = 14.",
+      "printf prints 14 then newline.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'int a = 2 + 3 * 4;', meaning:'Multiplication happens before addition; result 14.'},
+      {line:5, code:'printf(\"%d\\n\", a);', meaning:'Prints a.'}
+    ],
+    keyConcepts:['Operator precedence: * and / before + and -','Use parentheses to change order'],
+    commonMistake:'Evaluating left-to-right without considering precedence.',
+    tags:['basics','operators','easy']
+  },
+
+  {
+    id:9,
+    topic:"Char and ASCII",
+    concept:"char stores a single character; it maps to ASCII numeric codes.",
+    analogy:"A char is a tiny box holding a letter; behind the scenes it's a number like 97 for \'a\'.",
+    code:'#include <stdio.h>\n\nint main() {\n    char c = \'a\';\n    printf(\"%c %d\\n\", c, c);\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"a 97",
+    traceExplanation:[
+      "Start main.",
+      "c stores character 'a' whose ASCII code is 97.",
+      "printf prints character then space then numeric value (97).",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'char c = \'a\';', meaning:'Stores character a in c.'},
+      {line:5, code:'printf(\"%c %d\\n\", c, c);', meaning:'%c prints char, %d prints its ASCII numeric value.'}
+    ],
+    keyConcepts:['char is stored as numeric ASCII code','%c prints char, %d prints integer value'],
+    commonMistake:'Expecting char to be a string; it holds a single character and a numeric code.',
+    tags:['basics','char','easy']
+  },
+
+  {
+    id:10,
+    topic:"if statement",
+    concept:"if executes a block only when condition is true (non-zero).",
+    analogy:"An if is a gate that opens only when the condition is satisfied.",
+    code:'#include <stdio.h>\n\nint main() {\n    int x = 4;\n    if (x > 3) {\n        printf(\"Yes\\n\");\n    }\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"yes",
+    traceExplanation:[
+      "Start main.",
+      "x = 4 stored.",
+      "Check x > 3 → true, so printf(\"Yes\") runs.",
+      "Output: Yes then newline.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'int x = 4;', meaning:'Stores 4 in x.'},
+      {line:5, code:'if (x > 3) {', meaning:'Checks if x is greater than 3.'},
+      {line:6, code:'printf(\"Yes\\n\");', meaning:'Runs only if condition true.'}
+    ],
+    keyConcepts:['if executes when condition non-zero','Comparison operators return 0 or 1'],
+    commonMistake:'Using = instead of == in condition.',
+    tags:['conditionals','easy']
+  },
+
+  {
+    id:11,
+    topic:"Nested if-else",
+    concept:"You can place if-else inside another to check multiple conditions.",
+    analogy:"Like checking nested doors: open one, then check inside another.",
+    code:'#include <stdio.h>\n\nint main() {\n    int x = 0;\n    if (x > 0) {\n        printf(\"positive\\n\");\n    } else {\n        if (x == 0) printf(\"zero\\n\");\n        else printf(\"negative\\n\");\n    }\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"zero",
+    traceExplanation:[
+      "Start main.",
+      "x = 0.",
+      "x > 0 is false, go to else branch.",
+      "Inside else, check x == 0 → true, so prints 'zero'.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'int x = 0;', meaning:'x initialized to 0.'},
+      {line:5, code:'if (x > 0) {', meaning:'Checks positive.'},
+      {line:7, code:'if (x == 0) printf(\"zero\\n\");', meaning:'Nested check for zero.'}
+    ],
+    keyConcepts:['Nested conditions allow multi-step checks','Order matters: check specific cases first'],
+    commonMistake:'Assuming else covers only one condition; nested ifs allow more checks.',
+    tags:['conditionals','medium']
+  },
+
+  {
+    id:12,
+    topic:"Else-if ladder",
+    concept:"Use else if to check multiple exclusive conditions in sequence.",
+    analogy:"A ladder of checks: climb until one rung matches, then stop.",
+    code:'#include <stdio.h>\n\nint main() {\n    int n = 3;\n    if (n==1) printf(\"one\\n\");\n    else if (n==2) printf(\"two\\n\");\n    else if (n==3) printf(\"three\\n\");\n    else printf(\"other\\n\");\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"three",
+    traceExplanation:[
+      "Start main.",
+      "n = 3.",
+      "Check n==1 false, n==2 false, n==3 true → prints 'three'.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'int n = 3;', meaning:'n set to 3.'},
+      {line:5, code:'if (n==1) printf(\"one\\n\");', meaning:'First check.'},
+      {line:6, code:'else if (n==2) printf(\"two\\n\");', meaning:'Second check.'},
+      {line:7, code:'else if (n==3) printf(\"three\\n\");', meaning:'Third check; this runs.'}
+    ],
+    keyConcepts:['else if checks sequentially until one matches','Only the first true branch runs'],
+    commonMistake:'Using separate ifs instead of else if causing multiple branches to run.',
+    tags:['conditionals','easy']
+  },
+
+  {
+    id:13,
+    topic:"Ternary Operator",
+    concept:"Short form of if-else: condition ? expr1 : expr2",
+    analogy:"Like a quick decision: if true pick left, else pick right.",
+    code:'#include <stdio.h>\n\nint main() {\n    int a = 5;\n    int b = (a > 3) ? 10 : 20;\n    printf(\"%d\\n\", b);\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"10",
+    traceExplanation:[
+      "Start main.",
+      "a = 5.",
+      "Condition a > 3 true, so b = 10.",
+      "printf prints 10.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'int a = 5;', meaning:'a set to 5.'},
+      {line:5, code:'int b = (a > 3) ? 10 : 20;', meaning:'Ternary picks 10 because condition true.'},
+      {line:6, code:'printf(\"%d\\n\", b);', meaning:'Prints b.'}
+    ],
+    keyConcepts:['Ternary is shorthand for simple if-else','Useful for concise assignments'],
+    commonMistake:'Confusing order of ? and : or using it for complex logic.',
+    tags:['conditionals','easy']
+  },
+
+  {
+    id:14,
+    topic:"switch statement",
+    concept:"switch selects a case based on an integer expression.",
+    analogy:"Like a menu: pick the matching case and run its code.",
+    code:'#include <stdio.h>\n\nint main() {\n    int x = 2;\n    switch(x) {\n        case 1: printf(\"one\\n\"); break;\n        case 2: printf(\"two\\n\"); break;\n        default: printf(\"other\\n\");\n    }\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"two",
+    traceExplanation:[
+      "Start main.",
+      "x = 2.",
+      "switch checks cases; case 2 matches → prints 'two' then break exits switch.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'int x = 2;', meaning:'x set to 2.'},
+      {line:5, code:'switch(x) {', meaning:'Begin switch on x.'},
+      {line:7, code:'case 2: printf(\"two\\n\"); break;', meaning:'Matches 2 and stops after printing.'}
+    ],
+    keyConcepts:['switch compares integer-like values','Use break to avoid fall-through'],
+    commonMistake:'Forgetting break causes fall-through to next case.',
+    tags:['conditionals','medium']
+  },
+
+  {
+    id:15,
+    topic:"Logical Operators",
+    concept:"&& is AND, || is OR, ! negates a condition.",
+    analogy:"AND requires both keys; OR accepts either key; NOT flips true/false.",
+    code:'#include <stdio.h>\n\nint main() {\n    int a = 5, b = 10;\n    if (a < 10 && b > 5) printf(\"ok\\n\");\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"ok",
+    traceExplanation:[
+      "Start main.",
+      "a=5, b=10.",
+      "Check a<10 true AND b>5 true → overall true, so prints 'ok'.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'int a = 5, b = 10;', meaning:'Two variables declared.'},
+      {line:5, code:'if (a < 10 && b > 5) printf(\"ok\\n\");', meaning:'Both conditions must be true for printf to run.'}
+    ],
+    keyConcepts:['&& requires both true','|| requires at least one true','! flips boolean value'],
+    commonMistake:'Using & or | (bitwise) instead of && or || for logical checks.',
+    tags:['conditionals','operators','medium']
+  },
+
+  {
+    id:16,
+    topic:"Relational Operators",
+    concept:"Operators like ==, !=, <, > compare values and return 0 or 1.",
+    analogy:"They are questions that answer true (1) or false (0).",
+    code:'#include <stdio.h>\n\nint main() {\n    int x = 4;\n    printf(\"%d\\n\", x == 4);\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"1",
+    traceExplanation:[
+      "Start main.",
+      "x==4 is true, which in C is represented as 1.",
+      "printf prints 1 then newline.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'int x = 4;', meaning:'x set to 4.'},
+      {line:5, code:'printf(\"%d\\n\", x == 4);', meaning:'Prints result of comparison (1 for true).'}
+    ],
+    keyConcepts:['== checks equality','Comparisons yield 0 or 1 in C'],
+    commonMistake:'Using = instead of == in comparisons.',
+    tags:['conditionals','easy']
+  },
+
+  {
+    id:17,
+    topic:"Even or Odd Practical",
+    concept:"Use modulus to determine even/odd numbers.",
+    analogy:"If remainder when dividing by 2 is 0, it fits evenly into pairs.",
+    code:'#include <stdio.h>\n\nint main() {\n    int n = 7;\n    if (n % 2 == 0) printf(\"even\\n\");\n    else printf(\"odd\\n\");\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"odd",
+    traceExplanation:[
+      "Start main.",
+      "n = 7.",
+      "7 % 2 = 1, not 0 → else branch prints 'odd'.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'int n = 7;', meaning:'n set to 7.'},
+      {line:5, code:'if (n % 2 == 0) printf(\"even\\n\");', meaning:'Checks evenness.'},
+      {line:6, code:'else printf(\"odd\\n\");', meaning:'Runs when odd.'}
+    ],
+    keyConcepts:['Use % 2 to check even/odd','Comparison with 0 determines parity'],
+    commonMistake:'Using / instead of % for remainder.',
+    tags:['conditionals','practical','easy']
+  },
+
+  {
+    id:18,
+    topic:"for loop basics",
+    concept:"for loops run a block a fixed number of times with initialization, condition, increment.",
+    analogy:"Like a for-loop is a recipe step repeated for each ingredient until done.",
+    code:'#include <stdio.h>\n\nint main() {\n    for (int i = 0; i < 3; i++) {\n        printf(\"%d \", i);\n    }\n    printf(\"\\n\");\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"0 1 2",
+    traceExplanation:[
+      "Start main.",
+      "for initializes i=0; checks i<3 true → prints 0 and space; i++ → i=1.",
+      "Check i<3 true → prints 1; i++ → i=2.",
+      "Check i<3 true → prints 2; i++ → i=3.",
+      "Check i<3 false → exit loop; print newline.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'for (int i = 0; i < 3; i++) {', meaning:'Start loop: i from 0 to 2.'},
+      {line:5, code:'printf(\"%d \", i);', meaning:'Prints current i and a space each iteration.'}
+    ],
+    keyConcepts:['for(init; cond; incr) controls loop flow','i++ increments after each iteration'],
+    commonMistake:'Off-by-one errors: using <= instead of < may change iterations.',
+    tags:['loops','for','easy']
+  },
+
+  {
+    id:19,
+    topic:"while vs for",
+    concept:"while repeats while a condition is true; for is compact when count known.",
+    analogy:"while is like 'keep doing this until...', for is 'do this N times'.",
+    code:'#include <stdio.h>\n\nint main() {\n    int i = 0;\n    while (i < 3) {\n        printf(\"%d \", i);\n        i++;\n    }\n    printf(\"\\n\");\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"0 1 2",
+    traceExplanation:[
+      "Start main.",
+      "i=0; while checks i<3 true → prints 0; i becomes 1.",
+      "Loop continues for i=1 and i=2 similarly.",
+      "When i=3 condition false; exit and print newline.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'int i = 0;', meaning:'Initialize counter.'},
+      {line:5, code:'while (i < 3) {', meaning:'Loop while condition true.'},
+      {line:6, code:'printf(\"%d \", i);', meaning:'Print current i.'},
+      {line:7, code:'i++;', meaning:'Increment i each loop.'}
+    ],
+    keyConcepts:['while checks condition before each iteration','Ensure loop variable changes to avoid infinite loop'],
+    commonMistake:'Forgetting to increment i leads to infinite loop.',
+    tags:['loops','while','easy']
+  },
+
+  {
+    id:20,
+    topic:"do-while loop",
+    concept:"do-while runs the body at least once before checking the condition.",
+    analogy:"You must try once, then decide whether to repeat.",
+    code:'#include <stdio.h>\n\nint main() {\n    int i = 0;\n    do {\n        printf(\"%d \", i);\n        i++;\n    } while (i < 1);\n    printf(\"\\n\");\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"0",
+    traceExplanation:[
+      "Start main.",
+      "Enter do block: print 0; i becomes 1.",
+      "Check while (i < 1) → false, exit loop.",
+      "Print newline and exit.",
+    ],
+    lineExplanations:[
+      {line:4, code:'int i = 0;', meaning:'i initialized.'},
+      {line:5, code:'do {', meaning:'Start do-while block; body runs at least once.'},
+      {line:6, code:'printf(\"%d \", i);', meaning:'Prints i.'},
+      {line:8, code:'} while (i < 1);', meaning:'Condition checked after body.'}
+    ],
+    keyConcepts:['do-while guarantees one execution','Condition evaluated after body'],
+    commonMistake:'Expecting condition to be checked before first run.',
+    tags:['loops','do-while','medium']
+  },
+
+  {
+    id:21,
+    topic:"break and continue",
+    concept:"break exits loop immediately; continue skips to next iteration.",
+    analogy:"break is like leaving the room; continue is like skipping this turn and moving on.",
+    code:'#include <stdio.h>\n\nint main() {\n    for (int i=0;i<5;i++){\n        if (i==3) break;\n        if (i==1) continue;\n        printf(\"%d\", i);\n    }\n    printf(\"\\n\");\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"0 2",
+    traceExplanation:[
+      "Start main.",
+      "i=0 → not 3, not 1 → print 0.",
+      "i=1 → continue triggers; skip printing.",
+      "i=2 → print 2.",
+      "i=3 → break triggers; exit loop.",
+      "Print newline and exit.",
+    ],
+    lineExplanations:[
+      {line:4, code:'for (int i=0;i<5;i++){', meaning:'Loop i from 0 to 4.'},
+      {line:5, code:'if (i==3) break;', meaning:'Exit loop when i equals 3.'},
+      {line:6, code:'if (i==1) continue;', meaning:'Skip printing when i equals 1.'},
+      {line:7, code:'printf(\"%d\", i);', meaning:'Print i when not skipped.'}
+    ],
+    keyConcepts:['break stops loop entirely','continue skips to next iteration'],
+    commonMistake:'Expecting continue to stop loop; it only skips current iteration.',
+    tags:['loops','control','medium']
+  },
+
+  {
+    id:22,
+    topic:"Factorial (practical)",
+    concept:"Use loops to compute factorial by repeated multiplication.",
+    analogy:"Factorial multiplies a chain of numbers together like folding layers.",
+    code:'#include <stdio.h>\n\nint main() {\n    int n = 4;\n    int fact = 1;\n    for (int i = 1; i <= n; i++) fact *= i;\n    printf(\"%d\\n\", fact);\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"24",
+    traceExplanation:[
+      "Start main.",
+      "n=4, fact=1.",
+      "i=1 → fact=1*1=1; i=2 → fact=1*2=2; i=3 → fact=2*3=6; i=4 → fact=6*4=24.",
+      "Loop ends; print 24.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'int n = 4;', meaning:'n is the number to factorial.'},
+      {line:5, code:'int fact = 1;', meaning:'Initialize accumulator.'},
+      {line:6, code:'for (int i = 1; i <= n; i++) fact *= i;', meaning:'Multiply fact by i each iteration.'}
+    ],
+    keyConcepts:['Use accumulator variables','Loop boundaries inclusive for factorial'],
+    commonMistake:'Starting i at 0 would zero out factorial (fact*=0).',
+    tags:['loops','practical','medium']
+  },
+
+  {
+    id:23,
+    topic:"Function basics",
+    concept:"Functions group reusable code with parameters and return values.",
+    analogy:"Functions are machines: feed inputs, get outputs.",
+    code:'#include <stdio.h>\n\nint add(int a, int b) {\n    return a + b;\n}\n\nint main() {\n    printf(\"%d\\n\", add(2,3));\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"5",
+    traceExplanation:[
+      "Program starts; add function defined.",
+      "main calls add(2,3).",
+      "Inside add: a=2, b=3 → return 5.",
+      "printf prints 5 then newline.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:1, code:'#include <stdio.h>', meaning:'Provides printf.'},
+      {line:3, code:'int add(int a, int b) {', meaning:'Function add takes two ints.'},
+      {line:4, code:'return a + b;', meaning:'Returns sum.'},
+      {line:8, code:'printf(\"%d\\n\", add(2,3));', meaning:'Calls add and prints result.'}
+    ],
+    keyConcepts:['Functions encapsulate logic','Parameters are local to function','Return passes value back'],
+    commonMistake:'Confusing parameter names with global variables.',
+    tags:['functions','easy']
+  },
+
+  {
+    id:24,
+    topic:"Pass-by-value vs reference",
+    concept:"C passes arguments by value; to modify caller variables, pass pointers.",
+    analogy:"Passing by value is giving a copy of a note; passing address is giving the location to edit the original note.",
+    code:'#include <stdio.h>\n\nvoid inc(int x) { x = x + 1; }\nvoid incRef(int *p) { *p = *p + 1; }\n\nint main() {\n    int a = 5;\n    inc(a);\n    incRef(&a);\n    printf(\"%d\\n\", a);\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"6",
+    traceExplanation:[
+      "Start main: a=5.",
+      "inc(a) receives a copy (5) and increments local copy → original a still 5.",
+      "incRef(&a) receives address of a; *p increments original memory → a becomes 6.",
+      "printf prints 6.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:1, code:'void inc(int x) { x = x + 1; }', meaning:'Takes copy of value; modifying x does not change caller.'},
+      {line:2, code:'void incRef(int *p) { *p = *p + 1; }', meaning:'Takes pointer and modifies value at that address.'},
+      {line:6, code:'inc(a);', meaning:'Pass-by-value; no change to a.'},
+      {line:7, code:'incRef(&a);', meaning:'Pass address so function can modify original.'}
+    ],
+    keyConcepts:['C uses pass-by-value','Use pointers (& and *) to modify caller variables'],
+    commonMistake:'Expecting functions to change caller variables without pointers.',
+    tags:['functions','pointers','medium']
+  },
+
+  {
+    id:25,
+    topic:"Pointer basics",
+    concept:"Pointers store memory addresses; use * to dereference and & to get address.",
+    analogy:"Pointer is a sticky note with an address; dereferencing opens the box at that address.",
+    code:'#include <stdio.h>\n\nint main() {\n    int x = 10;\n    int *p = &x;\n    printf(\"%d %d\\n\", x, *p);\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"10 10",
+    traceExplanation:[
+      "Start main.",
+      "x = 10 stored.",
+      "p stores address of x.",
+      "*p reads value at that address → 10.",
+      "printf prints x and *p → '10 10'.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'int x = 10;', meaning:'x stores 10.'},
+      {line:5, code:'int *p = &x;', meaning:'p stores address of x.'},
+      {line:6, code:'printf(\"%d %d\\n\", x, *p);', meaning:'Prints x and value pointed by p.'}
+    ],
+    keyConcepts:['& gets address','* dereferences pointer to access value'],
+    commonMistake:'Confusing pointer type int* with int; forgetting to dereference.',
+    tags:['pointers','basics','medium']
+  },
+
+  {
+    id:26,
+    topic:"Arrays and indexing",
+    concept:"Arrays store sequences; indexing starts at 0.",
+    analogy:"Array is a row of boxes numbered from 0; arr[0] is the first box.",
+    code:'#include <stdio.h>\n\nint main() {\n    int a[3] = {2,4,6};\n    printf(\"%d\\n\", a[1]);\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"4",
+    traceExplanation:[
+      "Start main.",
+      "Array a created: a[0]=2, a[1]=4, a[2]=6.",
+      "printf prints a[1] which is 4.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'int a[3] = {2,4,6};', meaning:'Declares array with three elements.'},
+      {line:5, code:'printf(\"%d\\n\", a[1]);', meaning:'Prints second element (index 1).'}
+    ],
+    keyConcepts:['Arrays indexed from 0','a[1] accesses second element'],
+    commonMistake:'Thinking arrays start at 1; off-by-one indexing errors.',
+    tags:['arrays','basics','easy']
+  },
+
+  {
+    id:27,
+    topic:"Strings and null terminator",
+    concept:"Strings are char arrays ending with '\\0' to mark the end.",
+    analogy:"A string is a chain of letters with a special stop sign '\\0' at the end.",
+    code:'#include <stdio.h>\n#include <string.h>\n\nint main() {\n    char s[] = \"hi\";\n    printf(\"%zu %c\\n\", strlen(s), s[1]);\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"2 i",
+    traceExplanation:[
+      "Start main.",
+      "s contains 'h','i','\\0'. strlen(s) returns 2 (not counting \\0).",
+      "s[1] is 'i'.",
+      "printf prints '2 i'.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:1, code:'#include <stdio.h>', meaning:'printf available.'},
+      {line:2, code:'#include <string.h>', meaning:'strlen declared.'},
+      {line:5, code:'char s[] = \"hi\";', meaning:'String literal stored with null terminator.'},
+      {line:6, code:'printf(\"%zu %c\\n\", strlen(s), s[1]);', meaning:'Prints length and second character.'}
+    ],
+    keyConcepts:['Strings end with \\0','strlen counts characters before \\0'],
+    commonMistake:'Expecting strlen to include null terminator.',
+    tags:['strings','arrays','medium']
+  },
+
+  {
+    id:28,
+    topic:"2D arrays (matrices)",
+    concept:"2D arrays are arrays of arrays: rows and columns indexing.",
+    analogy:"Think of a spreadsheet with rows and columns; a[1][2] is row1 column2.",
+    code:'#include <stdio.h>\n\nint main() {\n    int m[2][2] = {{1,2},{3,4}};\n    printf(\"%d\\n\", m[1][0]);\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"3",
+    traceExplanation:[
+      "Start main.",
+      "m[0][0]=1, m[0][1]=2, m[1][0]=3, m[1][1]=4.",
+      "m[1][0] is 3; print 3.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:4, code:'int m[2][2] = {{1,2},{3,4}};', meaning:'2x2 matrix initialized.'},
+      {line:5, code:'printf(\"%d\\n\", m[1][0]);', meaning:'Prints element at second row, first column.'}
+    ],
+    keyConcepts:['2D arrays indexed as a[row][col]','Row-major memory layout in C'],
+    commonMistake:'Mixing up row and column indices.',
+    tags:['arrays','2d','medium']
+  },
+
+  {
+    id:29,
+    topic:"struct basics",
+    concept:"struct groups related fields into one type.",
+    analogy:"A struct is a form with labeled fields like name, age grouped together.",
+    code:'#include <stdio.h>\n\nstruct Point { int x; int y; };\n\nint main(){\n    struct Point p = {3,4};\n    printf(\"%d %d\\n\", p.x, p.y);\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"3 4",
+    traceExplanation:[
+      "Start main.",
+      "Define struct Point with x and y.",
+      "p initialized with x=3,y=4.",
+      "printf prints p.x and p.y → '3 4'.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:1, code:'#include <stdio.h>', meaning:'printf available.'},
+      {line:2, code:'struct Point { int x; int y; };', meaning:'Defines a struct type.'},
+      {line:5, code:'struct Point p = {3,4};', meaning:'Creates instance p with values.'},
+      {line:6, code:'printf(\"%d %d\\n\", p.x, p.y);', meaning:'Prints struct fields.'}
+    ],
+    keyConcepts:['struct groups fields','Access fields with dot operator .'],
+    commonMistake:'Confusing struct type name and variable name or forgetting semicolon after struct definition.',
+    tags:['structs','basics','medium']
+  },
+
+  {
+    id:30,
+    topic:"File I/O basics",
+    concept:"Use fopen, fprintf, fscanf to write/read files (simple example).",
+    analogy:"Files are like notebooks you open, write into, and close.",
+    code:'#include <stdio.h>\n\nint main(){\n    FILE *f = fopen(\"tmp.txt\",\"w\");\n    if(f){ fprintf(f, \"%d\", 9); fclose(f); }\n    printf(\"%d\\n\", 9);\n    return 0;\n}',
+    question:"What will this program print (ignore file contents)?",
+    correctAnswer:"9",
+    traceExplanation:[
+      "Start main.",
+      "Open file for writing; write 9 to file and close it.",
+      "printf prints 9 to screen.",
+      "Exit."
+    ],
+    lineExplanations:[
+      {line:3, code:'FILE *f = fopen(\"tmp.txt\",\"w\");', meaning:'Opens file for writing; returns pointer or NULL.'},
+      {line:4, code:'if(f){ fprintf(f, \"%d\", 9); fclose(f); }', meaning:'Write to file and close if opened.'},
+      {line:5, code:'printf(\"%d\\n\", 9);', meaning:'Prints 9 to standard output.'}
+    ],
+    keyConcepts:['fopen opens files','Always check for NULL before using FILE*','fclose closes file'],
+    commonMistake:'Not checking fopen result or forgetting to close file.',
+    tags:['io','advanced','medium']
+  },
+
+  {
+    id:31,
+    topic:"Dynamic memory (malloc/free)",
+    concept:"malloc allocates memory at runtime; free releases it.",
+    analogy:"malloc rents a box from the warehouse; free returns it when done.",
+    code:'#include <stdio.h>\n#include <stdlib.h>\n\nint main(){\n    int *p = malloc(sizeof(int));\n    *p = 11;\n    printf(\"%d\\n\", *p);\n    free(p);\n    return 0;\n}',
+    question:"What will this program print?",
+    correctAnswer:"11",
+    traceExplanation:[
+      "Start main.",
+      "malloc allocates memory for one int; p points to it.",
+      "*p = 11 stores 11 in allocated memory.",
+      "printf prints value at *p → 11.",
+      "free releases memory and exit."
+    ],
+    lineExplanations:[
+      {line:1, code:'#include <stdio.h>', meaning:'printf available.'},
+      {line:2, code:'#include <stdlib.h>', meaning:'malloc and free declared.'},
+      {line:5, code:'int *p = malloc(sizeof(int));', meaning:'Allocate memory for one int.'},
+      {line:6, code:'*p = 11;', meaning:'Store 11 in allocated memory.'}
+    ],
+    keyConcepts:['malloc returns pointer to allocated memory','Always free memory when done'],
+    commonMistake:'Using memory after free or forgetting to free (memory leak).',
+    tags:['memory','advanced','medium']
+  }
+];
+
+/* ===========================
+   State management
+   - currentIndex: index in questions array
+   - score: number correct
+   - answered: map of question id to boolean
+   - storage keys
+   =========================== */
+
+const STORAGE_KEY = 'clt_state_v1';
+
+let state = {
+  currentIndex: 0,
+  score: 0,
+  answered: {} // id -> true/false
+};
+
+/* Load state from localStorage */
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(parsed && typeof parsed === 'object'){
+        state = Object.assign(state, parsed);
+      }
     }
-  ];
-
-  // ================= STATE =================
-  let currentIdx = 0;
-  let score = 0;
-  let answered = false;
-
-  // ================= DOM REFS =================
-  const els = {
-    progressText: document.getElementById('progress-text'),
-    scoreText: document.getElementById('score-text'),
-    progressFill: document.getElementById('progress-fill'),
-    conceptText: document.getElementById('concept-text'),
-    codeDisplay: document.getElementById('code-display'),
-    questionText: document.getElementById('question-text'),
-    answerInput: document.getElementById('answer-input'),
-    checkBtn: document.getElementById('check-btn'),
-    resultSection: document.getElementById('result-section'),
-    feedback: document.getElementById('feedback'),
-    explanationList: document.getElementById('explanation-list'),
-    nextBtn: document.getElementById('next-btn'),
-    completionScreen: document.getElementById('completion-screen'),
-    finalScore: document.getElementById('final-score'),
-    totalQuestions: document.getElementById('total-questions'),
-    restartBtn: document.getElementById('restart-btn')
-  };
-
-  // ================= FUNCTIONS =================
-  function updateUI() {
-    const q = questions[currentIdx];
-    els.progressText.textContent = `Question ${currentIdx + 1} of ${questions.length}`;
-    els.scoreText.textContent = `Score: ${score}`;
-    els.progressFill.style.width = `${((currentIdx + 1) / questions.length) * 100}%`;
-    
-    els.conceptText.textContent = q.concept;
-    els.codeDisplay.textContent = q.code;
-    els.questionText.textContent = q.question;
-    
-    els.answerInput.value = '';
-    els.answerInput.disabled = false;
-    els.checkBtn.disabled = false;
-    els.resultSection.classList.add('hidden');
-    answered = false;
-    
-    els.completionScreen.classList.add('hidden');
-    document.querySelector('.card.concept-box').classList.remove('hidden');
-    document.querySelector('.card.code-block').classList.remove('hidden');
-    document.querySelector('.card.input-section').classList.remove('hidden');
+  }catch(e){
+    console.warn('Could not load state', e);
   }
+}
 
-  function normalizeAnswer(str) {
-    return str.trim().toLowerCase().replace(/\s+/g, ' ');
+/* Save state to localStorage */
+function saveState(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }catch(e){
+    console.warn('Could not save state', e);
   }
+}
 
-  function checkAnswer() {
-    if (answered) return;
-    const userAns = normalizeAnswer(els.answerInput.value);
-    const correctAns = normalizeAnswer(questions[currentIdx].answer);
-    
-    if (!userAns) {
-      els.answerInput.style.borderColor = 'var(--error)';
-      setTimeout(() => els.answerInput.style.borderColor = '', 1000);
+/* Reset progress */
+function resetProgress(){
+  if(confirm('Reset progress and score?')){
+    state = {currentIndex:0, score:0, answered:{}};
+    saveState();
+    render();
+  }
+}
+
+/* ===========================
+   DOM helpers & rendering
+   =========================== */
+
+const el = id => document.getElementById(id);
+
+function render(){
+  const total = questions.length;
+  const idx = state.currentIndex;
+  const q = questions[idx];
+
+  // Header
+  el('progressText').textContent = `Question ${idx+1} of ${total}`;
+  el('scoreText').textContent = `✅ Correct: ${state.score}`;
+  const pct = Math.round(((idx)/total)*100);
+  el('progressFill').style.width = `${Math.round(((idx)/total)*100)}%`;
+
+  // Concept card
+  el('topicTitle').textContent = `${q.topic}`;
+  el('conceptText').textContent = q.concept;
+  el('analogyText').textContent = q.analogy;
+  el('tagList').textContent = q.tags.join(', ');
+
+  // Code block
+  el('codeArea').textContent = q.code;
+  el('snippetInfo').textContent = `ID ${q.id} • ${q.topic}`;
+
+  // Line explanations
+  const show = el('toggleLines').checked;
+  el('lineExplanationsWrap').style.display = show ? 'block' : 'none';
+  const tbody = el('lineTableBody');
+  tbody.innerHTML = '';
+  q.lineExplanations.forEach(item=>{
+    const tr = document.createElement('tr');
+    const tdLine = document.createElement('td'); tdLine.textContent = item.line;
+    const tdCode = document.createElement('td'); tdCode.textContent = item.code;
+    const tdMeaning = document.createElement('td'); tdMeaning.textContent = item.meaning;
+    tr.appendChild(tdLine); tr.appendChild(tdCode); tr.appendChild(tdMeaning);
+    tbody.appendChild(tr);
+  });
+
+  // Prediction input reset
+  el('predictInput').value = '';
+  el('checkBtn').disabled = true;
+  el('resultSection').style.display = 'none';
+  el('completion').style.display = 'none';
+  el('mainCard').style.display = 'block';
+  el('hintArea').textContent = '';
+
+  // If we've finished all questions, show completion
+  if(idx >= total){
+    showCompletion();
+  }
+}
+
+/* Show completion screen */
+function showCompletion(){
+  const total = questions.length;
+  el('mainCard').style.display = 'none';
+  el('completion').style.display = 'flex';
+  el('finalScore').textContent = `Score: ${state.score} out of ${total}`;
+  const percent = Math.round((state.score/total)*100);
+  el('finalPercent').textContent = `Percentage: ${percent}%`;
+  el('progressFill').style.width = '100%';
+}
+
+/* ===========================
+   Input normalization & answer checking
+   =========================== */
+
+/* Normalize strings for comparison:
+   - trim, toLowerCase
+   - replace commas with spaces
+   - collapse multiple spaces to single
+   - remove trailing newlines
+*/
+function normalizeAnswer(s){
+  if(typeof s !== 'string') return '';
+  return s.trim().toLowerCase().replace(/,/g,' ').replace(/\s+/g,' ').replace(/\n/g,' ').trim();
+}
+
+/* Validate answer: accepts multiple formats like "6 5", "6,5" */
+function isAnswerCorrect(userRaw, correctRaw){
+  const u = normalizeAnswer(userRaw);
+  const c = normalizeAnswer(correctRaw);
+  // Accept exact match
+  if(u === c) return true;
+  // Accept if both are sequences of tokens that match ignoring separators
+  const uTokens = u.split(' ').filter(Boolean);
+  const cTokens = c.split(' ').filter(Boolean);
+  if(uTokens.length === cTokens.length){
+    let allMatch = true;
+    for(let i=0;i<uTokens.length;i++){
+      if(uTokens[i] !== cTokens[i]) { allMatch = false; break; }
+    }
+    if(allMatch) return true;
+  }
+  // Accept if user used commas without spaces and correct uses spaces
+  if(u.replace(/,/g,'') === c.replace(/,/g,'')) return true;
+  return false;
+}
+
+/* Provide targeted feedback for common mistakes */
+function detectMistake(userRaw, q){
+  const u = normalizeAnswer(userRaw);
+  // Example heuristics:
+  if(q.commonMistake && u !== normalizeAnswer(q.correctAnswer)){
+    return q.commonMistake;
+  }
+  // Specific: if correct is integer but user included decimal
+  if(/^\d+$/.test(normalizeAnswer(q.correctAnswer)) && /\d+\.\d+/.test(userRaw)){
+    return 'You provided a decimal but the program prints an integer (C truncates or prints integer formats).';
+  }
+  // If modulus question and user used division result
+  if(q.topic && q.topic.toLowerCase().includes('modulus') && u.includes('/')){
+    return 'Remember % gives remainder, not quotient.';
+  }
+  return '';
+}
+
+/* Render result & explanation */
+function showResult(isCorrect, q, userRaw){
+  el('resultSection').style.display = 'block';
+  const fb = el('feedbackBanner');
+  fb.className = 'feedback ' + (isCorrect ? 'correct' : 'wrong');
+  fb.textContent = isCorrect ? '✅ Correct!' : '❌ Not quite.';
+  // Trace
+  const traceList = el('traceList');
+  traceList.innerHTML = '';
+  q.traceExplanation.forEach(step=>{
+    const li = document.createElement('li');
+    li.textContent = step;
+    traceList.appendChild(li);
+  });
+  // Key concepts
+  el('keyConcepts').innerHTML = '';
+  q.keyConcepts.forEach(k=>{
+    const div = document.createElement('div');
+    div.textContent = '• ' + k;
+    el('keyConcepts').appendChild(div);
+  });
+  // If wrong, add targeted misconception
+  if(!isCorrect){
+    const hint = detectMistake(userRaw, q);
+    if(hint){
+      const h = document.createElement('div');
+      h.style.marginTop = '8px';
+      h.style.color = 'var(--muted)';
+      h.textContent = 'Possible misconception: ' + hint;
+      el('resultBox').appendChild(h);
+    }
+  }
+}
+
+/* ===========================
+   Event handlers
+   =========================== */
+
+function onInputChange(e){
+  const v = e.target.value;
+  el('checkBtn').disabled = v.trim().length === 0;
+}
+
+/* Auto-close brackets and quotes in input field */
+function setupAutoClose(input){
+  input.addEventListener('keydown', function(e){
+    const openers = {'(':')','[':']','{':'}','"':'"',"'" : "'"};
+    const key = e.key;
+    if(openers[key]){
+      e.preventDefault();
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      const val = input.value;
+      const close = openers[key];
+      input.value = val.slice(0,start) + key + close + val.slice(end);
+      input.selectionStart = input.selectionEnd = start + 1;
+      // trigger input event
+      input.dispatchEvent(new Event('input'));
       return;
     }
-
-    answered = true;
-    const isCorrect = userAns === correctAns;
-    
-    if (isCorrect) score++;
-    
-    els.feedback.textContent = isCorrect ? '✅ Correct! Well reasoned.' : '❌ Not quite. Review the steps below.';
-    els.feedback.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
-    
-    els.explanationList.innerHTML = questions[currentIdx].explanation
-      .map(step => `<li>${step}</li>`).join('');
-    
-    els.resultSection.classList.remove('hidden');
-    els.answerInput.disabled = true;
-    els.checkBtn.disabled = true;
-    
-    els.scoreText.textContent = `Score: ${score}`;
-  }
-
-  function nextQuestion() {
-    currentIdx++;
-    if (currentIdx >= questions.length) {
-      showCompletion();
-    } else {
-      updateUI();
+    // Handle Backspace to remove paired closers if directly after opener
+    if(key === 'Backspace'){
+      const start = input.selectionStart;
+      const val = input.value;
+      if(start>0 && val[start-1] && val[start] && ')]}"\''.includes(val[start]) ){
+        // If char before is opener and char at cursor is matching closer, remove both
+        const pairs = {'(':')','[':']','{':'}','"':'"',"'" : "'"};
+        const prev = val[start-1];
+        const next = val[start];
+        if(pairs[prev] === next){
+          e.preventDefault();
+          input.value = val.slice(0,start-1) + val.slice(start+1);
+          input.selectionStart = input.selectionEnd = start-1;
+          input.dispatchEvent(new Event('input'));
+          return;
+        }
+      }
     }
-  }
+  });
+}
 
-  function showCompletion() {
-    document.querySelector('.card.concept-box').classList.add('hidden');
-    document.querySelector('.card.code-block').classList.add('hidden');
-    document.querySelector('.card.input-section').classList.add('hidden');
-    els.resultSection.classList.add('hidden');
-    els.completionScreen.classList.remove('hidden');
-    els.finalScore.textContent = score;
-    els.totalQuestions.textContent = questions.length;
-    els.progressFill.style.width = '100%';
+/* Check answer handler */
+function checkAnswer(){
+  const q = questions[state.currentIndex];
+  const userRaw = el('predictInput').value;
+  const correctRaw = q.correctAnswer;
+  const correct = isAnswerCorrect(userRaw, correctRaw);
+  // Update score and answered map only first time correct
+  if(correct && !state.answered[q.id]){
+    state.score += 1;
+    state.answered[q.id] = true;
+    saveState();
+  } else if(!state.answered[q.id]){
+    // mark as attempted but not correct to avoid double scoring later
+    state.answered[q.id] = false;
+    saveState();
   }
+  showResult(correct, q, userRaw);
+}
 
-  function resetApp() {
-    currentIdx = 0;
-    score = 0;
-    updateUI();
+/* Reveal answer (skip) */
+function revealAnswer(){
+  const q = questions[state.currentIndex];
+  el('predictInput').value = q.correctAnswer;
+  el('checkBtn').disabled = false;
+  el('hintArea').textContent = 'Answer revealed; press Check Answer to continue.';
+}
+
+/* Next question */
+function nextQuestion(){
+  state.currentIndex += 1;
+  // If beyond last, show completion
+  if(state.currentIndex >= questions.length){
+    saveState();
+    render();
+    return;
   }
+  saveState();
+  render();
+}
 
-  // Auto-close brackets/quotes in textarea
-  const pairs = { '(': ')', '[': ']', '{': '}', '"': '"', "'": "'" };
-  els.answerInput.addEventListener('keydown', (e) => {
-    if (pairs[e.key]) {
+/* Restart session (from completion) */
+function restartSession(){
+  if(confirm('Restart session from first question? Score will reset.')){
+    state = {currentIndex:0, score:0, answered:{}};
+    saveState();
+    render();
+  }
+}
+
+/* Review questions: go to first unanswered or first question */
+function reviewQuestions(){
+  state.currentIndex = 0;
+  saveState();
+  render();
+}
+
+/* Keyboard: Enter triggers check when input focused */
+function setupKeyboard(){
+  el('predictInput').addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){
       e.preventDefault();
-      const start = els.answerInput.selectionStart;
-      const end = els.answerInput.selectionEnd;
-      const val = els.answerInput.value;
-      els.answerInput.value = val.substring(0, start) + e.key + pairs[e.key] + val.substring(end);
-      els.answerInput.selectionStart = els.answerInput.selectionEnd = start + 1;
+      if(!el('checkBtn').disabled){
+        checkAnswer();
+      }
     }
   });
+}
 
-  // Event Listeners
-  els.checkBtn.addEventListener('click', checkAnswer);
-  els.nextBtn.addEventListener('click', nextQuestion);
-  els.restartBtn.addEventListener('click', resetApp);
-  els.answerInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && !answered) checkAnswer();
+/* Toggle line explanations */
+function setupToggle(){
+  el('toggleLines').addEventListener('change', function(){
+    el('lineExplanationsWrap').style.display = this.checked ? 'block' : 'none';
   });
+}
 
-  // Init
-  updateUI();
+/* Attach event listeners */
+function attachEvents(){
+  el('predictInput').addEventListener('input', onInputChange);
+  el('checkBtn').addEventListener('click', function(){ try{ checkAnswer(); }catch(e){console.error(e);} });
+  el('showAnswerBtn').addEventListener('click', revealAnswer);
+  el('nextBtn').addEventListener('click', function(){
+    nextQuestion();
+  });
+  el('resetBtn').addEventListener('click', resetProgress);
+  el('restartBtn').addEventListener('click', restartSession);
+  el('reviewBtn').addEventListener('click', reviewQuestions);
+  setupAutoClose(el('predictInput'));
+  setupKeyboard();
+  setupToggle();
+  // Accessibility: allow code area to be focusable and copyable
+  el('codeArea').addEventListener('click', function(){ const sel = window.getSelection(); const range = document.createRange(); range.selectNodeContents(this); sel.removeAllRanges(); sel.addRange(range); });
+}
+
+/* Initialize app */
+function init(){
+  loadState();
+  attachEvents();
+  render();
+}
+
+/* Run init on DOMContentLoaded */
+document.addEventListener('DOMContentLoaded', init);
+
+/* Graceful handling: ensure no console errors on load even if localStorage cleared */
+window.addEventListener('error', function(e){ /* swallow unexpected errors to avoid noisy console in learner environment */ });
+
 </script>
 </body>
 </html>
