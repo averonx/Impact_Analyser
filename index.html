@@ -3,214 +3,375 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>C Sprint | Learn C Fast</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+  <title>C Logic Tutor | Predict & Learn</title>
   <style>
-    .cm-editor { height: 280px !important; font-size: 14px !important; border-radius: 0.5rem; }
-    .progress-bar { transition: width 0.4s ease; }
-    .day-card { transition: all 0.2s; cursor: pointer; }
-    .day-card:hover:not(.locked) { transform: translateY(-2px); }
-    .locked { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
-    .completed { border-left: 4px solid #22c55e; }
+    :root {
+      --bg: #0b0f19;
+      --card: #151b2b;
+      --border: #2a3447;
+      --text: #e2e8f0;
+      --text-dim: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #22c55e;
+      --error: #ef4444;
+      --code-bg: #0f172a;
+      --font-mono: 'Courier New', Courier, monospace;
+      --font-sans: system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container { max-width: 800px; width: 100%; }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .logo { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+    .stats { display: flex; gap: 16px; font-size: 0.9rem; color: var(--text-dim); }
+    .stats span { background: var(--card); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); }
+    .progress-bar {
+      width: 100%; height: 6px; background: var(--border); border-radius: 3px; margin-top: 8px; overflow: hidden;
+    }
+    .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s ease; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .hidden { display: none !important; }
+
+    .concept-box {
+      background: rgba(59, 130, 246, 0.1);
+      border-left: 4px solid var(--accent);
+    }
+    .concept-box h3 { color: var(--accent); margin-bottom: 8px; font-size: 1.1rem; }
+    .concept-box p { color: var(--text-dim); }
+
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      position: relative;
+    }
+    .code-label {
+      position: absolute; top: -10px; left: 12px; background: var(--card);
+      padding: 0 8px; font-size: 0.75rem; color: var(--text-dim); border: 1px solid var(--border); border-radius: 4px;
+    }
+
+    .input-section { text-align: center; }
+    .input-section p { margin-bottom: 12px; font-weight: 500; }
+    input[type="text"] {
+      width: 100%; max-width: 400px; padding: 12px; border-radius: 8px;
+      border: 2px solid var(--border); background: var(--bg); color: var(--text);
+      font-family: var(--font-mono); font-size: 1rem; outline: none; transition: border 0.2s;
+    }
+    input[type="text"]:focus { border-color: var(--accent); }
+    input[type="text"]:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .btn {
+      padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; font-size: 0.95rem; margin-top: 12px;
+    }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary:disabled { background: var(--border); cursor: not-allowed; }
+    .btn-secondary { background: transparent; border: 2px solid var(--border); color: var(--text); }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    .result-section { text-align: center; }
+    .feedback { font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; padding: 12px; border-radius: 8px; }
+    .feedback.correct { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+    .feedback.wrong { background: rgba(239, 68, 68, 0.15); color: var(--error); }
+    
+    .explanation { text-align: left; margin-top: 16px; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 8px; }
+    .explanation h4 { margin-bottom: 8px; color: var(--text-dim); }
+    .explanation ol { padding-left: 20px; color: var(--text-dim); }
+    .explanation li { margin-bottom: 6px; line-height: 1.6; }
+    .explanation li strong { color: var(--text); }
+
+    .completion { text-align: center; padding: 40px 20px; }
+    .completion h2 { font-size: 2rem; margin-bottom: 12px; color: var(--accent); }
+    .completion p { color: var(--text-dim); margin-bottom: 20px; }
+
+    @media (max-width: 600px) {
+      header { flex-direction: column; align-items: flex-start; }
+      .stats { width: 100%; justify-content: space-between; }
+    }
   </style>
 </head>
-<body class="bg-gray-900 text-gray-100 font-sans min-h-screen">
-  <div class="max-w-6xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- LEFT: Roadmap -->
-    <div class="lg:col-span-1 bg-gray-800 rounded-xl p-4 shadow-lg">
-      <h1 class="text-2xl font-bold mb-2 text-blue-400">C Sprint 🚀</h1>
-      <div class="flex justify-between items-center mb-4 text-sm text-gray-400">
-        <span id="streak-display">🔥 Streak: 0 days</span>
-        <span id="progress-display">0% Complete</span>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">🧠 C Logic Tutor</div>
+      <div class="stats">
+        <span id="progress-text">Question 1 of 5</span>
+        <span id="score-text">Score: 0</span>
       </div>
-      <div class="w-full bg-gray-700 rounded-full h-2 mb-4">
-        <div id="progress-bar" class="progress-bar bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
-      </div>
-      <div id="roadmap" class="space-y-2 max-h-[70vh] overflow-y-auto pr-2"></div>
-    </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    </header>
 
-    <!-- CENTER: Editor -->
-    <div class="lg:col-span-2 space-y-4">
-      <div class="bg-gray-800 rounded-xl p-4 shadow-lg">
-        <div class="flex justify-between items-center mb-3">
-          <h2 id="day-title" class="text-xl font-semibold text-green-400">Select a Day to Start</h2>
-          <div class="flex gap-2">
-            <span id="timer-display" class="bg-gray-700 px-3 py-1 rounded text-sm">00:00</span>
-            <button id="reset-timer" class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-sm">Reset</button>
-          </div>
+    <main id="app">
+      <div class="card concept-box">
+        <h3>💡 Concept</h3>
+        <p id="concept-text">Loading...</p>
+      </div>
+
+      <div class="card code-block">
+        <span class="code-label">C Code</span>
+        <pre id="code-display"></pre>
+      </div>
+
+      <div class="card input-section">
+        <p id="question-text">What will this program print?</p>
+        <input type="text" id="answer-input" placeholder="Type exact output (e.g., 5 8)..." autocomplete="off">
+        <button id="check-btn" class="btn btn-primary">Check Answer</button>
+      </div>
+
+      <div id="result-section" class="card result-section hidden">
+        <div id="feedback" class="feedback"></div>
+        <div class="explanation">
+          <h4>📖 Step-by-Step Execution</h4>
+          <ol id="explanation-list"></ol>
         </div>
-        <p id="day-desc" class="text-gray-400 mb-3 text-sm">Click a day on the left to load its challenge.</p>
-        <div id="code-editor"></div>
-        <div class="flex gap-2 mt-4">
-          <button id="run-btn" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-medium flex-1">▶ Run Code</button>
-          <button id="complete-btn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-medium">✅ Mark Complete</button>
-        </div>
+        <button id="next-btn" class="btn btn-secondary">Next Question →</button>
       </div>
 
-      <div class="bg-gray-800 rounded-xl p-4 shadow-lg">
-        <h3 class="text-lg font-semibold mb-2 text-yellow-400">Console Output</h3>
-        <pre id="console-output" class="bg-black p-3 rounded h-32 overflow-auto text-green-300 font-mono text-sm">Ready...</pre>
+      <div id="completion-screen" class="card completion hidden">
+        <h2>🎉 Session Complete!</h2>
+        <p>You scored <span id="final-score">0</span> out of <span id="total-questions">0</span></p>
+        <button id="restart-btn" class="btn btn-primary">Restart Session</button>
       </div>
-
-      <div class="bg-gray-800 rounded-xl p-4 shadow-lg text-sm text-gray-400">
-        <p>💡 <strong>Anti-Procrastination Rules:</strong></p>
-        <ul class="list-disc ml-5 mt-1 space-y-1">
-          <li>Max 75 mins/day. Timer pauses automatically.</li>
-          <li>Trace loops/recursion on paper before coding.</li>
-          <li>"Ugly first compile" > waiting for perfect code.</li>
-          <li>Data saves in browser. Clear cache = reset.</li>
-        </ul>
-      </div>
-    </div>
+    </main>
   </div>
 
 <script>
-  // 21-Day Curriculum (Mapped to your PDF)
-  const curriculum = [
-    { day:1, title:"Basics & I/O", desc:"printf, scanf, typecasting, variables. Build: Grade Calculator", trace:"Draw variable states before coding" },
-    { day:2, title:"Conditionals", desc:"if-else, && ||, leap year logic. Build: Triangle Validator", trace:"Map branches on paper" },
-    { day:3, title:"Loops", desc:"for/while/do-while. Build: Digit Counter & Reverser", trace:"Step through iterations manually" },
-    { day:4, title:"Nested Loops", desc:"Row/column architecture. Build: Solid Rectangle → Triangle", trace:"Draw i,j grid" },
-    { day:5, title:"Advanced Patterns", desc:"Inverted, Floyd’s, 0/1 triangle. Build: Number Pyramid", trace:"Track spaces & stars per row" },
-    { day:6, title:"Logic Refactor", desc:"Convert patterns to functions. Clean & modularize", trace:"Identify repeating blocks" },
-    { day:7, title:"Checkpoint 1", desc:"CLI Number Guessing Game. Combine loops + conditionals", trace:"Plan game flow first" },
-    { day:8, title:"Functions & Prototypes", desc:"nCr, swap without temp. Build: Math Utility", trace:"Map parameter flow" },
-    { day:9, title:"Pointers", desc:"&, *, pass-by-reference. Build: In-place swap", trace:"Draw memory addresses" },
-    { day:10, title:"Recursion", desc:"Base case, call stack. Build: n→1, sum 1→n", trace:"Draw recursion ladder" },
-    { day:11, title:"Strings & string.h", desc:"strlen, strcpy, reverse. Build: Vowel Counter", trace:"Track '\0' position" },
-    { day:12, title:"Char Pointers", desc:"Read-only vs mutable strings. Build: Safe copy tool", trace:"Sketch stack vs heap" },
-    { day:13, title:"1D Arrays", desc:"In-place reverse, second largest. Build: Array Manager", trace:"Index mapping" },
-    { day:14, title:"Checkpoint 2", desc:"String Analyzer (reverse, length, count, search)", trace:"Plan data flow" },
-    { day:15, title:"Structs", desc:"Student/Book records, dot operator. Build: Record Creator", trace:"Memory layout" },
-    { day:16, title:"Struct Arrays & ->", desc:"Pass to functions, pointer access. Build: Batch Updater", trace:"Address chaining" },
-    { day:17, title:"2D Arrays", desc:"Transpose, add, row max. Build: Matrix Tool", trace:"Row/col grid" },
-    { day:18, title:"Sorting & Big O", desc:"Bubble/Selection, move zeros. Build: Sorter", trace:"Pass-by-pass swaps" },
-    { day:19, title:"Dynamic Memory", desc:"malloc, calloc, realloc, free. Build: Dynamic Input", trace:"Heap allocation sketch" },
-    { day:20, title:"File I/O", desc:"fopen, fprintf, fscanf, save/load. Build: Persistent Records", trace:"File pointer flow" },
-    { day:21, title:"CAPSTONE", desc:"CLI Task Manager: add, view, sort, save, delete, search", trace:"Full architecture" }
+  // ================= DATA =================
+  const questions = [
+    {
+      id: 1,
+      topic: "Variables & Assignment",
+      concept: "Variables are labeled boxes in memory. Assigning a new value replaces the old one completely.",
+      code: `int x = 5;\nx = x + 3;\nprintf("%d", x);`,
+      question: "What will be printed?",
+      answer: "8",
+      explanation: [
+        "<strong>int x = 5;</strong> → Memory box 'x' is created and stores <strong>5</strong>.",
+        "<strong>x = x + 3;</strong> → Take current value of x (5), add 3, store back in x. Now x = <strong>8</strong>.",
+        "<strong>printf(\"%d\", x);</strong> → Prints the current value of x, which is <strong>8</strong>."
+      ]
+    },
+    {
+      id: 2,
+      topic: "Post-increment vs Pre-increment",
+      concept: "x++ (post) uses current value first, then increases. ++x (pre) increases first, then uses new value.",
+      code: `int a = 5;\nint b = a++;\nprintf("%d %d", a, b);`,
+      question: "What will be printed?",
+      answer: "6 5",
+      explanation: [
+        "<strong>int a = 5;</strong> → a holds 5.",
+        "<strong>int b = a++;</strong> → Post-increment: b gets CURRENT value of a (<strong>5</strong>). THEN a increases to <strong>6</strong>.",
+        "<strong>printf</strong> → Prints a (6) and b (5). Output: <strong>6 5</strong>"
+      ]
+    },
+    {
+      id: 3,
+      topic: "Integer Division",
+      concept: "Dividing two integers always truncates decimals. No rounding occurs.",
+      code: `int x = 7;\nint y = 2;\nint z = x / y;\nprintf("%d", z);`,
+      question: "What will be printed?",
+      answer: "3",
+      explanation: [
+        "<strong>x = 7, y = 2</strong>",
+        "<strong>z = x / y</strong> → 7 / 2 = 3.5, but C drops .5 for integers → z = <strong>3</strong>",
+        "<strong>printf</strong> → Prints <strong>3</strong>"
+      ]
+    },
+    {
+      id: 4,
+      topic: "Modulus Operator",
+      concept: "% gives the remainder after division. Great for checking even/odd or cycling patterns.",
+      code: `int n = 17;\nint r = n % 5;\nprintf("%d", r);`,
+      question: "What will be printed?",
+      answer: "2",
+      explanation: [
+        "<strong>n = 17</strong>",
+        "<strong>r = n % 5</strong> → 17 ÷ 5 = 3 with remainder <strong>2</strong>",
+        "<strong>printf</strong> → Prints <strong>2</strong>"
+      ]
+    },
+    {
+      id: 5,
+      topic: "For Loop Execution",
+      concept: "For loop order: init → check condition → execute body → increment → repeat until false.",
+      code: `int sum = 0;\nfor(int i = 1; i <= 3; i++) {\n  sum = sum + i;\n}\nprintf("%d", sum);`,
+      question: "What will be printed?",
+      answer: "6",
+      explanation: [
+        "<strong>sum = 0</strong>",
+        "<strong>i=1:</strong> sum = 0+1 = 1",
+        "<strong>i=2:</strong> sum = 1+2 = 3",
+        "<strong>i=3:</strong> sum = 3+3 = 6",
+        "<strong>i=4:</strong> condition i<=3 fails → loop ends",
+        "<strong>printf</strong> → Prints <strong>6</strong>"
+      ]
+    }
   ];
 
-  // State
-  let editor, timerInterval, timeLeft = 75 * 60;
-  let progress = JSON.parse(localStorage.getItem('cSprint_progress')) || {};
-  let streak = parseInt(localStorage.getItem('cSprint_streak')) || 0;
-  let lastVisit = localStorage.getItem('cSprint_lastVisit');
+  // ================= STATE =================
+  let currentIdx = 0;
+  let score = 0;
+  let answered = false;
+
+  // ================= DOM REFS =================
+  const els = {
+    progressText: document.getElementById('progress-text'),
+    scoreText: document.getElementById('score-text'),
+    progressFill: document.getElementById('progress-fill'),
+    conceptText: document.getElementById('concept-text'),
+    codeDisplay: document.getElementById('code-display'),
+    questionText: document.getElementById('question-text'),
+    answerInput: document.getElementById('answer-input'),
+    checkBtn: document.getElementById('check-btn'),
+    resultSection: document.getElementById('result-section'),
+    feedback: document.getElementById('feedback'),
+    explanationList: document.getElementById('explanation-list'),
+    nextBtn: document.getElementById('next-btn'),
+    completionScreen: document.getElementById('completion-screen'),
+    finalScore: document.getElementById('final-score'),
+    totalQuestions: document.getElementById('total-questions'),
+    restartBtn: document.getElementById('restart-btn')
+  };
+
+  // ================= FUNCTIONS =================
+  function updateUI() {
+    const q = questions[currentIdx];
+    els.progressText.textContent = `Question ${currentIdx + 1} of ${questions.length}`;
+    els.scoreText.textContent = `Score: ${score}`;
+    els.progressFill.style.width = `${((currentIdx + 1) / questions.length) * 100}%`;
+    
+    els.conceptText.textContent = q.concept;
+    els.codeDisplay.textContent = q.code;
+    els.questionText.textContent = q.question;
+    
+    els.answerInput.value = '';
+    els.answerInput.disabled = false;
+    els.checkBtn.disabled = false;
+    els.resultSection.classList.add('hidden');
+    answered = false;
+    
+    els.completionScreen.classList.add('hidden');
+    document.querySelector('.card.concept-box').classList.remove('hidden');
+    document.querySelector('.card.code-block').classList.remove('hidden');
+    document.querySelector('.card.input-section').classList.remove('hidden');
+  }
+
+  function normalizeAnswer(str) {
+    return str.trim().toLowerCase().replace(/\s+/g, ' ');
+  }
+
+  function checkAnswer() {
+    if (answered) return;
+    const userAns = normalizeAnswer(els.answerInput.value);
+    const correctAns = normalizeAnswer(questions[currentIdx].answer);
+    
+    if (!userAns) {
+      els.answerInput.style.borderColor = 'var(--error)';
+      setTimeout(() => els.answerInput.style.borderColor = '', 1000);
+      return;
+    }
+
+    answered = true;
+    const isCorrect = userAns === correctAns;
+    
+    if (isCorrect) score++;
+    
+    els.feedback.textContent = isCorrect ? '✅ Correct! Well reasoned.' : '❌ Not quite. Review the steps below.';
+    els.feedback.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
+    
+    els.explanationList.innerHTML = questions[currentIdx].explanation
+      .map(step => `<li>${step}</li>`).join('');
+    
+    els.resultSection.classList.remove('hidden');
+    els.answerInput.disabled = true;
+    els.checkBtn.disabled = true;
+    
+    els.scoreText.textContent = `Score: ${score}`;
+  }
+
+  function nextQuestion() {
+    currentIdx++;
+    if (currentIdx >= questions.length) {
+      showCompletion();
+    } else {
+      updateUI();
+    }
+  }
+
+  function showCompletion() {
+    document.querySelector('.card.concept-box').classList.add('hidden');
+    document.querySelector('.card.code-block').classList.add('hidden');
+    document.querySelector('.card.input-section').classList.add('hidden');
+    els.resultSection.classList.add('hidden');
+    els.completionScreen.classList.remove('hidden');
+    els.finalScore.textContent = score;
+    els.totalQuestions.textContent = questions.length;
+    els.progressFill.style.width = '100%';
+  }
+
+  function resetApp() {
+    currentIdx = 0;
+    score = 0;
+    updateUI();
+  }
+
+  // Auto-close brackets/quotes in textarea
+  const pairs = { '(': ')', '[': ']', '{': '}', '"': '"', "'": "'" };
+  els.answerInput.addEventListener('keydown', (e) => {
+    if (pairs[e.key]) {
+      e.preventDefault();
+      const start = els.answerInput.selectionStart;
+      const end = els.answerInput.selectionEnd;
+      const val = els.answerInput.value;
+      els.answerInput.value = val.substring(0, start) + e.key + pairs[e.key] + val.substring(end);
+      els.answerInput.selectionStart = els.answerInput.selectionEnd = start + 1;
+    }
+  });
+
+  // Event Listeners
+  els.checkBtn.addEventListener('click', checkAnswer);
+  els.nextBtn.addEventListener('click', nextQuestion);
+  els.restartBtn.addEventListener('click', resetApp);
+  els.answerInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !answered) checkAnswer();
+  });
 
   // Init
-  document.addEventListener('DOMContentLoaded', () => {
-    editor = CodeMirror(document.getElementById('code-editor'), {
-      mode: "text/x-csrc", theme: "dracula", lineNumbers: true, lineWrapping: true
-    });
-    renderRoadmap();
-    updateStreak();
-    setupTimer();
-  });
-
-  function renderRoadmap() {
-    const container = document.getElementById('roadmap');
-    container.innerHTML = '';
-    curriculum.forEach((d, i) => {
-      const isLocked = i > 0 && !progress[curriculum[i-1].day];
-      const isComplete = progress[d.day];
-      const el = document.createElement('div');
-      el.className = `day-card p-3 rounded bg-gray-700 border border-gray-600 ${isLocked ? 'locked' : ''} ${isComplete ? 'completed' : ''}`;
-      el.innerHTML = `<div class="font-medium text-sm">${d.day}. ${d.title}</div>`;
-      if (!isLocked) el.onclick = () => loadDay(d);
-      container.appendChild(el);
-    });
-    updateProgress();
-  }
-
-  function loadDay(day) {
-    document.getElementById('day-title').innerText = `Day ${day.day}: ${day.title}`;
-    document.getElementById('day-desc').innerText = day.desc;
-    editor.setValue(`#include <stdio.h>\n\nint main() {\n    // ${day.trace}\n    \n    return 0;\n}`);
-    document.getElementById('console-output').textContent = `Day ${day.day} loaded. Trace on paper first, then code.`;
-  }
-
-  function setupTimer() {
-    const updateDisplay = () => {
-      const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-      const s = (timeLeft % 60).toString().padStart(2, '0');
-      document.getElementById('timer-display').textContent = `${m}:${s}`;
-    };
-    document.getElementById('reset-timer').onclick = () => { timeLeft = 75 * 60; updateDisplay(); clearInterval(timerInterval); };
-    timerInterval = setInterval(() => {
-      if (timeLeft > 0) { timeLeft--; updateDisplay(); }
-      else { clearInterval(timerInterval); document.getElementById('console-output').textContent += "\n⏰ 75-min cap reached. Rest & continue tomorrow."; }
-    }, 1000);
-    updateDisplay();
-  }
-
-  function updateProgress() {
-    const done = Object.keys(progress).length;
-    const pct = Math.round((done / curriculum.length) * 100);
-    document.getElementById('progress-display').textContent = `${pct}% Complete`;
-    document.getElementById('progress-bar').style.width = `${pct}%`;
-  }
-
-  function updateStreak() {
-    const today = new Date().toDateString();
-    if (lastVisit !== today) {
-      const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-      streak = (lastVisit === yesterday.toDateString()) ? streak + 1 : 1;
-      localStorage.setItem('cSprint_streak', streak);
-      localStorage.setItem('cSprint_lastVisit', today);
-    }
-    document.getElementById('streak-display').textContent = `🔥 Streak: ${streak} days`;
-  }
-
-  document.getElementById('run-btn').onclick = () => {
-  const code = editor.getValue();
-  const output = document.getElementById('console-output');
-  output.textContent = "⏳ Compiling with Judge0...";
-  
-  fetch('https://ce.judge0.com/submissions?base64_encoded=false&wait=true', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      
-    },
-    body: JSON.stringify({ 
-      source_code: code, 
-      language_id: 50, // C (GCC 9.2.0)
-      stdin: "",
-      cpu_time_limit: "2",
-      memory_limit: 128000
-    })
-  })
-  .then(r => r.json())
-  .then(d => {
-    if (d.stdout) {
-      output.textContent = "✅ Output:\n" + d.stdout;
-    } else if (d.stderr) {
-      output.textContent = "❌ Runtime Error:\n" + d.stderr;
-    } else if (d.compile_output) {
-      output.textContent = "🔧 Compile Error:\n" + d.compile_output;
-    } else {
-      output.textContent = "⚠️ No output. Check your code.";
-    }
-  })
-  .catch(e => {
-    output.textContent = "🌐 Network error: " + e.message + "\n💡 Try again or use local gcc.";
-  });
-};
-
-  document.getElementById('complete-btn').onclick = () => {
-    const title = document.getElementById('day-title').innerText;
-    if (!title.includes("Day")) return alert("Select a day first.");
-    const dayNum = parseInt(title.match(/Day (\d+)/)[1]);
-    if (!progress[dayNum]) {
-      progress[dayNum] = true;
-      localStorage.setItem('cSprint_progress', JSON.stringify(progress));
-      renderRoadmap();
-      document.getElementById('console-output').textContent += "\n🎉 Day marked complete! Unlock next day.";
-    }
-  };
+  updateUI();
 </script>
 </body>
 </html>
