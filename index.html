@@ -3,854 +3,375 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>C Sprint | Learn C From Scratch - 100% Free</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closetag.min.js"></script>
+  <title>C Logic Tutor | Predict & Learn</title>
   <style>
-    .cm-editor { height: 300px !important; font-size: 14px !important; border-radius: 0.5rem; }
-    .progress-bar { transition: width 0.4s ease; }
-    .day-card { transition: all 0.2s; cursor: pointer; border-left: 4px solid transparent; }
-    .day-card:hover:not(.locked) { transform: translateY(-2px); border-left-color: #3b82f6; }
-    .locked { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
-    .completed { border-left-color: #22c55e; background: rgba(34, 197, 94, 0.1); }
-    .active-day { border-left-color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
-    .solution-box { display: none; background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; }
-    .hint-box { display: none; background: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b; }
-    .concept-card { background: rgba(75, 85, 99, 0.3); border-radius: 0.5rem; padding: 1rem; margin: 0.5rem 0; }
-    .example-code { background: #1e293b; padding: 0.75rem; border-radius: 0.375rem; font-family: monospace; margin: 0.5rem 0; }
-    .step-number { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: #3b82f6; color: white; border-radius: 50%; font-size: 0.75rem; margin-right: 0.5rem; }
-    .trace-prompt { background: rgba(168, 85, 247, 0.1); border-left: 4px solid #a855f7; padding: 0.75rem; margin: 0.5rem 0; border-radius: 0 0.375rem 0.375rem 0; }
-    @media (max-width: 1024px) {
-      .grid-cols-3 { grid-template-columns: 1fr !important; }
-      .lg\:col-span-2, .lg\:col-span-1 { grid-column: span 1 !important; }
+    :root {
+      --bg: #0b0f19;
+      --card: #151b2b;
+      --border: #2a3447;
+      --text: #e2e8f0;
+      --text-dim: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #22c55e;
+      --error: #ef4444;
+      --code-bg: #0f172a;
+      --font-mono: 'Courier New', Courier, monospace;
+      --font-sans: system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container { max-width: 800px; width: 100%; }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .logo { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+    .stats { display: flex; gap: 16px; font-size: 0.9rem; color: var(--text-dim); }
+    .stats span { background: var(--card); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); }
+    .progress-bar {
+      width: 100%; height: 6px; background: var(--border); border-radius: 3px; margin-top: 8px; overflow: hidden;
+    }
+    .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s ease; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .hidden { display: none !important; }
+
+    .concept-box {
+      background: rgba(59, 130, 246, 0.1);
+      border-left: 4px solid var(--accent);
+    }
+    .concept-box h3 { color: var(--accent); margin-bottom: 8px; font-size: 1.1rem; }
+    .concept-box p { color: var(--text-dim); }
+
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      position: relative;
+    }
+    .code-label {
+      position: absolute; top: -10px; left: 12px; background: var(--card);
+      padding: 0 8px; font-size: 0.75rem; color: var(--text-dim); border: 1px solid var(--border); border-radius: 4px;
+    }
+
+    .input-section { text-align: center; }
+    .input-section p { margin-bottom: 12px; font-weight: 500; }
+    input[type="text"] {
+      width: 100%; max-width: 400px; padding: 12px; border-radius: 8px;
+      border: 2px solid var(--border); background: var(--bg); color: var(--text);
+      font-family: var(--font-mono); font-size: 1rem; outline: none; transition: border 0.2s;
+    }
+    input[type="text"]:focus { border-color: var(--accent); }
+    input[type="text"]:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .btn {
+      padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; font-size: 0.95rem; margin-top: 12px;
+    }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary:disabled { background: var(--border); cursor: not-allowed; }
+    .btn-secondary { background: transparent; border: 2px solid var(--border); color: var(--text); }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    .result-section { text-align: center; }
+    .feedback { font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; padding: 12px; border-radius: 8px; }
+    .feedback.correct { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+    .feedback.wrong { background: rgba(239, 68, 68, 0.15); color: var(--error); }
+    
+    .explanation { text-align: left; margin-top: 16px; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 8px; }
+    .explanation h4 { margin-bottom: 8px; color: var(--text-dim); }
+    .explanation ol { padding-left: 20px; color: var(--text-dim); }
+    .explanation li { margin-bottom: 6px; line-height: 1.6; }
+    .explanation li strong { color: var(--text); }
+
+    .completion { text-align: center; padding: 40px 20px; }
+    .completion h2 { font-size: 2rem; margin-bottom: 12px; color: var(--accent); }
+    .completion p { color: var(--text-dim); margin-bottom: 20px; }
+
+    @media (max-width: 600px) {
+      header { flex-direction: column; align-items: flex-start; }
+      .stats { width: 100%; justify-content: space-between; }
     }
   </style>
 </head>
-<body class="bg-gray-900 text-gray-100 font-sans min-h-screen">
-  <div class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- LEFT: Roadmap -->
-    <div class="lg:col-span-1 bg-gray-800 rounded-xl p-4 shadow-lg">
-      <div class="flex items-center justify-between mb-4">
-        <h1 class="text-2xl font-bold text-blue-400">C Sprint 🚀</h1>
-        <button id="reset-progress" class="text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded">Reset Progress</button>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">🧠 C Logic Tutor</div>
+      <div class="stats">
+        <span id="progress-text">Question 1 of 5</span>
+        <span id="score-text">Score: 0</span>
       </div>
-      
-      <div class="flex justify-between items-center mb-4 text-sm text-gray-400">
-        <span id="streak-display">🔥 Streak: 0 days</span>
-        <span id="progress-display">0% Complete</span>
-      </div>
-      
-      <div class="w-full bg-gray-700 rounded-full h-2 mb-4">
-        <div id="progress-bar" class="progress-bar bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
-      </div>
-      
-      <div class="mb-4 p-3 bg-gray-700 rounded-lg text-sm">
-        <p class="font-medium mb-1">💡 How to Use:</p>
-        <ol class="list-decimal ml-4 space-y-1 text-gray-300">
-          <li>Start with Day 1 (unlocked)</li>
-          <li>Read concept → Try code → Check solution</li>
-          <li>Mark complete to unlock next day</li>
-          <li>Max 75 mins/day (timer helps!)</li>
-        </ol>
-      </div>
-      
-      <div id="roadmap" class="space-y-2 max-h-[60vh] overflow-y-auto pr-2"></div>
-    </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    </header>
 
-    <!-- CENTER: Learning Content -->
-    <div class="lg:col-span-2 space-y-4">
-      <!-- Day Content -->
-      <div class="bg-gray-800 rounded-xl p-4 shadow-lg">
-        <div class="flex justify-between items-start mb-3">
-          <div>
-            <h2 id="day-title" class="text-xl font-semibold text-green-400">Welcome to C Sprint!</h2>
-            <p id="day-subtitle" class="text-gray-400 text-sm">Select a day from the left to start learning</p>
-          </div>
-          <div class="flex gap-2">
-            <span id="timer-display" class="bg-gray-700 px-3 py-1 rounded text-sm font-mono">75:00</span>
-            <button id="reset-timer" class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-sm">Reset</button>
-          </div>
-        </div>
-        
-        <div id="concept-section" class="mb-4 hidden">
-          <div class="concept-card">
-            <h3 class="font-bold text-lg mb-2 flex items-center">
-              <span class="step-number">1</span>What You'll Learn
-            </h3>
-            <p id="concept-desc" class="text-gray-300"></p>
-          </div>
-          
-          <div class="concept-card">
-            <h3 class="font-bold text-lg mb-2 flex items-center">
-              <span class="step-number">2</span>Key Concepts
-            </h3>
-            <div id="key-concepts" class="space-y-2 text-gray-300"></div>
-          </div>
-          
-          <div class="concept-card">
-            <h3 class="font-bold text-lg mb-2 flex items-center">
-              <span class="step-number">3</span>Example Code
-            </h3>
-            <pre id="example-code" class="example-code text-sm overflow-x-auto"></pre>
-          </div>
-          
-          <div class="trace-prompt">
-            <p class="font-medium">✏️ Before Coding:</p>
-            <p id="trace-prompt" class="text-sm text-gray-300"></p>
-          </div>
-        </div>
-        
-        <div id="task-section" class="mb-4 hidden">
-          <h3 class="font-bold text-lg mb-2 flex items-center">
-            <span class="step-number">4</span>Your Task
-          </h3>
-          <p id="task-desc" class="text-gray-300 mb-3"></p>
-          
-          <div class="flex gap-2 mb-3">
-            <button id="show-hint-btn" class="bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-sm">💡 Show Hint</button>
-            <button id="show-solution-btn" class="bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded text-sm">✨ Show Solution</button>
-          </div>
-          
-          <div id="hint-box" class="hint-box p-3 rounded mb-3 text-sm">
-            <p id="hint-content"></p>
-          </div>
-          
-          <div id="solution-box" class="solution-box p-3 rounded mb-3">
-            <p class="font-medium mb-2">✅ Solution:</p>
-            <pre id="solution-code" class="example-code text-sm overflow-x-auto"></pre>
-          </div>
-        </div>
-        
-        <div id="code-section" class="hidden">
-          <div id="code-editor"></div>
-          
-          <div class="flex gap-2 mt-4">
-            <button id="run-btn" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-medium flex-1">▶ Check Syntax</button>
-            <button id="complete-btn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-medium">✅ Mark Complete</button>
-          </div>
-        </div>
-        
-        <!-- Welcome Message (shown when no day selected) -->
-        <div id="welcome-message" class="text-center py-8">
-          <div class="text-5xl mb-4">🎯</div>
-          <h3 class="text-xl font-bold mb-2">Learn C Programming Step-by-Step</h3>
-          <p class="text-gray-400 mb-4">21 days • 75 mins/day • Zero cost • No API keys needed</p>
-          <div class="bg-gray-700 rounded-lg p-4 text-left max-w-md mx-auto">
-            <p class="font-medium mb-2">✨ What makes this different:</p>
-            <ul class="list-disc ml-5 space-y-1 text-sm text-gray-300">
-              <li>Step-by-step lessons with examples</li>
-              <li>Auto-close brackets & quotes in editor</li>
-              <li>Client-side syntax checking (no internet needed)</li>
-              <li>Progress saved in your browser</li>
-              <li>Anti-procrastination timer & streaks</li>
-              <li>Solutions & hints when you're stuck</li>
-            </ul>
-          </div>
-          <p class="text-sm text-gray-500 mt-4">Click "1. Basics & I/O" on the left to begin!</p>
-        </div>
+    <main id="app">
+      <div class="card concept-box">
+        <h3>💡 Concept</h3>
+        <p id="concept-text">Loading...</p>
       </div>
 
-      <!-- Console Output -->
-      <div class="bg-gray-800 rounded-xl p-4 shadow-lg">
-        <h3 class="text-lg font-semibold mb-2 text-yellow-400 flex items-center">
-          <span class="step-number">5</span>Output & Feedback
-        </h3>
-        <pre id="console-output" class="bg-black p-3 rounded h-32 overflow-auto text-green-300 font-mono text-sm">Ready to code! Select a day to start learning C.</pre>
+      <div class="card code-block">
+        <span class="code-label">C Code</span>
+        <pre id="code-display"></pre>
       </div>
 
-      <!-- Rules & Tips -->
-      <div class="bg-gray-800 rounded-xl p-4 shadow-lg text-sm text-gray-400">
-        <p class="font-medium mb-2">💡 Anti-Procrastination Rules:</p>
-        <ul class="list-disc ml-5 space-y-1">
-          <li><strong>75-minute daily cap:</strong> Timer pauses automatically to prevent burnout</li>
-          <li><strong>Trace on paper first:</strong> Draw variables/memory before coding complex topics</li>
-          <li><strong>"Ugly first compile":</strong> Write broken code → fix errors → learn faster</li>
-          <li><strong>Progress saves locally:</strong> Your streaks and completions stay in your browser</li>
-          <li><strong>No internet needed:</strong> Everything works offline after first load</li>
-        </ul>
+      <div class="card input-section">
+        <p id="question-text">What will this program print?</p>
+        <input type="text" id="answer-input" placeholder="Type exact output (e.g., 5 8)..." autocomplete="off">
+        <button id="check-btn" class="btn btn-primary">Check Answer</button>
       </div>
-    </div>
+
+      <div id="result-section" class="card result-section hidden">
+        <div id="feedback" class="feedback"></div>
+        <div class="explanation">
+          <h4>📖 Step-by-Step Execution</h4>
+          <ol id="explanation-list"></ol>
+        </div>
+        <button id="next-btn" class="btn btn-secondary">Next Question →</button>
+      </div>
+
+      <div id="completion-screen" class="card completion hidden">
+        <h2>🎉 Session Complete!</h2>
+        <p>You scored <span id="final-score">0</span> out of <span id="total-questions">0</span></p>
+        <button id="restart-btn" class="btn btn-primary">Restart Session</button>
+      </div>
+    </main>
   </div>
 
 <script>
-  // Complete 21-Day C Curriculum (Mapped to your PDF)
-  const curriculum = [
+  // ================= DATA =================
+  const questions = [
     {
-      day: 1,
-      title: "Basics & I/O",
-      concept: "Learn how to print output, take input, and use variables in C. This is the foundation of every C program.",
-      keyConcepts: [
-        "printf() prints text to screen",
-        "scanf() takes input from user",
-        "Variables store data (int, float, char)",
-        "Format specifiers: %d (int), %f (float), %c (char)",
-        "Typecasting: (int)float to convert types"
-      ],
-      example: `#include <stdio.h>\n\nint main() {\n    int age = 21;\n    float height = 5.9;\n    char grade = 'A';\n    \n    printf("Age: %d\\n", age);\n    printf("Height: %.1f\\n", height);\n    printf("Grade: %c\\n", grade);\n    \n    return 0;\n}`,
-      tracePrompt: "Draw boxes for age, height, grade. What values go in each?",
-      task: "Build a Grade Calculator: Take percentage input, print half of it, and display grade (Very Good/Good/Average/Fail)",
-      hint: "Use if-else ladder: if(percent >= 81) → Very Good, else if(percent >= 61) → Good, etc. Remember to check for invalid input (<0 or >100)!",
-      solution: `#include <stdio.h>\n\nint main() {\n    float percent;\n    printf("Enter percentage: ");\n    scanf("%f", &percent);\n    \n    // Print half (typecast to int)\n    int half = (int)percent / 2;\n    printf("Half: %d\\n", half);\n    \n    // Grade logic\n    if(percent >= 81 && percent <= 100) {\n        printf("Grade: Very Good\\n");\n    } else if(percent >= 61 && percent < 81) {\n        printf("Grade: Good\\n");\n    } else if(percent >= 41 && percent < 61) {\n        printf("Grade: Average\\n");\n    } else if(percent >= 0 && percent < 41) {\n        printf("Grade: Fail\\n");\n    } else {\n        printf("Error: Invalid percentage!\\n");\n    }\n    \n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n\nint main() {\n    // Your code here\n    // 1. Declare float percent\n    // 2. Take input with scanf\n    // 3. Print half of percent\n    // 4. Add if-else for grades\n    \n    return 0;\n}`
+      id: 1,
+      topic: "Variables & Assignment",
+      concept: "Variables are labeled boxes in memory. Assigning a new value replaces the old one completely.",
+      code: `int x = 5;\nx = x + 3;\nprintf("%d", x);`,
+      question: "What will be printed?",
+      answer: "8",
+      explanation: [
+        "<strong>int x = 5;</strong> → Memory box 'x' is created and stores <strong>5</strong>.",
+        "<strong>x = x + 3;</strong> → Take current value of x (5), add 3, store back in x. Now x = <strong>8</strong>.",
+        "<strong>printf(\"%d\", x);</strong> → Prints the current value of x, which is <strong>8</strong>."
+      ]
     },
     {
-      day: 2,
-      title: "Conditionals",
-      concept: "Master if-else statements, logical operators (&&, ||), and nested conditions to make decisions in your code.",
-      keyConcepts: [
-        "if(condition) { code } runs when true",
-        "else { code } runs when if is false",
-        "&& (AND): both conditions must be true",
-        "|| (OR): at least one condition true",
-        "Nested if: if inside another if"
-      ],
-      example: `#include <stdio.h>\n\nint main() {\n    int num;\n    printf("Enter number: ");\n    scanf("%d", &num);\n    \n    if(num % 2 == 0) {\n        printf("Even\\n");\n    } else {\n        printf("Odd\\n");\n    }\n    \n    // Check if 3-digit number\n    if(num > 99 && num < 1000) {\n        printf("3-digit number\\n");\n    }\n    \n    return 0;\n}`,
-      tracePrompt: "For num=150: Draw the path through if(num%2==0) → else. What about the 3-digit check?",
-      task: "Build a Triangle Validator: Take 3 sides as input, check if they can form a valid triangle (a+b>c, b+c>a, c+a>b)",
-      hint: "Store sides in variables a, b, c. Use if(a+b>c && b+c>a && c+a>b) to check validity. Print 'Valid triangle' or 'Invalid triangle'.",
-      solution: `#include <stdio.h>\n\nint main() {\n    int a, b, c;\n    printf("Enter 3 sides: ");\n    scanf("%d %d %d", &a, &b, &c);\n    \n    if(a+b>c && b+c>a && c+a>b) {\n        printf("Valid triangle\\n");\n    } else {\n        printf("Invalid triangle\\n");\n    }\n    \n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n\nint main() {\n    int a, b, c;\n    // Take input for a, b, c\n    \n    // Check triangle validity condition\n    // Print result\n    \n    return 0;\n}`
+      id: 2,
+      topic: "Post-increment vs Pre-increment",
+      concept: "x++ (post) uses current value first, then increases. ++x (pre) increases first, then uses new value.",
+      code: `int a = 5;\nint b = a++;\nprintf("%d %d", a, b);`,
+      question: "What will be printed?",
+      answer: "6 5",
+      explanation: [
+        "<strong>int a = 5;</strong> → a holds 5.",
+        "<strong>int b = a++;</strong> → Post-increment: b gets CURRENT value of a (<strong>5</strong>). THEN a increases to <strong>6</strong>.",
+        "<strong>printf</strong> → Prints a (6) and b (5). Output: <strong>6 5</strong>"
+      ]
     },
     {
-      day: 3,
-      title: "Loops (for/while)",
-      concept: "Learn to repeat code efficiently using for and while loops. Essential for processing data and patterns.",
-      keyConcepts: [
-        "for(initial; condition; increment) { }",
-        "while(condition) { } runs while true",
-        "do-while runs at least once",
-        "break exits loop early",
-        "continue skips to next iteration"
-      ],
-      example: `#include <stdio.h>\n\nint main() {\n    // Print 1 to 5\n    for(int i=1; i<=5; i++) {\n        printf("%d ", i);\n    }\n    printf("\\n");\n    \n    // Count digits in number\n    int n=12345, count=0;\n    while(n > 0) {\n        count++;\n        n /= 10;\n    }\n    printf("Digits: %d\\n", count);\n    \n    return 0;\n}`,
-      tracePrompt: "For n=123: Draw n and count at each while loop iteration. What's the final count?",
-      task: "Build a Digit Counter & Reverser: Take number input, count its digits, and print the reversed number",
-      hint: "Use while(n>0) loop: extract last digit with n%10, build reverse with rev=rev*10+digit, count digits with count++. Remember to handle n=0!",
-      solution: `#include <stdio.h>\n\nint main() {\n    int n, rev=0, count=0, temp;\n    printf("Enter number: ");\n    scanf("%d", &n);\n    temp = n;\n    \n    // Handle 0 separately\n    if(n == 0) {\n        printf("Digits: 1, Reverse: 0\\n");\n        return 0;\n    }\n    \n    // Count digits and reverse\n    while(n > 0) {\n        int digit = n % 10;\n        rev = rev * 10 + digit;\n        count++;\n        n /= 10;\n    }\n    \n    printf("Digits: %d, Reverse: %d\\n", count, rev);\n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n\nint main() {\n    int n, rev=0, count=0;\n    // Take input\n    \n    // Handle n=0 case\n    \n    // Loop to count and reverse\n    \n    // Print results\n    return 0;\n}`
+      id: 3,
+      topic: "Integer Division",
+      concept: "Dividing two integers always truncates decimals. No rounding occurs.",
+      code: `int x = 7;\nint y = 2;\nint z = x / y;\nprintf("%d", z);`,
+      question: "What will be printed?",
+      answer: "3",
+      explanation: [
+        "<strong>x = 7, y = 2</strong>",
+        "<strong>z = x / y</strong> → 7 / 2 = 3.5, but C drops .5 for integers → z = <strong>3</strong>",
+        "<strong>printf</strong> → Prints <strong>3</strong>"
+      ]
     },
     {
-      day: 4,
-      title: "Nested Loops & Patterns",
-      concept: "Master nested loops to print patterns. Learn the row(i) and column(j) architecture for complex output.",
-      keyConcepts: [
-        "Outer loop = rows, inner loop = columns",
-        "Pattern logic: stars depend on row number",
-        "Spaces before stars for alignment",
-        "Use i and j to control output",
-        "Break complex patterns into parts"
-      ],
-      example: `#include <stdio.h>\n\nint main() {\n    int n=4;\n    // Solid rectangle\n    for(int i=1; i<=n; i++) {\n        for(int j=1; j<=n; j++) {\n            printf("*");\n        }\n        printf("\\n");\n    }\n    \n    // Right triangle\n    for(int i=1; i<=n; i++) {\n        for(int j=1; j<=i; j++) {\n            printf("*");\n        }\n        printf("\\n");\n    }\n    return 0;\n}`,
-      tracePrompt: "For n=3 triangle: Draw i=1,2,3 and how many stars j prints each time. What's the pattern?",
-      task: "Print a star pyramid: For input n=4, print a centered pyramid of stars (1, 3, 5, 7 stars per row)",
-      hint: "Two inner loops: one for spaces (n-i), one for stars (2*i-1). Outer loop for rows 1 to n. Test with n=1,2 first!",
-      solution: `#include <stdio.h>\n\nint main() {\n    int n;\n    printf("Enter rows: ");\n    scanf("%d", &n);\n    \n    for(int i=1; i<=n; i++) {\n        // Print spaces\n        for(int j=1; j<=n-i; j++) {\n            printf(" ");\n        }\n        // Print stars\n        for(int j=1; j<=2*i-1; j++) {\n            printf("*");\n        }\n        printf("\\n");\n    }\n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n\nint main() {\n    int n;\n    // Take input\n    \n    // Outer loop for rows\n    // Inner loop 1: spaces (n-i)\n    // Inner loop 2: stars (2*i-1)\n    // Newline after each row\n    \n    return 0;\n}`
+      id: 4,
+      topic: "Modulus Operator",
+      concept: "% gives the remainder after division. Great for checking even/odd or cycling patterns.",
+      code: `int n = 17;\nint r = n % 5;\nprintf("%d", r);`,
+      question: "What will be printed?",
+      answer: "2",
+      explanation: [
+        "<strong>n = 17</strong>",
+        "<strong>r = n % 5</strong> → 17 ÷ 5 = 3 with remainder <strong>2</strong>",
+        "<strong>printf</strong> → Prints <strong>2</strong>"
+      ]
     },
     {
-      day: 5,
-      title: "Advanced Patterns",
-      concept: "Create complex patterns like inverted triangles, Floyd's triangle, and number pyramids using loop logic.",
-      keyConcepts: [
-        "Inverted patterns: stars decrease as i increases",
-        "Floyd's triangle: sequential numbers in rows",
-        "Number patterns: use counters that increment",
-        "Alphabet patterns: use ASCII values (A=65)",
-        "Combine conditions for mixed patterns"
-      ],
-      example: `#include <stdio.h>\n\nint main() {\n    int n=4, num=1;\n    // Floyd's triangle\n    for(int i=1; i<=n; i++) {\n        for(int j=1; j<=i; j++) {\n            printf("%d ", num++);\n        }\n        printf("\\n");\n    }\n    \n    // Inverted triangle\n    for(int i=n; i>=1; i--) {\n        for(int j=1; j<=i; j++) {\n            printf("*");\n        }\n        printf("\\n");\n    }\n    return 0;\n}`,
-      tracePrompt: "For Floyd's n=3: Draw how num changes: row1:1, row2:2,3, row3:4,5,6. What's the pattern?",
-      task: "Print a number pyramid: For n=4, print rows with increasing numbers (1, 123, 12345, 1234567)",
-      hint: "Outer loop i=1 to n. Inner loop j=1 to 2*i-1. Use a counter that resets each row. Print numbers without spaces for compact output.",
-      solution: `#include <stdio.h>\n\nint main() {\n    int n;\n    printf("Enter rows: ");\n    scanf("%d", &n);\n    \n    for(int i=1; i<=n; i++) {\n        // Spaces for centering\n        for(int s=1; s<=n-i; s++) printf(" ");\n        \n        // Numbers: 1 to 2*i-1\n        int num=1;\n        for(int j=1; j<=2*i-1; j++) {\n            printf("%d", num++);\n        }\n        printf("\\n");\n    }\n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n\nint main() {\n    int n;\n    // Take input\n    \n    // Loop for rows\n    // Print spaces for centering\n    // Print numbers 1 to (2*i-1)\n    // Newline after row\n    \n    return 0;\n}`
-    },
-    {
-      day: 6,
-      title: "Functions & Modularity",
-      concept: "Break code into reusable functions. Learn prototypes, parameters, return values, and the DRY principle.",
-      keyConcepts: [
-        "Function syntax: returnType name(params) { }",
-        "Function prototype: declare before use",
-        "Parameters: values passed to function",
-        "Return: send value back to caller",
-        "DRY: Don't Repeat Yourself - reuse code"
-      ],
-      example: `#include <stdio.h>\n\n// Function prototype\nint add(int a, int b);\n\nint main() {\n    int x=5, y=3;\n    int sum = add(x, y); // Call function\n    printf("Sum: %d\\n", sum);\n    return 0;\n}\n\n// Function definition\nint add(int a, int b) {\n    return a + b; // Return result\n}`,
-      tracePrompt: "For add(5,3): Draw the call stack. What values go into a,b? What comes back?",
-      task: "Create a Math Utility: Write functions for nCr (combinations) and swap two numbers without a temporary variable",
-      hint: "nCr = n!/(r!(n-r)!). Write a factorial() function first. For swap: use arithmetic (x=x+y; y=x-y; x=x-y) or pointers.",
-      solution: `#include <stdio.h>\n\n// Factorial helper\nint fact(int n) {\n    if(n<=1) return 1;\n    return n * fact(n-1);\n}\n\n// nCr calculation\nint nCr(int n, int r) {\n    return fact(n) / (fact(r) * fact(n-r));\n}\n\n// Swap without temp\nvoid swap(int *x, int *y) {\n    *x = *x + *y;\n    *y = *x - *y;\n    *x = *x - *y;\n}\n\nint main() {\n    // Test nCr\n    printf("5C2 = %d\\n", nCr(5,2));\n    \n    // Test swap\n    int a=10, b=20;\n    printf("Before: a=%d, b=%d\\n", a, b);\n    swap(&a, &b);\n    printf("After: a=%d, b=%d\\n", a, b);\n    \n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n\n// Write factorial function\n\n// Write nCr function using factorial\n\n// Write swap function (use pointers)\n\nint main() {\n    // Test your functions here\n    return 0;\n}`
-    },
-    {
-      day: 7,
-      title: "Checkpoint 1: Number Guessing Game",
-      concept: "Combine loops, conditionals, and functions to build an interactive game. Practice debugging and user interaction.",
-      keyConcepts: [
-        "Generate random numbers with rand()%max",
-        "Seed random with srand(time(0))",
-        "Loop until correct guess",
-        "Give hints: too high/too low",
-        "Count attempts and display score"
-      ],
-      example: `#include <stdio.h>\n#include <stdlib.h>\n#include <time.h>\n\nint main() {\n    srand(time(0)); // Seed random\n    int secret = rand() % 100 + 1; // 1-100\n    int guess, attempts=0;\n    \n    printf("Guess number 1-100:\\n");\n    do {\n        scanf("%d", &guess);\n        attempts++;\n        if(guess > secret) printf("Too high!\\n");\n        else if(guess < secret) printf("Too low!\\n");\n    } while(guess != secret);\n    \n    printf("Correct! Attempts: %d\\n", attempts);\n    return 0;\n}`,
-      tracePrompt: "For secret=42: Draw the loop iterations for guesses 50→25→42. How does attempts change?",
-      task: "Build the complete Number Guessing Game: Add difficulty levels, replay option, and input validation",
-      hint: "Add a menu for difficulty (easy:1-50, medium:1-100, hard:1-200). Use a do-while for replay. Validate input is in range before comparing.",
-      solution: `#include <stdio.h>\n#include <stdlib.h>\n#include <time.h>\n\nint main() {\n    char playAgain;\n    do {\n        srand(time(0));\n        int max, secret, guess, attempts=0;\n        \n        // Difficulty selection\n        printf("Choose difficulty (1:Easy 1-50, 2:Med 1-100, 3:Hard 1-200): ");\n        int diff;\n        scanf("%d", &diff);\n        max = (diff==1) ? 50 : (diff==2) ? 100 : 200;\n        secret = rand() % max + 1;\n        \n        printf("Guess number 1-%d:\\n", max);\n        do {\n            printf("Your guess: ");\n            scanf("%d", &guess);\n            \n            // Input validation\n            if(guess < 1 || guess > max) {\n                printf("Enter 1-%d!\\n", max);\n                continue;\n            }\n            \n            attempts++;\n            if(guess > secret) printf("Too high!\\n");\n            else if(guess < secret) printf("Too low!\\n");\n        } while(guess != secret);\n        \n        printf("🎉 Correct! Attempts: %d\\n", attempts);\n        printf("Play again? (y/n): ");\n        scanf(" %c", &playAgain); // Space before %c to skip newline\n    } while(playAgain == 'y' || playAgain == 'Y');\n    \n    printf("Thanks for playing!\\n");\n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n#include <stdlib.h>\n#include <time.h>\n\nint main() {\n    // Add replay loop\n    // Get difficulty and set max\n    // Generate secret number\n    // Guessing loop with validation\n    // Hint system and attempt counter\n    // Replay prompt\n    return 0;\n}`
-    },
-    {
-      day: 8,
-      title: "Pointers Fundamentals",
-      concept: "Understand memory addresses, pointer declaration, dereferencing, and pass-by-reference vs pass-by-value.",
-      keyConcepts: [
-        "& operator: gets address of variable",
-        "* operator: dereferences pointer (gets value at address)",
-        "int *ptr declares pointer to int",
-        "Pass-by-reference: modify original variables",
-        "Pointers enable dynamic memory and arrays"
-      ],
-      example: `#include <stdio.h>\n\nint main() {\n    int x = 42;\n    int *ptr = &x; // ptr holds address of x\n    \n    printf("x = %d\\n", x);           // 42\n    printf("&x = %p\\n", &x);         // address\n    printf("ptr = %p\\n", ptr);       // same address\n    printf("*ptr = %d\\n", *ptr);     // 42 (value at address)\n    \n    *ptr = 100; // Change x through pointer\n    printf("x is now %d\\n", x);      // 100\n    \n    return 0;\n}`,
-      tracePrompt: "Draw memory: x at address 0x1000 with value 42. ptr holds 0x1000. What does *ptr access?",
-      task: "Build a Pointer Swap Tool: Write a function that swaps two integers using pointers (not temporary variable)",
-      hint: "Function signature: void swap(int *a, int *b). Inside: use a temporary pointer or arithmetic. Call with swap(&x, &y) to pass addresses.",
-      solution: `#include <stdio.h>\n\n// Swap using pointers\nvoid swap(int *a, int *b) {\n    int temp = *a;  // Store value at a's address\n    *a = *b;        // Put b's value at a's address\n    *b = temp;      // Put temp at b's address\n}\n\nint main() {\n    int x, y;\n    printf("Enter two numbers: ");\n    scanf("%d %d", &x, &y);\n    \n    printf("Before: x=%d, y=%d\\n", x, y);\n    swap(&x, &y); // Pass addresses\n    printf("After: x=%d, y=%d\\n", x, y);\n    \n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n\n// Write swap function using pointers\n\nint main() {\n    int x, y;\n    // Take input\n    \n    // Call swap with addresses\n    \n    // Print results\n    return 0;\n}`
-    },
-    {
-      day: 9,
-      title: "Recursion Basics",
-      concept: "Learn functions that call themselves. Master base cases, recursive cases, and the call stack visualization.",
-      keyConcepts: [
-        "Base case: stops recursion (prevents infinite loop)",
-        "Recursive case: function calls itself with smaller input",
-        "Call stack: tracks function calls in memory",
-        "Factorial: n! = n * (n-1)!",
-        "Print patterns: n→1 vs 1→n using call order"
-      ],
-      example: `#include <stdio.h>\n\n// Factorial using recursion\nint fact(int n) {\n    if(n <= 1) return 1; // Base case\n    return n * fact(n-1); // Recursive case\n}\n\n// Print n to 1\nvoid printDown(int n) {\n    if(n < 1) return;\n    printf("%d ", n);\n    printDown(n-1);\n}\n\nint main() {\n    printf("5! = %d\\n", fact(5)); // 120\n    printf("Count down: ");\n    printDown(5); // 5 4 3 2 1\n    return 0;\n}`,
-      tracePrompt: "For fact(3): Draw the call stack: fact(3)→fact(2)→fact(1)→return 1→2*1→3*2. What's the final value?",
-      task: "Build a Recursive Sum Calculator: Write a function that calculates sum from 1 to n using recursion (no loops)",
-      hint: "Base case: if(n==1) return 1. Recursive case: return n + sum(n-1). Test with n=5: 5+4+3+2+1=15.",
-      solution: `#include <stdio.h>\n\n// Recursive sum from 1 to n\nint sumToN(int n) {\n    if(n <= 0) return 0; // Handle 0/negative\n    if(n == 1) return 1; // Base case\n    return n + sumToN(n-1); // Recursive case\n}\n\nint main() {\n    int n;\n    printf("Enter n: ");\n    scanf("%d", &n);\n    \n    printf("Sum 1 to %d = %d\\n", n, sumToN(n));\n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n\n// Write recursive sum function\n\nint main() {\n    int n;\n    // Take input\n    \n    // Call and print result\n    return 0;\n}`
-    },
-    {
-      day: 10,
-      title: "Strings & string.h",
-      concept: "Master character arrays, null terminators, and built-in string functions like strlen, strcpy, strcat.",
-      keyConcepts: [
-        "Strings are char arrays ending with '\\0'",
-        "strlen(s): returns length (excludes \\0)",
-        "strcpy(dest, src): copies string",
-        "strcat(s1, s2): appends s2 to s1",
-        "strcmp(s1,s2): compares strings (0 if equal)"
-      ],
-      example: `#include <stdio.h>\n#include <string.h>\n\nint main() {\n    char name[20] = "C Sprint";\n    char greeting[30] = "Hello, ";\n    \n    // strlen: length without \\0\n    printf("Name length: %lu\\n", strlen(name));\n    \n    // strcpy: copy string\n    char copy[20];\n    strcpy(copy, name);\n    printf("Copy: %s\\n", copy);\n    \n    // strcat: concatenate\n    strcat(greeting, name);\n    printf("Greeting: %s\\n", greeting);\n    \n    return 0;\n}`,
-      tracePrompt: "For name=\"Hi\": Draw memory: ['H','i','\\0',...]. What does strlen return? What about sizeof?",
-      task: "Build a String Analyzer: Take input string, print its length, reverse it, and count vowels",
-      hint: "Use strlen for length. For reverse: swap characters from start/end moving inward. For vowels: loop through string, check if char is a,e,i,o,u (case-insensitive).",
-      solution: `#include <stdio.h>\n#include <string.h>\n#include <ctype.h>\n\nint main() {\n    char str[100];\n    printf("Enter string: ");\n    scanf("%[^\\n]", str); // Read with spaces\n    \n    // Length\n    int len = strlen(str);\n    printf("Length: %d\\n", len);\n    \n    // Reverse\n    for(int i=0; i<len/2; i++) {\n        char temp = str[i];\n        str[i] = str[len-1-i];\n        str[len-1-i] = temp;\n    }\n    printf("Reversed: %s\\n", str);\n    \n    // Count vowels\n    int vowels=0;\n    for(int i=0; i<len; i++) {\n        char c = tolower(str[i]);\n        if(c=='a'||c=='e'||c=='i'||c=='o'||c=='u') vowels++;\n    }\n    printf("Vowels: %d\\n", vowels);\n    \n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n#include <string.h>\n#include <ctype.h>\n\nint main() {\n    char str[100];\n    // Take input (use %[^\n] for spaces)\n    \n    // Print length with strlen\n    \n    // Reverse the string in-place\n    \n    // Count vowels (a,e,i,o,u case-insensitive)\n    \n    return 0;\n}`
-    },
-    {
-      day: 11,
-      title: "1D Arrays",
-      concept: "Learn to store and process collections of data. Master indexing, iteration, and common array operations.",
-      keyConcepts: [
-        "Declaration: int arr[10] creates 10 integers",
-        "Indexing: arr[0] is first element (0-based)",
-        "Loop through: for(i=0; i<size; i++)",
-        "Find max/min: iterate and compare",
-        "In-place operations: modify array without extra space"
-      ],
-      example: `#include <stdio.h>\n\nint main() {\n    int arr[5] = {10, 20, 30, 40, 50};\n    \n    // Print all elements\n    printf("Array: ");\n    for(int i=0; i<5; i++) {\n        printf("%d ", arr[i]);\n    }\n    \n    // Find maximum\n    int max = arr[0];\n    for(int i=1; i<5; i++) {\n        if(arr[i] > max) max = arr[i];\n    }\n    printf("\\nMax: %d\\n", max);\n    \n    return 0;\n}`,
-      tracePrompt: "For arr=[3,1,4,1,5]: Draw i and max at each iteration of the max-finding loop. What's the final max?",
-      task: "Build an Array Manager: Take 10 numbers, find second largest, reverse the array in-place, and print results",
-      hint: "For second largest: find max first, then find largest that's < max. For reverse: swap arr[i] and arr[n-1-i] for i=0 to n/2.",
-      solution: `#include <stdio.h>\n\nint main() {\n    int arr[10];\n    printf("Enter 10 numbers: ");\n    for(int i=0; i<10; i++) {\n        scanf("%d", &arr[i]);\n    }\n    \n    // Find max and second max\n    int max = arr[0], second = -1;\n    for(int i=1; i<10; i++) {\n        if(arr[i] > max) {\n            second = max;\n            max = arr[i];\n        } else if(arr[i] > second && arr[i] < max) {\n            second = arr[i];\n        }\n    }\n    printf("Second largest: %d\\n", second);\n    \n    // Reverse in-place\n    for(int i=0; i<5; i++) {\n        int temp = arr[i];\n        arr[i] = arr[9-i];\n        arr[9-i] = temp;\n    }\n    \n    printf("Reversed array: ");\n    for(int i=0; i<10; i++) {\n        printf("%d ", arr[i]);\n    }\n    printf("\\n");\n    \n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n\nint main() {\n    int arr[10];\n    // Take 10 inputs\n    \n    // Find second largest (handle duplicates)\n    \n    // Reverse array in-place (swap first/last, etc.)\n    \n    // Print results\n    return 0;\n}`
-    },
-    {
-      day: 12,
-      title: "Checkpoint 2: String Analyzer Tool",
-      concept: "Combine strings, arrays, and functions to build a practical tool. Practice modular design and user interaction.",
-      keyConcepts: [
-        "Modular code: separate functions for each task",
-        "Input validation: handle edge cases gracefully",
-        "User-friendly prompts: clear instructions",
-        "Output formatting: clean, readable results",
-        "Testing: verify with multiple inputs"
-      ],
-      example: `#include <stdio.h>\n#include <string.h>\n#include <ctype.h>\n\n// Function prototypes\nint countVowels(char str[]);\nvoid reverseString(char str[]);\n\nint main() {\n    char input[100];\n    printf("Enter text: ");\n    scanf("%[^\\n]", input);\n    \n    printf("Vowels: %d\\n", countVowels(input));\n    reverseString(input);\n    printf("Reversed: %s\\n", input);\n    return 0;\n}\n\nint countVowels(char str[]) {\n    int count=0;\n    for(int i=0; str[i]!='\\0'; i++) {\n        char c = tolower(str[i]);\n        if(c=='a'||c=='e'||c=='i'||c=='o'||c=='u') count++;\n    }\n    return count;\n}\n\nvoid reverseString(char str[]) {\n    int len = strlen(str);\n    for(int i=0; i<len/2; i++) {\n        char temp = str[i];\n        str[i] = str[len-1-i];\n        str[len-1-i] = temp;\n    }\n}`,
-      tracePrompt: "For input=\"Hello\": Draw how countVowels processes each character. What about reverseString's swaps?",
-      task: "Build the complete String Analyzer: Add word count, palindrome check, and case conversion options via menu",
-      hint: "Create functions: countWords(), isPalindrome(), toUpperCase(). Use a switch menu for options. Handle empty input and special characters gracefully.",
-      solution: `#include <stdio.h>\n#include <string.h>\n#include <ctype.h>\n\nint countVowels(char str[]) {\n    int count=0;\n    for(int i=0; str[i]; i++) {\n        char c = tolower(str[i]);\n        if(c=='a'||c=='e'||c=='i'||c=='o'||c=='u') count++;\n    }\n    return count;\n}\n\nint countWords(char str[]) {\n    int count=0, inWord=0;\n    for(int i=0; str[i]; i++) {\n        if(isspace(str[i])) inWord=0;\n        else if(!inWord) { inWord=1; count++; }\n    }\n    return count;\n}\n\nint isPalindrome(char str[]) {\n    int len = strlen(str);\n    for(int i=0; i<len/2; i++) {\n        if(tolower(str[i]) != tolower(str[len-1-i])) return 0;\n    }\n    return 1;\n}\n\nvoid toUpperCase(char str[]) {\n    for(int i=0; str[i]; i++) {\n        str[i] = toupper(str[i]);\n    }\n}\n\nint main() {\n    char str[100];\n    int choice;\n    \n    printf("=== String Analyzer ===\\n");\n    printf("Enter text: ");\n    scanf("%[^\\n]", str);\n    \n    do {\n        printf("\\n1. Count vowels\\n2. Count words\\n3. Check palindrome\\n4. Convert to uppercase\\n5. Exit\\nChoice: ");\n        scanf("%d", &choice);\n        \n        switch(choice) {\n            case 1:\n                printf("Vowels: %d\\n", countVowels(str));\n                break;\n            case 2:\n                printf("Words: %d\\n", countWords(str));\n                break;\n            case 3:\n                printf("%s\\n", isPalindrome(str) ? "Palindrome!" : "Not palindrome");\n                break;\n            case 4:\n                toUpperCase(str);\n                printf("Uppercase: %s\\n", str);\n                break;\n            case 5:\n                printf("Done!\\n");\n                break;\n            default:\n                printf("Invalid choice!\\n");\n        }\n    } while(choice != 5);\n    \n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n#include <string.h>\n#include <ctype.h>\n\n// Write helper functions: countVowels, countWords, etc.\n\nint main() {\n    char str[100];\n    // Take input\n    \n    // Menu loop with switch for options\n    // Call appropriate function for each choice\n    \n    return 0;\n}`
-    },
-    {
-      day: 13,
-      title: "Structures (struct)",
-      concept: "Group related data into custom types. Learn struct declaration, initialization, and the dot operator for access.",
-      keyConcepts: [
-        "struct defines a new data type with multiple fields",
-        "Dot operator (.) accesses struct members",
-        "Typedef creates alias for cleaner syntax",
-        "Structs can contain arrays and other structs",
-        "Pass structs to functions by value or reference"
-      ],
-      example: `#include <stdio.h>\n\n// Define struct type\nstruct Student {\n    int roll;\n    char name[20];\n    float marks;\n};\n\nint main() {\n    // Declare and initialize\n    struct Student s1 = {101, "Rahul", 95.5};\n    \n    // Access members with dot operator\n    printf("Roll: %d\\n", s1.roll);\n    printf("Name: %s\\n", s1.name);\n    printf("Marks: %.1f\\n", s1.marks);\n    \n    // Modify member\n    s1.marks = 98.0;\n    printf("Updated marks: %.1f\\n", s1.marks);\n    \n    return 0;\n}`,
-      tracePrompt: "For s1: Draw memory layout. Where are roll, name[20], marks stored? How does .name access the array?",
-      task: "Build a Student Record System: Create a struct for student data, take input for 3 students, and print the one with highest marks",
-      hint: "Define struct Student with roll, name, marks. Use array of structs: struct Student class[3]. Loop to find max marks, then print that student's details.",
-      solution: `#include <stdio.h>\n#include <string.h>\n\nstruct Student {\n    int roll;\n    char name[20];\n    float marks;\n};\n\nint main() {\n    struct Student class[3];\n    \n    // Input for 3 students\n    for(int i=0; i<3; i++) {\n        printf("Student %d - Roll, Name, Marks: ", i+1);\n        scanf("%d %s %f", &class[i].roll, class[i].name, &class[i].marks);\n    }\n    \n    // Find student with highest marks\n    int topIndex = 0;\n    for(int i=1; i<3; i++) {\n        if(class[i].marks > class[topIndex].marks) {\n            topIndex = i;\n        }\n    }\n    \n    // Print top student\n    printf("\\nTop Student:\\n");\n    printf("Roll: %d\\n", class[topIndex].roll);\n    printf("Name: %s\\n", class[topIndex].name);\n    printf("Marks: %.2f\\n", class[topIndex].marks);\n    \n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n#include <string.h>\n\n// Define Student struct\n\nint main() {\n    // Array of 3 students\n    \n    // Input loop for each student\n    \n    // Find index of student with max marks\n    \n    // Print top student details\n    return 0;\n}`
-    },
-    {
-      day: 14,
-      title: "2D Arrays & Matrices",
-      concept: "Master two-dimensional arrays for tables, grids, and mathematical matrices. Learn row-major order and nested iteration.",
-      keyConcepts: [
-        "Declaration: int matrix[3][4] = 3 rows, 4 columns",
-        "Access: matrix[i][j] where i=row, j=column",
-        "Nested loops: outer for rows, inner for columns",
-        "Matrix operations: transpose, addition, multiplication",
-        "Row-major order: elements stored row-by-row in memory"
-      ],
-      example: `#include <stdio.h>\n\nint main() {\n    // 3x3 matrix initialization\n    int matrix[3][3] = {\n        {1, 2, 3},\n        {4, 5, 6},\n        {7, 8, 9}\n    };\n    \n    // Print matrix\n    printf("Matrix:\\n");\n    for(int i=0; i<3; i++) {\n        for(int j=0; j<3; j++) {\n            printf("%d ", matrix[i][j]);\n        }\n        printf("\\n");\n    }\n    \n    // Print transpose\n    printf("\\nTranspose:\\n");\n    for(int j=0; j<3; j++) {\n        for(int i=0; i<3; i++) {\n            printf("%d ", matrix[i][j]);\n        }\n        printf("\\n");\n    }\n    return 0;\n}`,
-      tracePrompt: "For matrix[2][1] in 3x3: Which row and column? What value is stored there in the example?",
-      task: "Build a Matrix Tool: Take 3x3 matrix input, print its transpose, and find the row with maximum sum",
-      hint: "For transpose: print matrix[j][i] instead of matrix[i][j]. For max row sum: loop through each row, sum its elements, track the maximum sum and its row index.",
-      solution: `#include <stdio.h>\n\nint main() {\n    int matrix[3][3];\n    \n    // Input 3x3 matrix\n    printf("Enter 3x3 matrix (9 numbers):\\n");\n    for(int i=0; i<3; i++) {\n        for(int j=0; j<3; j++) {\n            scanf("%d", &matrix[i][j]);\n        }\n    }\n    \n    // Print original\n    printf("\\nOriginal:\\n");\n    for(int i=0; i<3; i++) {\n        for(int j=0; j<3; j++) {\n            printf("%d ", matrix[i][j]);\n        }\n        printf("\\n");\n    }\n    \n    // Print transpose\n    printf("\\nTranspose:\\n");\n    for(int j=0; j<3; j++) {\n        for(int i=0; i<3; i++) {\n            printf("%d ", matrix[i][j]);\n        }\n        printf("\\n");\n    }\n    \n    // Find row with max sum\n    int maxSum = -1, maxRow = 0;\n    for(int i=0; i<3; i++) {\n        int rowSum = 0;\n        for(int j=0; j<3; j++) {\n            rowSum += matrix[i][j];\n        }\n        if(rowSum > maxSum) {\n            maxSum = rowSum;\n            maxRow = i;\n        }\n    }\n    printf("\\nRow %d has max sum: %d\\n", maxRow+1, maxSum);\n    \n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n\nint main() {\n    int matrix[3][3];\n    // Take 9 inputs for 3x3 matrix\n    \n    // Print original matrix\n    \n    // Print transpose (swap i and j in loops)\n    \n    // Find row with maximum sum\n    \n    return 0;\n}`
-    },
-    {
-      day: 15,
-      title: "Sorting Algorithms",
-      concept: "Learn fundamental sorting techniques: Bubble Sort and Selection Sort. Understand time complexity and in-place operations.",
-      keyConcepts: [
-        "Bubble Sort: repeatedly swap adjacent elements if wrong order",
-        "Selection Sort: find min element and swap to front",
-        "In-place sorting: no extra array needed",
-        "Time complexity: O(n²) for both algorithms",
-        "Optimization: stop early if array is already sorted"
-      ],
-      example: `#include <stdio.h>\n\n// Bubble Sort\nvoid bubbleSort(int arr[], int n) {\n    for(int i=0; i<n-1; i++) {\n        int swapped = 0;\n        for(int j=0; j<n-i-1; j++) {\n            if(arr[j] > arr[j+1]) {\n                // Swap\n                int temp = arr[j];\n                arr[j] = arr[j+1];\n                arr[j+1] = temp;\n                swapped = 1;\n            }\n        }\n        // If no swaps, array is sorted\n        if(!swapped) break;\n    }\n}\n\nint main() {\n    int arr[] = {64, 34, 25, 12, 22};\n    int n = sizeof(arr)/sizeof(arr[0]);\n    \n    bubbleSort(arr, n);\n    \n    printf("Sorted: ");\n    for(int i=0; i<n; i++) printf("%d ", arr[i]);\n    return 0;\n}`,
-      tracePrompt: "For arr=[5,2,4,1]: Draw each pass of bubble sort. How many swaps in first pass? When does it stop?",
-      task: "Build a Sorter: Take 10 numbers, sort them using Bubble Sort, and print the sorted array with pass-by-pass visualization",
-      hint: "Add a flag to detect if any swaps occurred in a pass. If no swaps, break early. For visualization: print array after each outer loop iteration.",
-      solution: `#include <stdio.h>\n\nvoid bubbleSort(int arr[], int n) {\n    printf("Sorting process:\\n");\n    for(int i=0; i<n-1; i++) {\n        int swapped = 0;\n        printf("Pass %d: ", i+1);\n        for(int j=0; j<n-i-1; j++) {\n            if(arr[j] > arr[j+1]) {\n                // Swap\n                int temp = arr[j];\n                arr[j] = arr[j+1];\n                arr[j+1] = temp;\n                swapped = 1;\n            }\n        }\n        // Print array after this pass\n        for(int k=0; k<n; k++) printf("%d ", arr[k]);\n        printf("\\n");\n        \n        if(!swapped) {\n            printf("Array sorted early!\\n");\n            break;\n        }\n    }\n}\n\nint main() {\n    int arr[10];\n    printf("Enter 10 numbers: ");\n    for(int i=0; i<10; i++) {\n        scanf("%d", &arr[i]);\n    }\n    \n    bubbleSort(arr, 10);\n    \n    printf("\\nFinal sorted array: ");\n    for(int i=0; i<10; i++) printf("%d ", arr[i]);\n    printf("\\n");\n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n\n// Write bubble sort with pass visualization\n\nint main() {\n    int arr[10];\n    // Take 10 inputs\n    \n    // Call bubble sort\n    \n    // Print final result\n    return 0;\n}`
-    },
-    {
-      day: 16,
-      title: "Dynamic Memory Allocation",
-      concept: "Learn to allocate memory at runtime using malloc, calloc, realloc, and free. Understand heap vs stack memory.",
-      keyConcepts: [
-        "malloc(size): allocates uninitialized memory block",
-        "calloc(n, size): allocates and initializes to zero",
-        "realloc(ptr, newSize): resizes allocated memory",
-        "free(ptr): releases memory back to system",
-        "Always check if allocation succeeded (ptr != NULL)"
-      ],
-      example: `#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    // Allocate array of 5 integers\n    int *arr = (int*)malloc(5 * sizeof(int));\n    \n    // Check if allocation succeeded\n    if(arr == NULL) {\n        printf("Memory allocation failed!\\n");\n        return 1;\n    }\n    \n    // Use the array\n    for(int i=0; i<5; i++) {\n        arr[i] = i*10;\n        printf("%d ", arr[i]);\n    }\n    \n    // Free the memory\n    free(arr);\n    arr = NULL; // Good practice\n    \n    printf("\\nMemory freed!\\n");\n    return 0;\n}`,
-      tracePrompt: "For malloc(5*sizeof(int)): Draw the heap memory block. What does arr point to? What happens after free(arr)?",
-      task: "Build a Dynamic Input Handler: Take n as input, allocate array of size n dynamically, take n numbers, and print them in reverse",
-      hint: "Use malloc(n * sizeof(int)). Check for NULL. Take inputs in a loop. Print in reverse by looping from n-1 down to 0. Always free() at the end!",
-      solution: `#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int n;\n    printf("How many numbers? ");\n    scanf("%d", &n);\n    \n    // Allocate memory dynamically\n    int *arr = (int*)malloc(n * sizeof(int));\n    if(arr == NULL) {\n        printf("Memory allocation failed!\\n");\n        return 1;\n    }\n    \n    // Take input\n    printf("Enter %d numbers: ", n);\n    for(int i=0; i<n; i++) {\n        scanf("%d", &arr[i]);\n    }\n    \n    // Print in reverse\n    printf("Reversed: ");\n    for(int i=n-1; i>=0; i--) {\n        printf("%d ", arr[i]);\n    }\n    printf("\\n");\n    \n    // Free memory\n    free(arr);\n    arr = NULL;\n    printf("Memory freed successfully!\\n");\n    \n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int n;\n    // Take n as input\n    \n    // Allocate array of size n with malloc\n    // Check for NULL\n    \n    // Take n inputs\n    \n    // Print in reverse order\n    \n    // Free memory and set pointer to NULL\n    return 0;\n}`
-    },
-    {
-      day: 17,
-      title: "File I/O Basics",
-      concept: "Learn to read from and write to files using fopen, fprintf, fscanf, and fclose. Understand file modes and error handling.",
-      keyConcepts: [
-        "fopen(filename, mode): opens file (\"r\"=read, \"w\"=write)",
-        "fprintf(file, format, ...): writes formatted data to file",
-        "fscanf(file, format, ...): reads formatted data from file",
-        "fclose(file): closes file and flushes buffers",
-        "Always check if fopen succeeded (file != NULL)"
-      ],
-      example: `#include <stdio.h>\n\nint main() {\n    // Write to file\n    FILE *fptr = fopen("data.txt", "w");\n    if(fptr == NULL) {\n        printf("Error opening file!\\n");\n        return 1;\n    }\n    \n    fprintf(fptr, "Hello File!\\n");\n    fprintf(fptr, "Number: %d\\n", 42);\n    fclose(fptr);\n    \n    // Read from file\n    fptr = fopen("data.txt", "r");\n    if(fptr == NULL) {\n        printf("Error opening file!\\n");\n        return 1;\n    }\n    \n    char line[100];\n    while(fgets(line, sizeof(line), fptr)) {\n        printf("%s", line);\n    }\n    fclose(fptr);\n    \n    return 0;\n}`,
-      tracePrompt: "For fopen(\"data.txt\", \"w\"): What happens if file exists? What about \"r\" mode if file doesn't exist?",
-      task: "Build a Persistent Record Keeper: Take student records (roll, name, marks), save to file, then read and display them",
-      hint: "Use fprintf to write each student as \"roll name marks\\n\". Use fscanf in a loop to read until EOF. Handle file open errors gracefully.",
-      solution: `#include <stdio.h>\n#include <stdlib.h>\n\nstruct Student {\n    int roll;\n    char name[20];\n    float marks;\n};\n\nint main() {\n    FILE *fptr;\n    int n;\n    \n    // Input records\n    printf("How many students? ");\n    scanf("%d", &n);\n    struct Student students[n];\n    \n    for(int i=0; i<n; i++) {\n        printf("Student %d (roll name marks): ", i+1);\n        scanf("%d %s %f", &students[i].roll, students[i].name, &students[i].marks);\n    }\n    \n    // Save to file\n    fptr = fopen("students.txt", "w");\n    if(fptr == NULL) {\n        printf("Error saving file!\\n");\n        return 1;\n    }\n    \n    for(int i=0; i<n; i++) {\n        fprintf(fptr, "%d %s %.2f\\n", \n                students[i].roll, students[i].name, students[i].marks);\n    }\n    fclose(fptr);\n    printf("Records saved to students.txt\\n");\n    \n    // Read and display\n    printf("\\nReading from file:\\n");\n    fptr = fopen("students.txt", "r");\n    if(fptr == NULL) {\n        printf("Error reading file!\\n");\n        return 1;\n    }\n    \n    struct Student temp;\n    while(fscanf(fptr, "%d %s %f", &temp.roll, temp.name, &temp.marks) == 3) {\n        printf("Roll: %d, Name: %s, Marks: %.2f\\n", \n               temp.roll, temp.name, temp.marks);\n    }\n    fclose(fptr);\n    \n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n#include <stdlib.h>\n\nstruct Student {\n    int roll;\n    char name[20];\n    float marks;\n};\n\nint main() {\n    // Take number of students and their details\n    \n    // Open file in write mode, check for errors\n    \n    // Write each student to file with fprintf\n    \n    // Close file, reopen in read mode\n    \n    // Read and print all records with fscanf\n    \n    return 0;\n}`
-    },
-    {
-      day: 18,
-      title: "Preprocessor & Macros",
-      concept: "Master #include, #define, and conditional compilation. Learn to write efficient, portable C code with macros.",
-      keyConcepts: [
-        "#include <file>: includes standard library headers",
-        "#define NAME value: creates compile-time constant",
-        "Macro functions: #define SQUARE(x) ((x)*(x))",
-        "Conditional compilation: #ifdef, #ifndef, #endif",
-        "Preprocessor runs before compilation (text substitution)"
-      ],
-      example: `#include <stdio.h>\n\n// Macro constants\n#define PI 3.14159\n#define MAX(a,b) ((a)>(b)?(a):(b))\n\n// Conditional compilation\n#ifndef DEBUG\n    #define DEBUG 0\n#endif\n\nint main() {\n    // Use macro constant\n    float radius = 5.0;\n    float area = PI * radius * radius;\n    printf("Area: %.2f\\n", area);\n    \n    // Use macro function\n    int x=10, y=20;\n    printf("Max: %d\\n", MAX(x,y));\n    \n    // Conditional debug output\n    #if DEBUG\n        printf("Debug: radius=%.2f, area=%.2f\\n", radius, area);\n    #endif\n    \n    return 0;\n}`,
-      tracePrompt: "For MAX(3,5): How does preprocessor expand it? Why the extra parentheses in ((a)>(b)?(a):(b))?",
-      task: "Build a Configurable Calculator: Use macros for operations, debug mode toggle, and compile-time configuration",
-      hint: "Define macros for ADD, SUB, MUL, DIV. Use #ifdef DEBUG to enable verbose output. Use #define VERSION \"1.0\" for build info. Test with different DEBUG settings.",
-      solution: `#include <stdio.h>\n\n// Configuration macros\n#define VERSION "1.0"\n#define DEBUG 0\n\n// Operation macros\n#define ADD(a,b) ((a)+(b))\n#define SUB(a,b) ((a)-(b))\n#define MUL(a,b) ((a)*(b))\n#define DIV(a,b) ((b)!=0 ? (a)/(b) : 0)\n\nint main() {\n    printf("Calculator v%s\\n", VERSION);\n    \n    int x=15, y=3;\n    printf("Operations on %d and %d:\\n", x, y);\n    printf("Add: %d\\n", ADD(x,y));\n    printf("Sub: %d\\n", SUB(x,y));\n    printf("Mul: %d\\n", MUL(x,y));\n    printf("Div: %d\\n", DIV(x,y));\n    \n    // Debug output if enabled\n    #if DEBUG\n        printf("\\n[DEBUG] x=%d, y=%d\\n", x, y);\n        printf("[DEBUG] Results: add=%d, sub=%d, mul=%d, div=%d\\n",\n               ADD(x,y), SUB(x,y), MUL(x,y), DIV(x,y));\n    #endif\n    \n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n\n// Define version and debug macros\n\n// Define operation macros (ADD, SUB, etc.)\n\nint main() {\n    // Test operations with sample values\n    \n    // Add conditional debug output\n    \n    return 0;\n}`
-    },
-    {
-      day: 19,
-      title: "Advanced Pointers",
-      concept: "Master pointer arithmetic, arrays of pointers, and pointer-to-pointer. Understand memory layout and safe pointer practices.",
-      keyConcepts: [
-        "Pointer arithmetic: ptr++ moves by sizeof(type) bytes",
-        "Arrays and pointers: arr[i] == *(arr+i)",
-        "Pointer to pointer: int **ptr holds address of pointer",
-        "Dynamic 2D arrays: array of pointers to arrays",
-        "NULL pointers: always initialize to NULL when not assigned"
-      ],
-      example: `#include <stdio.h>\n\nint main() {\n    // Pointer arithmetic\n    int arr[3] = {10, 20, 30};\n    int *ptr = arr; // Points to arr[0]\n    \n    printf("arr[0]=%d, *ptr=%d\\n", arr[0], *ptr);\n    ptr++; // Now points to arr[1]\n    printf("arr[1]=%d, *ptr=%d\\n", arr[1], *ptr);\n    \n    // Array of pointers\n    char *names[2] = {"Alice", "Bob"};\n    printf("First name: %s\\n", names[0]);\n    \n    // Pointer to pointer\n    int x = 42;\n    int *p1 = &x;\n    int **p2 = &p1;\n    printf("Value: %d\\n", **p2); // Dereference twice\n    \n    return 0;\n}`,
-      tracePrompt: "For arr=[10,20,30], ptr=arr: Draw memory addresses. After ptr++, what address does ptr hold? What does *ptr access?",
-      task: "Build a Dynamic String Manager: Create an array of string pointers, take input for 3 names, and print them in reverse order using pointer arithmetic",
-      hint: "Declare char *names[3]. Use malloc for each name or string literals. To reverse: loop from index 2 down to 0, access with *(names+i) or names[i].",
-      solution: `#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main() {\n    // Array of string pointers\n    char *names[3];\n    \n    // Input 3 names\n    printf("Enter 3 names:\\n");\n    for(int i=0; i<3; i++) {\n        names[i] = (char*)malloc(20 * sizeof(char));\n        printf("Name %d: ", i+1);\n        scanf("%s", names[i]);\n    }\n    \n    // Print in reverse using pointer arithmetic\n    printf("\\nNames in reverse:\\n");\n    for(int i=2; i>=0; i--) {\n        // Using array notation: names[i]\n        // Using pointer arithmetic: *(names + i)\n        printf("%s\\n", *(names + i));\n    }\n    \n    // Free allocated memory\n    for(int i=0; i<3; i++) {\n        free(names[i]);\n        names[i] = NULL;\n    }\n    \n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    // Array of 3 string pointers\n    \n    // Allocate and input 3 names\n    \n    // Print in reverse using pointer arithmetic (*(names+i))\n    \n    // Free all allocated memory\n    return 0;\n}`
-    },
-    {
-      day: 20,
-      title: "Command Line Arguments",
-      concept: "Learn to handle command line arguments with argc and argv. Build flexible programs that accept input from the shell.",
-      keyConcepts: [
-        "int main(int argc, char *argv[]): standard signature",
-        "argc: argument count (including program name)",
-        "argv: array of strings (argv[0] = program name)",
-        "Convert strings to numbers: atoi(), atof()",
-        "Validate arguments: check argc before accessing argv"
-      ],
-      example: `#include <stdio.h>\n#include <stdlib.h>\n\nint main(int argc, char *argv[]) {\n    printf("Program: %s\\n", argv[0]);\n    printf("Arguments: %d\\n", argc-1);\n    \n    // Print all arguments\n    for(int i=1; i<argc; i++) {\n        printf("Arg %d: %s\\n", i, argv[i]);\n    }\n    \n    // Convert to number if possible\n    if(argc > 1) {\n        int num = atoi(argv[1]);\n        printf("As integer: %d\\n", num * 2);\n    }\n    \n    return 0;\n}`,
-      tracePrompt: "For command: ./program hello 42: What is argc? What are argv[0], argv[1], argv[2]?",
-      task: "Build a CLI Calculator: Accept operation and numbers as arguments (e.g., ./calc add 5 3), perform calculation, and print result",
-      hint: "Check argc for correct number of arguments. Use strcmp to match operation strings (\"add\", \"sub\", etc.). Convert argv[2] and argv[3] to integers with atoi(). Handle division by zero.",
-      solution: `#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(int argc, char *argv[]) {\n    // Validate arguments\n    if(argc != 4) {\n        printf("Usage: %s <operation> <num1> <num2>\\n", argv[0]);\n        printf("Operations: add, sub, mul, div\\n");\n        return 1;\n    }\n    \n    char *op = argv[1];\n    int a = atoi(argv[2]);\n    int b = atoi(argv[3]);\n    int result;\n    \n    if(strcmp(op, "add") == 0) {\n        result = a + b;\n    } else if(strcmp(op, "sub") == 0) {\n        result = a - b;\n    } else if(strcmp(op, "mul") == 0) {\n        result = a * b;\n    } else if(strcmp(op, "div") == 0) {\n        if(b == 0) {\n            printf("Error: Division by zero!\\n");\n            return 1;\n        }\n        result = a / b;\n    } else {\n        printf("Unknown operation: %s\\n", op);\n        return 1;\n    }\n    \n    printf("%d %s %d = %d\\n", a, op, b, result);\n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main(int argc, char *argv[]) {\n    // Validate argc (should be 4: program + op + num1 + num2)\n    \n    // Extract operation and numbers\n    \n    // Perform calculation based on operation string\n    \n    // Print result or error message\n    return 0;\n}`
-    },
-    {
-      day: 21,
-      title: "CAPSTONE: Task Manager CLI",
-      concept: "Combine all concepts to build a complete, practical application. Practice architecture, error handling, and user experience.",
-      keyConcepts: [
-        "Modular design: separate functions for each feature",
-        "Data persistence: save/load tasks from file",
-        "User interaction: clear menus and prompts",
-        "Error handling: validate input, handle file errors",
-        "Code organization: comments, consistent formatting"
-      ],
-      example: `#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\n#define MAX_TASKS 100\n#define MAX_DESC 100\n\ntypedef struct {\n    int id;\n    char desc[MAX_DESC];\n    int completed;\n} Task;\n\n// Function prototypes\nvoid addTask(Task tasks[], int *count);\nvoid listTasks(Task tasks[], int count);\nvoid saveTasks(Task tasks[], int count, char *filename);\n\nint main() {\n    Task tasks[MAX_TASKS];\n    int count = 0;\n    char filename[] = "tasks.txt";\n    \n    // Load existing tasks\n    // ... (file reading code)\n    \n    int choice;\n    do {\n        printf("\\n1. Add task\\n2. List tasks\\n3. Save & Exit\\nChoice: ");\n        scanf("%d", &choice);\n        \n        switch(choice) {\n            case 1: addTask(tasks, &count); break;\n            case 2: listTasks(tasks, count); break;\n            case 3: saveTasks(tasks, count, filename); break;\n            default: printf("Invalid choice!\\n");\n        }\n    } while(choice != 3);\n    \n    return 0;\n}`,
-      tracePrompt: "For 3 tasks: Draw the Task array in memory. How does addTask update count? How does saveTasks write to file?",
-      task: "Build the complete Task Manager: Add, list, mark complete, delete tasks, save/load from file, with a clean menu interface",
-      hint: "Use struct Task with id, description, completed flag. Implement functions: addTask(), listTasks(), markComplete(), deleteTask(), saveTasks(), loadTasks(). Use a loop for the main menu. Handle file I/O errors gracefully.",
-      solution: `#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\n#define MAX_TASKS 100\n#define MAX_DESC 100\n\ntypedef struct {\n    int id;\n    char desc[MAX_DESC];\n    int completed;\n} Task;\n\nint nextId = 1;\n\nvoid addTask(Task tasks[], int *count) {\n    if(*count >= MAX_TASKS) {\n        printf("Task list full!\\n");\n        return;\n    }\n    \n    Task *t = &tasks[(*count)++];\n    t->id = nextId++;\n    printf("Enter task: ");\n    scanf(" %[^\n]", t->desc); // Read with spaces\n    t->completed = 0;\n    printf("Task #%d added!\\n", t->id);\n}\n\nvoid listTasks(Task tasks[], int count) {\n    if(count == 0) {\n        printf("No tasks!\\n");\n        return;\n    }\n    printf("\\n=== Tasks ===\\n");\n    for(int i=0; i<count; i++) {\n        printf("%d. [%s] %s\\n", \n               tasks[i].id,\n               tasks[i].completed ? "x" : " ",\n               tasks[i].desc);\n    }\n}\n\nvoid markComplete(Task tasks[], int count) {\n    int id;\n    printf("Enter task ID to complete: ");\n    scanf("%d", &id);\n    \n    for(int i=0; i<count; i++) {\n        if(tasks[i].id == id) {\n            tasks[i].completed = 1;\n            printf("Task #%d marked complete!\\n", id);\n            return;\n        }\n    }\n    printf("Task #%d not found!\\n", id);\n}\n\nvoid saveTasks(Task tasks[], int count, char *filename) {\n    FILE *f = fopen(filename, "w");\n    if(!f) {\n        printf("Error saving file!\\n");\n        return;\n    }\n    \n    fprintf(f, "%d\\n", nextId); // Save nextId\n    for(int i=0; i<count; i++) {\n        fprintf(f, "%d %d %s\\n", \n                tasks[i].id, \n                tasks[i].completed, \n                tasks[i].desc);\n    }\n    fclose(f);\n    printf("Tasks saved to %s\\n", filename);\n}\n\nint loadTasks(Task tasks[], int *count, char *filename) {\n    FILE *f = fopen(filename, "r");\n    if(!f) return 0; // No file yet\n    \n    fscanf(f, "%d", &nextId);\n    *count = 0;\n    while(*count < MAX_TASKS && \n          fscanf(f, "%d %d %[^\n]", \n                 &tasks[*count].id, \n                 &tasks[*count].completed,\n                 tasks[*count].desc) == 3) {\n        (*count)++;\n    }\n    fclose(f);\n    return 1;\n}\n\nint main() {\n    Task tasks[MAX_TASKS];\n    int count = 0;\n    char filename[] = "tasks.txt";\n    \n    // Load existing tasks\n    loadTasks(tasks, &count, filename);\n    \n    int choice;\n    do {\n        printf("\\n=== Task Manager ===\\n");\n        printf("1. Add task\\n2. List tasks\\n");\n        printf("3. Mark complete\\n4. Save & Exit\\nChoice: ");\n        scanf("%d", &choice);\n        \n        switch(choice) {\n            case 1: addTask(tasks, &count); break;\n            case 2: listTasks(tasks, count); break;\n            case 3: markComplete(tasks, count); break;\n            case 4: \n                saveTasks(tasks, count, filename);\n                printf("Goodbye!\\n");\n                break;\n            default: printf("Invalid choice!\\n");\n        }\n    } while(choice != 4);\n    \n    return 0;\n}`,
-      starterCode: `#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\n#define MAX_TASKS 100\n#define MAX_DESC 100\n\n// Define Task struct\n\n// Global nextId counter\n\n// Function prototypes: addTask, listTasks, etc.\n\nint main() {\n    // Initialize tasks array and count\n    // Load existing tasks from file\n    \n    // Main menu loop with switch for options\n    // Call appropriate functions\n    \n    // Save and exit\n    return 0;\n}`
+      id: 5,
+      topic: "For Loop Execution",
+      concept: "For loop order: init → check condition → execute body → increment → repeat until false.",
+      code: `int sum = 0;\nfor(int i = 1; i <= 3; i++) {\n  sum = sum + i;\n}\nprintf("%d", sum);`,
+      question: "What will be printed?",
+      answer: "6",
+      explanation: [
+        "<strong>sum = 0</strong>",
+        "<strong>i=1:</strong> sum = 0+1 = 1",
+        "<strong>i=2:</strong> sum = 1+2 = 3",
+        "<strong>i=3:</strong> sum = 3+3 = 6",
+        "<strong>i=4:</strong> condition i<=3 fails → loop ends",
+        "<strong>printf</strong> → Prints <strong>6</strong>"
+      ]
     }
   ];
 
-  // State management
-  let editor, timerInterval, timeLeft = 75 * 60;
-  let progress = JSON.parse(localStorage.getItem('cSprint_progress')) || {};
-  let streak = parseInt(localStorage.getItem('cSprint_streak')) || 0;
-  let lastVisit = localStorage.getItem('cSprint_lastVisit');
-  let currentDay = null;
+  // ================= STATE =================
+  let currentIdx = 0;
+  let score = 0;
+  let answered = false;
 
-  // Initialize app
-  document.addEventListener('DOMContentLoaded', () => {
-    // Setup CodeMirror editor with auto-close brackets
-    editor = CodeMirror(document.getElementById('code-editor'), {
-      mode: "text/x-csrc", 
-      theme: "dracula", 
-      lineNumbers: true, 
-      lineWrapping: true,
-      autoCloseBrackets: true,
-      autoCloseTags: true
-    });
-    
-    // Initial UI setup
-    renderRoadmap();
-    updateStreak();
-    setupTimer();
-    
-    // Event listeners
-    document.getElementById('reset-progress').onclick = resetProgress;
-    document.getElementById('run-btn').onclick = checkSyntax;
-    document.getElementById('complete-btn').onclick = markComplete;
-    document.getElementById('show-hint-btn').onclick = toggleHint;
-    document.getElementById('show-solution-btn').onclick = toggleSolution;
-  });
+  // ================= DOM REFS =================
+  const els = {
+    progressText: document.getElementById('progress-text'),
+    scoreText: document.getElementById('score-text'),
+    progressFill: document.getElementById('progress-fill'),
+    conceptText: document.getElementById('concept-text'),
+    codeDisplay: document.getElementById('code-display'),
+    questionText: document.getElementById('question-text'),
+    answerInput: document.getElementById('answer-input'),
+    checkBtn: document.getElementById('check-btn'),
+    resultSection: document.getElementById('result-section'),
+    feedback: document.getElementById('feedback'),
+    explanationList: document.getElementById('explanation-list'),
+    nextBtn: document.getElementById('next-btn'),
+    completionScreen: document.getElementById('completion-screen'),
+    finalScore: document.getElementById('final-score'),
+    totalQuestions: document.getElementById('total-questions'),
+    restartBtn: document.getElementById('restart-btn')
+  };
 
-  // Render the roadmap sidebar
-  function renderRoadmap() {
-    const container = document.getElementById('roadmap');
-    container.innerHTML = '';
+  // ================= FUNCTIONS =================
+  function updateUI() {
+    const q = questions[currentIdx];
+    els.progressText.textContent = `Question ${currentIdx + 1} of ${questions.length}`;
+    els.scoreText.textContent = `Score: ${score}`;
+    els.progressFill.style.width = `${((currentIdx + 1) / questions.length) * 100}%`;
     
-    curriculum.forEach((day, index) => {
-      const isLocked = index > 0 && !progress[curriculum[index-1].day];
-      const isComplete = progress[day.day];
-      const isActive = currentDay && currentDay.day === day.day;
-      
-      const el = document.createElement('div');
-      el.className = `day-card p-3 rounded bg-gray-700 border border-gray-600 ${
-        isLocked ? 'locked' : ''
-      } ${isComplete ? 'completed' : ''} ${isActive ? 'active-day' : ''}`;
-      
-      el.innerHTML = `
-        <div class="flex justify-between items-center">
-          <div class="font-medium text-sm">${day.day}. ${day.title}</div>
-          ${isComplete ? '<span class="text-green-400 text-xs">✓</span>' : ''}
-        </div>
-      `;
-      
-      if (!isLocked) {
-        el.onclick = () => loadDay(day);
-      }
-      container.appendChild(el);
-    });
+    els.conceptText.textContent = q.concept;
+    els.codeDisplay.textContent = q.code;
+    els.questionText.textContent = q.question;
     
-    updateProgress();
+    els.answerInput.value = '';
+    els.answerInput.disabled = false;
+    els.checkBtn.disabled = false;
+    els.resultSection.classList.add('hidden');
+    answered = false;
+    
+    els.completionScreen.classList.add('hidden');
+    document.querySelector('.card.concept-box').classList.remove('hidden');
+    document.querySelector('.card.code-block').classList.remove('hidden');
+    document.querySelector('.card.input-section').classList.remove('hidden');
   }
 
-  // Load a specific day's content
-  function loadDay(day) {
-    currentDay = day;
-    
-    // Update UI sections
-    document.getElementById('day-title').innerText = `Day ${day.day}: ${day.title}`;
-    document.getElementById('day-subtitle').innerText = day.concept;
-    document.getElementById('concept-desc').innerText = day.concept;
-    
-    // Populate key concepts
-    const conceptsDiv = document.getElementById('key-concepts');
-    conceptsDiv.innerHTML = '';
-    day.keyConcepts.forEach(concept => {
-      const p = document.createElement('p');
-      p.className = 'flex items-start';
-      p.innerHTML = `<span class="step-number mt-1">•</span> ${concept}`;
-      conceptsDiv.appendChild(p);
-    });
-    
-    // Set example code
-    document.getElementById('example-code').innerText = day.example;
-    
-    // Set trace prompt
-    document.getElementById('trace-prompt').innerText = day.tracePrompt;
-    
-    // Set task
-    document.getElementById('task-desc').innerText = day.task;
-    
-    // Set hint and solution
-    document.getElementById('hint-content').innerText = day.hint;
-    document.getElementById('solution-code').innerText = day.solution;
-    
-    // Set editor content
-    editor.setValue(day.starterCode);
-    
-    // Show/hide sections
-    document.getElementById('welcome-message').classList.add('hidden');
-    document.getElementById('concept-section').classList.remove('hidden');
-    document.getElementById('task-section').classList.remove('hidden');
-    document.getElementById('code-section').classList.remove('hidden');
-    
-    // Reset hints/solutions
-    document.getElementById('hint-box').style.display = 'none';
-    document.getElementById('solution-box').style.display = 'none';
-    
-    // Update console
-    document.getElementById('console-output').textContent = 
-      `Day ${day.day} loaded. Read concepts → Try code → Use hints if stuck → Mark complete when done!`;
-    
-    // Re-render roadmap to show active day
-    renderRoadmap();
+  function normalizeAnswer(str) {
+    return str.trim().toLowerCase().replace(/\s+/g, ' ');
   }
 
-  // Setup the 75-minute timer
-  function setupTimer() {
-    const updateDisplay = () => {
-      const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-      const s = (timeLeft % 60).toString().padStart(2, '0');
-      document.getElementById('timer-display').textContent = `${m}:${s}`;
-    };
+  function checkAnswer() {
+    if (answered) return;
+    const userAns = normalizeAnswer(els.answerInput.value);
+    const correctAns = normalizeAnswer(questions[currentIdx].answer);
     
-    document.getElementById('reset-timer').onclick = () => { 
-      timeLeft = 75 * 60; 
-      updateDisplay(); 
-      clearInterval(timerInterval); 
-      setupTimer(); // Restart timer
-    };
-    
-    timerInterval = setInterval(() => {
-      if (timeLeft > 0) { 
-        timeLeft--; 
-        updateDisplay(); 
-      } else { 
-        clearInterval(timerInterval); 
-        document.getElementById('console-output').textContent += 
-          "\n⏰ 75-minute session complete! Great work. Rest and continue tomorrow."; 
-      }
-    }, 1000);
-    
-    updateDisplay();
-  }
-
-  // Update progress bar and display
-  function updateProgress() {
-    const done = Object.keys(progress).length;
-    const pct = Math.round((done / curriculum.length) * 100);
-    document.getElementById('progress-display').textContent = `${pct}% Complete`;
-    document.getElementById('progress-bar').style.width = `${pct}%`;
-  }
-
-  // Update streak counter
-  function updateStreak() {
-    const today = new Date().toDateString();
-    if (lastVisit !== today) {
-      const yesterday = new Date(); 
-      yesterday.setDate(yesterday.getDate() - 1);
-      streak = (lastVisit === yesterday.toDateString()) ? streak + 1 : 1;
-      localStorage.setItem('cSprint_streak', streak);
-      localStorage.setItem('cSprint_lastVisit', today);
-    }
-    document.getElementById('streak-display').textContent = `🔥 Streak: ${streak} days`;
-  }
-
-  // Client-side syntax checking (no API needed)
-  function checkSyntax() {
-    const code = editor.getValue();
-    const output = document.getElementById('console-output');
-    output.textContent = "🔍 Checking syntax...";
-    
-    // Basic C syntax validation (client-side only)
-    const errors = [];
-    
-    // Check for main function
-    if (!code.includes('main') || !code.includes('int main')) {
-      errors.push("❌ Missing 'int main()' function - every C program needs this!");
-    }
-    
-    // Check for #include
-    if (!code.includes('#include')) {
-      errors.push("❌ Missing #include directive - need at least #include <stdio.h>");
-    }
-    
-    // Check for balanced braces
-    const openBraces = (code.match(/{/g) || []).length;
-    const closeBraces = (code.match(/}/g) || []).length;
-    if (openBraces !== closeBraces) {
-      errors.push(`❌ Unbalanced braces: ${openBraces} open, ${closeBraces} close`);
-    }
-    
-    // Check for balanced parentheses in common functions
-    if (code.includes('printf') && !code.match(/printf\s*\([^)]*\)/)) {
-      errors.push("❌ printf() has unbalanced parentheses");
-    }
-    
-    if (code.includes('scanf') && !code.match(/scanf\s*\([^)]*\)/)) {
-      errors.push("❌ scanf() has unbalanced parentheses");
-    }
-    
-    // Check for semicolons after statements (basic heuristic)
-    const lines = code.split('\n');
-    lines.forEach((line, index) => {
-      const trimmed = line.trim();
-      if (trimmed && 
-          !trimmed.startsWith('//') && 
-          !trimmed.startsWith('#') && 
-          !trimmed.endsWith('{') && 
-          !trimmed.endsWith('}') &&
-          !trimmed.endsWith(';') &&
-          !trimmed.endsWith(',') &&
-          !trimmed.includes('if') &&
-          !trimmed.includes('for') &&
-          !trimmed.includes('while') &&
-          !trimmed.includes('return') &&
-          trimmed.length > 1) {
-        // This is a simplified check - real C parsing is complex
-        // We'll skip this for now to avoid false positives
-      }
-    });
-    
-    // Display results
-    if (errors.length === 0) {
-      output.textContent = "✅ Syntax looks good! Your code has proper structure.\n\n💡 Tip: To see actual output, compile with gcc locally:\n   gcc program.c -o program\n   ./program";
-    } else {
-      output.textContent = "⚠️ Potential issues found:\n" + errors.join('\n') + 
-        "\n\n💡 Fix these and try again. Remember: 'Ugly first compile' > waiting for perfect code!";
-    }
-  }
-
-  // Mark day as complete
-  function markComplete() {
-    if (!currentDay) {
-      alert("Please select a day first!");
+    if (!userAns) {
+      els.answerInput.style.borderColor = 'var(--error)';
+      setTimeout(() => els.answerInput.style.borderColor = '', 1000);
       return;
     }
+
+    answered = true;
+    const isCorrect = userAns === correctAns;
     
-    if (!progress[currentDay.day]) {
-      progress[currentDay.day] = true;
-      localStorage.setItem('cSprint_progress', JSON.stringify(progress));
-      
-      // Show completion message
-      const output = document.getElementById('console-output');
-      output.textContent += `\n🎉 Day ${currentDay.day} completed!`;
-      
-      if (currentDay.day < curriculum.length) {
-        output.textContent += `\n✨ Next: Day ${currentDay.day + 1} - ${curriculum[currentDay.day].title}`;
-      } else {
-        output.textContent += `\n🏆 CONGRATULATIONS! You've completed all 21 days of C Sprint!`;
-      }
-      
-      // Re-render roadmap to show completion
-      renderRoadmap();
+    if (isCorrect) score++;
+    
+    els.feedback.textContent = isCorrect ? '✅ Correct! Well reasoned.' : '❌ Not quite. Review the steps below.';
+    els.feedback.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
+    
+    els.explanationList.innerHTML = questions[currentIdx].explanation
+      .map(step => `<li>${step}</li>`).join('');
+    
+    els.resultSection.classList.remove('hidden');
+    els.answerInput.disabled = true;
+    els.checkBtn.disabled = true;
+    
+    els.scoreText.textContent = `Score: ${score}`;
+  }
+
+  function nextQuestion() {
+    currentIdx++;
+    if (currentIdx >= questions.length) {
+      showCompletion();
+    } else {
+      updateUI();
     }
   }
 
-  // Toggle hint visibility
-  function toggleHint() {
-    const hintBox = document.getElementById('hint-box');
-    hintBox.style.display = hintBox.style.display === 'none' || !hintBox.style.display ? 'block' : 'none';
+  function showCompletion() {
+    document.querySelector('.card.concept-box').classList.add('hidden');
+    document.querySelector('.card.code-block').classList.add('hidden');
+    document.querySelector('.card.input-section').classList.add('hidden');
+    els.resultSection.classList.add('hidden');
+    els.completionScreen.classList.remove('hidden');
+    els.finalScore.textContent = score;
+    els.totalQuestions.textContent = questions.length;
+    els.progressFill.style.width = '100%';
   }
 
-  // Toggle solution visibility
-  function toggleSolution() {
-    const solutionBox = document.getElementById('solution-box');
-    solutionBox.style.display = solutionBox.style.display === 'none' || !solutionBox.style.display ? 'block' : 'none';
+  function resetApp() {
+    currentIdx = 0;
+    score = 0;
+    updateUI();
   }
 
-  // Reset all progress
-  function resetProgress() {
-    if (confirm("Reset all progress? This will clear your streak and completions.")) {
-      localStorage.removeItem('cSprint_progress');
-      localStorage.removeItem('cSprint_streak');
-      localStorage.removeItem('cSprint_lastVisit');
-      progress = {};
-      streak = 0;
-      lastVisit = null;
-      currentDay = null;
-      
-      // Reset UI
-      document.getElementById('welcome-message').classList.remove('hidden');
-      document.getElementById('concept-section').classList.add('hidden');
-      document.getElementById('task-section').classList.add('hidden');
-      document.getElementById('code-section').classList.add('hidden');
-      document.getElementById('console-output').textContent = "Progress reset! Start fresh with Day 1.";
-      
-      renderRoadmap();
-      updateStreak();
+  // Auto-close brackets/quotes in textarea
+  const pairs = { '(': ')', '[': ']', '{': '}', '"': '"', "'": "'" };
+  els.answerInput.addEventListener('keydown', (e) => {
+    if (pairs[e.key]) {
+      e.preventDefault();
+      const start = els.answerInput.selectionStart;
+      const end = els.answerInput.selectionEnd;
+      const val = els.answerInput.value;
+      els.answerInput.value = val.substring(0, start) + e.key + pairs[e.key] + val.substring(end);
+      els.answerInput.selectionStart = els.answerInput.selectionEnd = start + 1;
     }
-  }
+  });
+
+  // Event Listeners
+  els.checkBtn.addEventListener('click', checkAnswer);
+  els.nextBtn.addEventListener('click', nextQuestion);
+  els.restartBtn.addEventListener('click', resetApp);
+  els.answerInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !answered) checkAnswer();
+  });
+
+  // Init
+  updateUI();
 </script>
 </body>
 </html>
