@@ -1,0 +1,53 @@
+    :root {
+      --bg: #edf3ff;
+      --card: #ffffff;
+      --panel: #dbe8ff;
+      --text: #14213d;
+      --muted: #3d5a80;
+      --accent: #7c3aed;
+      --accent-2: #0284c7;
+      --good: #047857;
+      --bad: #be123c;
+    }
+    body.dark {
+      --bg: #0b1020;
+      --card: #172039;
+      --panel: #1f2d50;
+      --text: #eaf1ff;
+      --muted: #9fb0d9;
+      --accent: #8b5cf6;
+      --accent-2: #22d3ee;
+      --good: #34d399;
+      --bad: #fb7185;
+    }
+    *{box-sizing:border-box}
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, Arial, sans-serif;
+      color: var(--text);
+      background:
+      radial-gradient(circle at 10% 10%, rgba(139,92,246,.2), transparent 35%),
+      radial-gradient(circle at 90% 20%, rgba(34,211,238,.15), transparent 30%),
+      var(--bg);
+      min-height: 100vh;
+    }
+    .app { max-width: 1100px; margin: 0 auto; padding: 20px; }
+    .header,.stats,.layout,.actions{display:flex;gap:12px;flex-wrap:wrap}
+    .header{justify-content:space-between;align-items:center}
+    .card{background:var(--card);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+    .stats .card{flex:1;min-width:150px}
+    .layout{margin-top:14px}
+    .left{flex:2;min-width:320px}
+    .right{flex:1;min-width:260px}
+    button,select{background:var(--panel);color:var(--text);border:none;border-radius:10px;padding:10px 12px;font-weight:600;cursor:pointer}
+    button.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+    .mode{display:none}
+    .mode.active{display:block}
+    .option{display:block;width:100%;text-align:left;margin:8px 0;padding:10px;border-radius:10px;background:var(--panel)}
+    .codebank,.dropzone{display:grid;gap:8px}
+    .line{padding:10px;border-radius:8px;background:var(--panel)}
+    .dropzone{min-height:130px;border:1px dashed var(--muted);padding:8px;border-radius:10px}
+    .hint{color:var(--muted)}
+    .ok{color:var(--good);font-weight:700}
+    .err{color:var(--bad);font-weight:700}
+  
