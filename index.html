@@ -690,724 +690,143 @@
 -    badges: [],
 -    answers: {}, // lessonId -> {attempts, correct}
 -    mode: 'adventure' // or practice/review
-+const storageKey = 'cquest_v1';
-+const baseState = { xp:0, level:1, streak:0, quest:0, weak:{loops:60,pointers:70,arrays:50,conditions:45,functions:55}, theme:'dark', hintLevel:0 };
-+const state = {...baseState, ...(JSON.parse(localStorage.getItem(storageKey) || '{}'))};
-+
-+const mcqs = [
-+  {q:'Which operator compares values in C?',opts:['=','==','!=','<='],a:'=='},
-+  {q:'What is the first index of an array?',opts:['0','1','-1','depends'],a:'0'}
-+];
-+const parsons = { lines:['int sum = 0;','for(int i=0;i<3;i++){','sum += i;','}'], answer:[0,1,2,3] };
-+const debugTask = { buggy:'int *p;\n*p = 4;', fix:'int x=4; int *p=&x;' };
-+const labTask = { prompt:'Write one line to print Hello', expected:'printf("Hello");' };
-+
-+function save(){ localStorage.setItem(storageKey, JSON.stringify(state)); }
-+function renderStats(){
-+  xp.textContent = state.xp; level.textContent = state.level; streak.textContent = state.streak; quest.textContent = `${state.quest}/5`;
-+  weakList.innerHTML = Object.entries(state.weak).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<li>${k}: ${v}% weak</li>`).join('');
-+}
-+function reward(correct=true){
-+  if(correct){ state.xp += 20; state.quest = Math.min(5, state.quest+1); Object.keys(state.weak).forEach(k=>state.weak[k]=Math.max(10,state.weak[k]-2)); }
-+  else { state.xp = Math.max(0, state.xp-5); state.weak.pointers = Math.min(100, state.weak.pointers + 4); }
-+  state.level = Math.floor(state.xp/100)+1; save(); renderStats();
-+}
-+
-+function mountMCQ(){
-+  const item = mcqs[Math.floor(Math.random()*mcqs.length)];
-+  mcq.innerHTML = `<p>${item.q}</p>` + item.opts.map(o=>`<button class="option">${o}</button>`).join('');
-+  [...mcq.querySelectorAll('.option')].forEach(btn=>btn.onclick=()=>{
-+    const ok = btn.textContent===item.a;
-+    feedback.innerHTML = ok ? `<span class='ok'>Correct!</span> Tiny explanation: == compares values.` : `<span class='err'>Not yet.</span> Tiny explanation: = assigns, it doesn't compare.`;
-+    reward(ok);
-+  });
-+}
-+function mountParsons(){
-+  const shuffled = [...parsons.lines].sort(()=>Math.random()-0.5);
-+  parsonsEl.innerHTML = `<p>Tap lines in correct order:</p><div class='codebank'>${shuffled.map(l=>`<button class='option'>${l}</button>`).join('')}</div><div class='dropzone' id='zone'></div><button id='checkP'>Check</button>`;
-+  const zone = document.getElementById('zone');
-+  parsonsEl.querySelectorAll('.option').forEach(b=>b.onclick=()=>zone.innerHTML += `<div class='line'>${b.textContent}</div>`);
-+  document.getElementById('checkP').onclick = ()=>{
-+    const lines = [...zone.querySelectorAll('.line')].map(n=>n.textContent);
-+    const ok = JSON.stringify(lines)===JSON.stringify(parsons.lines);
-+    feedback.innerHTML = ok ? `<span class='ok'>Solved!</span> You formed a valid loop structure.` : `<span class='err'>Order mismatch.</span> Hint: initialization should come before loop.`;
-+    reward(ok);
-   };
--
--  function loadState(){
--    try{
--      const raw = localStorage.getItem(STORAGE_KEY);
--      if(raw){
--        const parsed = JSON.parse(raw);
--        if(parsed && typeof parsed === 'object'){
--          state = Object.assign(state, parsed);
--        }
--      }
--    }catch(e){
--      console.warn('loadState error', e);
--    }
--  }
--  function saveState(){
--    try{
--      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
--      renderStatus();
--    }catch(e){
--      console.warn('saveState error', e);
--    }
--  }
--
--  function resetState(){
--    if(!confirm('Reset all progress?')) return;
--    state = {
--      currentChapter:1,currentLessonId:null,xp:0,level:1,gold:0,streak:0,lastVisit:null,badges:[],answers:{},mode:'adventure'
--    };
--    saveState();
--    renderAll();
--  }
--
--  function exportState(){
--    try{
--      const data = JSON.stringify(state, null, 2);
--      const blob = new Blob([data], {type:'application/json'});
--      const url = URL.createObjectURL(blob);
--      const a = document.createElement('a');
--      a.href = url; a.download = 'cacademy_progress.json';
--      document.body.appendChild(a); a.click(); a.remove();
--      URL.revokeObjectURL(url);
--    }catch(e){
--      alert('Export failed');
--    }
--  }
--
--  /* Streak logic */
--  function updateStreak(){
--    const today = new Date().toDateString();
--    if(state.lastVisit === today) return;
--    const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
--    if(state.lastVisit === yesterday.toDateString()){
--      state.streak = (state.streak || 0) + 1;
--    } else {
--      state.streak = 1;
--    }
--    state.lastVisit = today;
--    saveState();
--  }
--
--  /* XP & Level */
--  function addXP(amount){
--    state.xp = (state.xp || 0) + amount;
--    // level up every 100 XP
--    const newLevel = Math.floor(state.xp / 100) + 1;
--    if(newLevel > state.level){
--      state.level = newLevel;
--      state.gold = (state.gold || 0) + 10 * (newLevel - state.level + 1);
--      // award level badge
--      awardBadge('Level ' + newLevel);
--    }
--    saveState();
--  }
--
--  function awardBadge(name){
--    if(!state.badges.includes(name)){
--      state.badges.push(name);
--      saveState();
--    }
--  }
--
--  /* -------------------------
--     Rendering
--     ------------------------- */
--
--  const el = id => document.getElementById(id);
--
--  function renderWorldMap(){
--    const container = el('worldMap');
--    container.innerHTML = '';
--    curriculum.forEach(ch=>{
--      const div = document.createElement('div');
--      div.className = 'chapter';
--      div.tabIndex = 0;
--      div.innerHTML = `<div style="font-weight:800">${ch.title}</div><div class="small muted">${ch.lessons.length} lessons</div>`;
--      div.addEventListener('click', ()=>{ openChapter(ch.id); });
--      container.appendChild(div);
--    });
--  }
--
--  function openChapter(chapterId){
--    state.currentChapter = chapterId;
--    // default to first lesson
--    const ch = curriculum.find(c=>c.id===chapterId);
--    if(ch && ch.lessons && ch.lessons.length) state.currentLessonId = ch.lessons[0].id;
--    saveState();
--    renderAll();
--  }
--
--  function renderAll(){
--    renderWorldMap();
--    renderContent();
--    renderRightPanel();
--    renderStatus();
--  }
--
--  function renderStatus(){
--    el('xp').textContent = state.xp;
--    el('level').textContent = state.level;
--    el('gold').textContent = state.gold;
--    el('streak').textContent = state.streak;
--    el('xpSmall').textContent = state.xp;
--    el('levelSmall').textContent = state.level;
--    const xpPct = Math.min(100, (state.xp % 100));
--    el('xpFill').style.width = xpPct + '%';
--    el('progressPercent').textContent = Math.round(computeProgress()) + '%';
--    // badges
--    const badges = el('badges'); badges.innerHTML = '';
--    state.badges.forEach(b=>{
--      const d = document.createElement('div'); d.className='badge'; d.textContent = b; badges.appendChild(d);
--    });
--  }
--
--  function computeProgress(){
--    const totalLessons = curriculum.reduce((s,c)=>s+c.lessons.length,0);
--    const done = Object.keys(state.answers).length;
--    return totalLessons ? (done/totalLessons)*100 : 0;
--  }
--
--  function renderRightPanel(){
--    const ch = curriculum.find(c=>c.id===state.currentChapter);
--    el('topicTag').textContent = ch ? ch.tag : '';
--    el('topicTitle').textContent = ch ? ch.title : 'Select a chapter';
--  }
--
--  /* -------------------------
--     Content rendering per tab
--     ------------------------- */
--
--  let activeTab = 'read';
--  function setActiveTab(tab){
--    activeTab = tab;
--    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
--    renderContent();
--  }
--
--  function renderContent(){
--    const area = el('contentArea');
--    area.innerHTML = '';
--    const ch = curriculum.find(c=>c.id===state.currentChapter);
--    if(!ch){ area.innerHTML = '<div class="small">Select a chapter to begin.</div>'; return; }
--    const lesson = ch.lessons.find(l=>l.id===state.currentLessonId) || ch.lessons[0];
--    state.currentLessonId = lesson.id;
--    // header
--    const header = document.createElement('div'); header.style.display='flex'; header.style.justifyContent='space-between'; header.style.alignItems='center';
--    header.innerHTML = `<div><div class="small muted">${ch.title}</div><div style="font-weight:900">${lesson.title}</div></div><div class="small muted">Tag: ${ch.tag}</div>`;
--    area.appendChild(header);
--
--    if(activeTab === 'read'){
--      renderRead(area, lesson);
--    } else if(activeTab === 'visual'){
--      renderVisual(area, lesson);
--    } else if(activeTab === 'practice'){
--      renderPractice(area, lesson);
--    }
--  }
--
--  function renderRead(container, lesson){
--    const div = document.createElement('div'); div.className='section';
--    const theory = document.createElement('div'); theory.innerHTML = `<div style="font-weight:800">Theory</div><div class="small" style="margin-top:6px">${lesson.theory}</div>`;
--    div.appendChild(theory);
--    if(lesson.analogy){
--      const ana = document.createElement('div'); ana.innerHTML = `<div style="font-weight:800;margin-top:8px">Analogy</div><div class="small" style="margin-top:6px">${lesson.analogy}</div>`;
--      div.appendChild(ana);
--    }
--    if(lesson.syntax){
--      const syn = document.createElement('div'); syn.innerHTML = `<div style="font-weight:800;margin-top:8px">Syntax</div><div class="code" style="margin-top:6px">${highlightC(lesson.syntax)}</div>`;
--      div.appendChild(syn);
--    }
--    if(lesson.proTips && lesson.proTips.length){
--      const tips = document.createElement('div'); tips.innerHTML = `<div style="font-weight:800;margin-top:8px">Pro-Tips</div>`;
--      const ul = document.createElement('ul'); ul.className='small';
--      lesson.proTips.forEach(t=>{ const li=document.createElement('li'); li.textContent=t; ul.appendChild(li); });
--      tips.appendChild(ul); div.appendChild(tips);
--    }
--    container.appendChild(div);
--  }
--
--  function renderVisual(container, lesson){
--    const div = document.createElement('div'); div.className='visualizer';
--    // code examples
--    const codeWrap = document.createElement('div'); codeWrap.innerHTML = `<div style="font-weight:800">Interactive Example</div>`;
--    const codeBox = document.createElement('div'); codeBox.className='code'; codeBox.id='visualCode';
--    const example = (lesson.visualExamples && lesson.visualExamples[0]) || {code: lesson.syntax || '// example', trace: []};
--    codeBox.innerHTML = `<pre>${escapeHtml(example.code)}</pre>`;
--    codeWrap.appendChild(codeBox);
--    const controls = document.createElement('div'); controls.style.display='flex'; controls.style.gap='8px'; controls.style.marginTop='8px';
--    const runBtn = document.createElement('button'); runBtn.className='btn primary'; runBtn.textContent='Run Visual Trace';
--    const stepBtn = document.createElement('button'); stepBtn.className='btn'; stepBtn.textContent='Step';
--    controls.appendChild(runBtn); controls.appendChild(stepBtn);
--    codeWrap.appendChild(controls);
--    div.appendChild(codeWrap);
--
--    // memory map
--    const memWrap = document.createElement('div'); memWrap.innerHTML = `<div style="font-weight:800;margin-top:12px">Memory Map</div>`;
--    const memMap = document.createElement('div'); memMap.className='memory-map'; memMap.id='memoryMap';
--    memWrap.appendChild(memMap);
--    div.appendChild(memWrap);
--
--    // ascii & operator chart
--    const refWrap = document.createElement('div'); refWrap.style.display='flex'; refWrap.style.gap='12px'; refWrap.style.marginTop='12px';
--    const ascii = document.createElement('div'); ascii.style.flex='1'; ascii.innerHTML = `<div style="font-weight:800">ASCII Reference</div><div class="ascii small" id="asciiRef">${generateAsciiMini()}</div>`;
--    const op = document.createElement('div'); op.style.width='220px'; op.innerHTML = `<div style="font-weight:800">Operator Precedence</div><div class="operator-chart small" id="opChart">${generateOpChart()}</div>`;
--    refWrap.appendChild(ascii); refWrap.appendChild(op);
--    div.appendChild(refWrap);
--
--    container.appendChild(div);
--
--    // visual trace logic
--    let trace = example.trace || [];
--    let step = 0;
--    function renderMemory(stateObj){
--      memMap.innerHTML = '';
--      Object.keys(stateObj).forEach(k=>{
--        const box = document.createElement('div'); box.className='mem-box';
--        box.innerHTML = `<div style="font-weight:800">${k}</div><div style="font-size:14px">${stateObj[k]}</div>`;
--        memMap.appendChild(box);
--      });
--    }
--    runBtn.addEventListener('click', ()=>{
--      // animate trace
--      step = 0;
--      const mem = {};
--      renderMemory(mem);
--      if(trace.length===0){ alert('No trace available for this example'); return; }
--      const interval = setInterval(()=>{
--        if(step >= trace.length){ clearInterval(interval); return; }
--        const t = trace[step];
--        // simple parse: "x = 5" or "store x=5" or "remove 5 add 11"
--        applyTraceStep(t, mem);
--        renderMemory(mem);
--        step++;
--      }, 700);
--    });
--    stepBtn.addEventListener('click', ()=>{
--      const mem = {}; // reconstruct from previous steps
--      for(let i=0;i<=step && i<trace.length;i++) applyTraceStep(trace[i], mem);
--      renderMemory(mem);
--      step = Math.min(step+1, trace.length);
--    });
--  }
--
--  function applyTraceStep(text, mem){
--    // heuristics: "x = 5", "y = x + 3", "store x=5", "remove 5 add 11"
--    const t = text.toString();
--    const assign = t.match(/([A-Za-z_]\w*)\s*=\s*([0-9]+)/);
--    if(assign){ mem[assign[1]] = assign[2]; return; }
--    const store = t.match(/store\s+([A-Za-z_]\w*)\s+([0-9]+)/i);
--    if(store){ mem[store[1]] = store[2]; return; }
--    const change = t.match(/([A-Za-z_]\w*)\s*→\s*([0-9]+)/);
--    if(change){ mem[change[1]] = change[2]; return; }
--    // fallback: show message as pseudo variable
--    mem['step'] = t;
--  }
--
--  function renderPractice(container, lesson){
--    const div = document.createElement('div'); div.className='practice';
--    const qWrap = document.createElement('div'); qWrap.className='question-card';
--    const qTitle = document.createElement('div'); qTitle.innerHTML = `<div style="font-weight:800">Practice</div><div class="small muted" style="margin-top:6px">Attempt questions to earn XP</div>`;
--    qWrap.appendChild(qTitle);
--
--    // pick a practice item (rotate)
--    const item = (lesson.practice && lesson.practice[0]) || null;
--    if(!item){
--      qWrap.innerHTML += '<div class="small muted" style="margin-top:8px">No practice items for this lesson.</div>';
--      div.appendChild(qWrap); container.appendChild(div); return;
--    }
--
--    const prompt = document.createElement('div'); prompt.style.marginTop='8px'; prompt.innerHTML = `<div class="small muted">Question</div><div style="font-weight:800;margin-top:6px">${item.prompt}</div>`;
--    qWrap.appendChild(prompt);
--
--    // render input based on type
--    let inputEl = null;
--    if(item.type === 'mcq'){
--      const opts = item.options || [];
--      const form = document.createElement('div'); form.style.display='flex'; form.style.flexDirection='column'; form.style.gap='8px'; form.style.marginTop='8px';
--      opts.forEach((o,i)=>{
--        const row = document.createElement('label'); row.style.display='flex'; row.style.alignItems='center'; row.style.gap='8px';
--        const r = document.createElement('input'); r.type='radio'; r.name='mcq'; r.value=o;
--        row.appendChild(r); row.appendChild(document.createTextNode(o));
--        form.appendChild(row);
--      });
--      qWrap.appendChild(form);
--      inputEl = form;
--    } else if(item.type === 'predict' || item.type === 'pattern'){
--      const inp = document.createElement('input'); inp.className='input'; inp.placeholder='Type exact output, e.g., 6 5 or pattern';
--      qWrap.appendChild(inp); inputEl = inp;
--      setupEditorShortcuts(inp);
--    } else if(item.type === 'error-find'){
--      const ta = document.createElement('textarea'); ta.className='textarea'; ta.placeholder='Describe the error or line number';
--      qWrap.appendChild(ta); inputEl = ta; setupEditorShortcuts(ta);
--    } else if(item.type === 'code-complete'){
--      const ta = document.createElement('textarea'); ta.className='textarea'; ta.value = item.starter || '';
--      qWrap.appendChild(ta); inputEl = ta; setupEditorShortcuts(ta);
--    } else {
--      const ta = document.createElement('textarea'); ta.className='textarea';
--      qWrap.appendChild(ta); inputEl = ta; setupEditorShortcuts(ta);
--    }
--
--    const actions = document.createElement('div'); actions.style.display='flex'; actions.style.gap='8px'; actions.style.marginTop='8px';
--    const checkBtn = document.createElement('button'); checkBtn.className='btn primary'; checkBtn.textContent='Check Answer';
--    const hintBtn = document.createElement('button'); hintBtn.className='btn'; hintBtn.textContent='Hint';
--    actions.appendChild(checkBtn); actions.appendChild(hintBtn);
--    qWrap.appendChild(actions);
--
--    const feedback = document.createElement('div'); feedback.style.marginTop='8px'; qWrap.appendChild(feedback);
--
--    checkBtn.addEventListener('click', ()=>{
--      let userVal = '';
--      if(item.type === 'mcq'){
--        const sel = qWrap.querySelector('input[name="mcq"]:checked');
--        if(!sel){ alert('Select an option'); return; }
--        userVal = sel.value;
--      } else {
--        userVal = (inputEl && inputEl.value) || '';
--        if(!userVal.trim()){ alert('Enter an answer'); return; }
--      }
--      const correct = validatePracticeAnswer(item, userVal);
--      if(correct){
--        feedback.innerHTML = `<div class="badge-success">✅ Correct! +10 XP</div>`;
--        addXP(10);
--        state.answers[lesson.id] = state.answers[lesson.id] || {attempts:0,correct:false};
--        state.answers[lesson.id].attempts += 1;
--        state.answers[lesson.id].correct = true;
--        awardBadge(lesson.title.split(' ')[0] + ' Master');
--        saveState();
--      } else {
--        feedback.innerHTML = `<div class="badge-error">❌ Not quite. Try again or view explanation.</div>`;
--        state.answers[lesson.id] = state.answers[lesson.id] || {attempts:0,correct:false};
--        state.answers[lesson.id].attempts += 1;
--        saveState();
--      }
--      renderStatus();
--    });
--
--    hintBtn.addEventListener('click', ()=>{
--      const hintText = lesson.proTips && lesson.proTips[0] ? lesson.proTips[0] : 'Think about how values change in memory.';
--      alert('Hint: ' + hintText);
--    });
--
--    div.appendChild(qWrap);
--    container.appendChild(div);
--  }
--
--  function validatePracticeAnswer(item, userVal){
--    const normalize = s => (s||'').toString().trim().toLowerCase().replace(/,/g,' ').replace(/\s+/g,' ');
--    if(item.type === 'mcq') return normalize(userVal) === normalize(item.answer);
--    return normalize(userVal) === normalize(item.answer);
--  }
--
--  /* -------------------------
--     Utilities: syntax highlight, ascii, op chart
--     ------------------------- */
--
--  function highlightC(code){
--    // very simple regex-based highlighting
--    const esc = escapeHtml(code);
--    return esc
--      .replace(/(\/\/.*?$)/gm, '<span class="tok-comment">$1</span>')
--      .replace(/(".*?")/g, '<span class="tok-str">$1</span>')
--      .replace(/\b(int|float|double|char|return|if|else|for|while|do|struct|typedef|switch|case|break|continue|void|sizeof)\b/g, '<span class="tok-key">$1</span>')
--      .replace(/\b([0-9]+)\b/g, '<span class="tok-num">$1</span>');
--  }
--
--  function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
--
--  function generateAsciiMini(){
--    // show a small subset
--    const rows = [];
--    const chars = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','a','b','c','d','e','f',' ','!','"',"'",'(',')'];
--    chars.forEach(ch=>{
--      rows.push(`${ch} : ${ch.charCodeAt(0)}`);
--    });
--    return rows.join('  |  ');
--  }
--
--  function generateOpChart(){
--    const levels = [
--      '() [] -> .',
--      '! ~ ++ -- + - (type) * & sizeof',
--      '* / %',
--      '+ -',
--      '<< >>',
--      '< <= > >=',
--      '== !=',
--      '&',
--      '^',
--      '|',
--      '&&',
--      '||',
--      '? :',
--      '= += -= *= /= %=',
--      ','
--    ];
--    return levels.map(l=>`<div>${l}</div>`).join('');
--  }
--
--  /* -------------------------
--     Keyboard & Editor niceties
--     - Shift+Enter inserts newline
--     - Ctrl/Cmd+Enter triggers check (clicks first primary button)
--     - Enter alone does nothing
--     - Auto-close brackets and quotes
--     - Smart backspace
--     ------------------------- */
--
--  function setupGlobalShortcuts(){
--    document.addEventListener('keydown', function(e){
--      // Ctrl/Cmd+Enter -> click primary visible button
--      if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
--        e.preventDefault();
--        const primary = document.querySelector('.btn.primary');
--        if(primary) primary.click();
--        return;
--      }
--      // Enter alone does nothing globally
--      if(e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey){
--        // prevent accidental form submits
--        const active = document.activeElement;
--        if(active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')){
--          e.preventDefault();
--        }
--      }
--    });
--  }
--
--  function setupEditorShortcuts(input){
--    if(!input) return;
--    input.addEventListener('keydown', function(e){
--      // Shift+Enter -> newline
--      if(e.key === 'Enter' && e.shiftKey){
--        e.preventDefault();
--        const start = input.selectionStart;
--        const val = input.value;
--        input.value = val.slice(0,start) + '\n' + val.slice(input.selectionEnd);
--        input.selectionStart = input.selectionEnd = start + 1;
--        input.dispatchEvent(new Event('input'));
--        return;
--      }
--      // Ctrl/Cmd+Enter -> submit
--      if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
--        e.preventDefault();
--        const primary = document.querySelector('.btn.primary');
--        if(primary) primary.click();
--        return;
--      }
--      // Auto-close
--      const openers = {'(':')','[':']','{':'}','"':'"',"'" : "'"};
--      if(openers[e.key] && !e.ctrlKey && !e.metaKey && !e.altKey){
--        e.preventDefault();
--        const start = input.selectionStart;
--        const end = input.selectionEnd;
--        const val = input.value;
--        const close = openers[e.key];
--        input.value = val.slice(0,start) + e.key + close + val.slice(end);
--        input.selectionStart = input.selectionEnd = start + 1;
--        input.dispatchEvent(new Event('input'));
--        return;
--      }
--      // Smart backspace
--      if(e.key === 'Backspace'){
--        const start = input.selectionStart;
--        const val = input.value;
--        if(start>0 && val[start-1] && val[start]){
--          const prev = val[start-1];
--          const next = val[start];
--          const pairs = {'(':')','[':']','{':'}','"':'"',"'" : "'"};
--          if(pairs[prev] === next){
--            e.preventDefault();
--            input.value = val.slice(0,start-1) + val.slice(start+1);
--            input.selectionStart = input.selectionEnd = start-1;
--            input.dispatchEvent(new Event('input'));
--            return;
--          }
--        }
--      }
--    });
--  }
--
--  /* -------------------------
--     Simple static analysis for debugging practice items
--     Heuristics:
--     - Missing semicolons
--     - Unbalanced braces/parentheses
--     - scanf missing &
--     - common typos
--     - assignment in condition
--     ------------------------- */
--
--  function analyzeCode(code){
--    const issues = [];
--    if(!code) return issues;
--    const lines = code.split(/\r?\n/);
--    lines.forEach((ln,i)=>{
--      const t = ln.trim();
--      if(!t) return;
--      if(t.startsWith('#') || t.startsWith('//') || t.startsWith('/*') || t.endsWith('{') || t.endsWith('}')) return;
--      if(/[A-Za-z0-9\)\"]$/.test(t) && !t.endsWith(';') && !t.endsWith(')') && !t.includes('for(') && !t.includes('if(') && !t.includes('while(')){
--        // avoid function headers
--        if(!/^\w+\s+\w+\s*\(.*\)\s*$/.test(t)){
--          issues.push({line:i+1,type:'syntax',message:'Possible missing semicolon.'});
--        }
--      }
--      if(/scanf\s*\(.*[^\&]\)/.test(t) && /scanf/.test(t) && !t.includes('&')){
--        issues.push({line:i+1,type:'logic',message:'scanf likely missing & before variable.'});
--      }
--      if(/if\s*\(.*=[^=].*\)/.test(t)){
--        issues.push({line:i+1,type:'logic',message:'Assignment = used in conditional; did you mean == ?'});
--      }
--      const typos = ['prinft','scanff','retun','intg','floatt'];
--      typos.forEach(tp=>{ if(t.includes(tp)) issues.push({line:i+1,type:'typo',message:'Possible typo: '+tp}); });
--    });
--    // unbalanced braces/parens
--    const opens = {'{':0,'(':0,'[':0};
--    for(const ch of code){
--      if(ch==='{') opens['{']++; if(ch==='}') opens['{']--;
--      if(ch==='(') opens['(']++; if(ch===')') opens['(']--;
--      if(ch==='[') opens['[']++; if(ch===']') opens['[']--;
--    }
--    if(opens['{']!==0) issues.push({line:null,type:'syntax',message:'Unbalanced braces detected.'});
--    if(opens['(']!==0) issues.push({line:null,type:'syntax',message:'Unbalanced parentheses detected.'});
--    if(opens['[']!==0) issues.push({line:null,type:'syntax',message:'Unbalanced brackets detected.'});
--    return issues;
--  }
--
--  /* -------------------------
--     Event bindings
--     ------------------------- */
--
--  function attachEvents(){
--    document.querySelectorAll('.tab').forEach(t=>{
--      t.addEventListener('click', ()=>{ setActiveTab(t.dataset.tab); });
--    });
--    el('resetBtn').addEventListener('click', resetState);
--    el('exportBtn').addEventListener('click', exportState);
--    el('quickPractice').addEventListener('click', ()=>{
--      // open first chapter practice
--      state.currentChapter = 1; state.currentLessonId = curriculum[0].lessons[0].id; setActiveTab('practice'); renderAll();
--    });
--    el('openVisualizer').addEventListener('click', ()=>{ setActiveTab('visual'); renderAll(); });
--    el('openRead').addEventListener('click', ()=>{ setActiveTab('read'); renderAll(); });
--    el('modeSelect').addEventListener('change', (e)=>{ state.mode = e.target.value; saveState(); });
--    // global keyboard
--    setupGlobalShortcuts();
--    // initial editor shortcuts for dynamic inputs will be attached when inputs are created
--  }
--
--  /* -------------------------
--     Initialization
--     ------------------------- */
--
--  function init(){
--    loadState();
--    updateStreak();
--    attachEvents();
--    renderAll();
--    // set default tab
--    setActiveTab('read');
--    // ensure no console errors on load
--    window.addEventListener('error', function(e){ /* swallow to keep console clean for learners */ });
--  }
--
--  /* -------------------------
--     Helper: validate practice answers (simple)
--     ------------------------- */
--
--  function validatePracticeAnswer(item, userVal){
--    const normalize = s => (s||'').toString().trim().toLowerCase().replace(/,/g,' ').replace(/\s+/g,' ');
--    if(item.type === 'mcq') return normalize(userVal) === normalize(item.answer);
--    return normalize(userVal) === normalize(item.answer);
--  }
--
--  /* -------------------------
--     Start
--     ------------------------- */
--
--  init();
--
--  /* Expose some functions for debugging in dev console (safe) */
--  window.CAcademy = {
--    state, curriculum, analyzeCode, addXP, awardBadge
-+}
-+function mountDebug(){
-+  debug.innerHTML = `<p>Find and fix the bug:</p><pre class='line'>${debugTask.buggy}</pre><textarea id='fix' rows='4' style='width:100%'></textarea><button id='checkD'>Submit Fix</button>`;
-+  document.getElementById('checkD').onclick = ()=>{
-+    const input = document.getElementById('fix').value.trim();
-+    const ok = input.includes('&') && input.includes('int');
-+    feedback.innerHTML = ok ? `<span class='ok'>Great fix.</span> You initialized memory before dereference.` : `<span class='err'>Segfault risk remains.</span> Create a real variable and point to it.`;
-+    reward(ok);
-   };
--
--})();
-+}
-+function mountLab(){
-+  lab.innerHTML = `<p>${labTask.prompt}</p><textarea id='labcode' rows='3' style='width:100%'></textarea><button id='runLab'>Run</button>`;
-+  document.getElementById('runLab').onclick = ()=>{
-+    const ok = document.getElementById('labcode').value.includes('printf');
-+    feedback.innerHTML = ok ? `<span class='ok'>Output: Hello</span> Nice start.` : `<span class='err'>No output function detected.</span> Try printf.`;
-+    reward(ok);
-+  };
-+}
-+
-+const modeSelect = document.getElementById('modeSelect');
-+const feedback = document.getElementById('feedback');
-+const hintText = document.getElementById('hintText');
-+const weakList = document.getElementById('weakList');
-+const xp = document.getElementById('xp');
-+const level = document.getElementById('level');
-+const streak = document.getElementById('streak');
-+const quest = document.getElementById('quest');
-+const mcq = document.getElementById('mcq');
-+const parsonsEl = document.getElementById('parsons');
-+const debug = document.getElementById('debug');
-+const lab = document.getElementById('lab');
-+
-+function switchMode(mode){
-+  document.querySelectorAll('.mode').forEach(m=>m.classList.remove('active'));
-+  document.getElementById(mode).classList.add('active');
-+  title.textContent = modeSelect.options[modeSelect.selectedIndex].text;
-+  if(mode==='mcq') mountMCQ();
-+  if(mode==='parsons') mountParsons();
-+  if(mode==='debug') mountDebug();
-+  if(mode==='lab') mountLab();
-+}
-+
-+modeSelect.onchange = () => switchMode(modeSelect.value);
-+nextBtn.onclick = ()=> switchMode(modeSelect.value);
-+hintBtn.onclick = ()=>{
-+  state.hintLevel = (state.hintLevel+1)%3;
-+  hintText.textContent = [
-+    'Hint 1: What does this line intend to compare?',
-+    'Hint 2: Check operator choice and initialization order.',
-+    'Hint 3: Initialize variable, then compare with == not =.'
-+  ][state.hintLevel];
-+  save();
-+};
-+
-+themeBtn.onclick = ()=>{ document.documentElement.classList.toggle('light'); state.theme = document.documentElement.classList.contains('light')?'light':'dark'; save(); };
-+if(state.theme==='light') document.documentElement.classList.add('light');
-+
-+exportBtn.onclick = ()=> alert(btoa(JSON.stringify(state)));
-+importBtn.onclick = ()=>{
-+  const code = prompt('Paste backup code');
-+  if(!code) return;
-+  try { Object.assign(state, JSON.parse(atob(code))); save(); renderStats(); switchMode(modeSelect.value); }
-+  catch { alert('Invalid backup code'); }
-+};
-+
-+const lastDateKey = 'cquest_last_day';
-+const today = new Date().toISOString().slice(0,10);
-+const last = localStorage.getItem(lastDateKey);
-+if(last !== today){ state.streak += 1; localStorage.setItem(lastDateKey,today); save(); }
-+
-+renderStats();
-+switchMode('mcq');
- </script>
++const storageKey = 'cquest_v2';
+const todayIso = () => new Date().toISOString();
+const dayKey = (iso) => iso.slice(0, 10);
+
+const baseState = {
+  xp:0, level:1, streak:0, quest:0,
+  weak:{loops:60,pointers:70,arrays:50,conditions:45,functions:55},
+  theme:'dark', hintLevel:0,
+  attemptHistory: [],
+  conceptStats: {},
+  reviewQueue: []
+};
+const state = {...baseState, ...(JSON.parse(localStorage.getItem(storageKey) || '{}'))};
+state.attemptHistory = Array.isArray(state.attemptHistory) ? state.attemptHistory : [];
+state.reviewQueue = Array.isArray(state.reviewQueue) ? state.reviewQueue : [];
+state.conceptStats = state.conceptStats && typeof state.conceptStats === 'object' ? state.conceptStats : {};
+
+const mcqs = [
+  {concept:'conditions', q:'Which operator compares values in C?',opts:['=','==','!=','<='],a:'=='},
+  {concept:'arrays', q:'What is the first index of an array?',opts:['0','1','-1','depends'],a:'0'}
+];
+const parsons = { concept:'loops', lines:['int sum = 0;','for(int i=0;i<3;i++){','sum += i;','}'] };
+const debugTask = { concept:'pointers', buggy:'int *p;
+*p = 4;' };
+const labTask = { concept:'functions', prompt:'Write one line to print Hello' };
+
+const toastEl = document.createElement('div');
+toastEl.style.cssText = 'position:fixed;bottom:16px;right:16px;background:#111;color:#fff;padding:10px 12px;border-radius:8px;display:none;z-index:9999;';
+document.body.appendChild(toastEl);
+function toast(msg){ toastEl.textContent = msg; toastEl.style.display = 'block'; setTimeout(()=>toastEl.style.display='none', 1800); }
+
+function save(){ localStorage.setItem(storageKey, JSON.stringify(state)); }
+
+function computeMastery(correct, hintLevel, responseMs){
+  const correctnessScore = correct ? 1 : 0;
+  const hintScore = Math.max(0, 1 - (hintLevel / 3));
+  const responseScore = Math.max(0, Math.min(1, 1 - (responseMs / 45000)));
+  return Number((0.6*correctnessScore + 0.2*hintScore + 0.2*responseScore).toFixed(3));
+}
+
+function updateReviewQueue(concept, correct){
+  const now = Date.now();
+  let card = state.reviewQueue.find(r => r.concept === concept);
+  if(!card){ card = {concept, interval:1, dueAt: now}; state.reviewQueue.push(card); }
+  if(correct){ card.interval = Math.min(card.interval * 2, 14); }
+  else { card.interval = 1; }
+  card.dueAt = now + card.interval * 24 * 60 * 60 * 1000;
+}
+
+function recordAttempt({concept,type,correct,hintLevel,responseMs}){
+  const ts = todayIso();
+  const mastery = computeMastery(correct, hintLevel, responseMs);
+  state.attemptHistory.push({ timestamp: ts, concept, type, correct, hintLevelUsed: hintLevel, responseMs, mastery });
+  if(state.attemptHistory.length > 500) state.attemptHistory.shift();
+  const stat = state.conceptStats[concept] || { attempts:0, mastery:0 };
+  stat.attempts += 1;
+  stat.mastery = Number((((stat.mastery * (stat.attempts - 1)) + mastery) / stat.attempts).toFixed(3));
+  state.conceptStats[concept] = stat;
+  updateReviewQueue(concept, correct);
+}
+
+function getWeakestConcept(){
+  const entries = Object.entries(state.conceptStats);
+  if(!entries.length) return 'N/A';
+  entries.sort((a,b)=>a[1].mastery-b[1].mastery);
+  return `${entries[0][0]} (${Math.round(entries[0][1].mastery*100)}%)`;
+}
+
+function dueReviewsToday(){
+  const endOfDay = new Date(); endOfDay.setUTCHours(23,59,59,999);
+  return state.reviewQueue.filter(r=>r.dueAt <= endOfDay.getTime()).length;
+}
+
+function weeklyConsistency(){
+  const now = Date.now(); const weekAgo = now - 7*24*60*60*1000;
+  const days = new Set(state.attemptHistory.filter(a=>new Date(a.timestamp).getTime()>=weekAgo).map(a=>dayKey(a.timestamp)));
+  return `${days.size}/7 active days`;
+}
+
+function renderStats(){
+  xp.textContent = state.xp; level.textContent = state.level; streak.textContent = state.streak; quest.textContent = `${state.quest}/5`;
+  weakList.innerHTML = Object.entries(state.weak).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<li>${k}: ${v}% weak</li>`).join('');
+  dashboard.innerHTML = `<li><strong>Weakest concept:</strong> ${getWeakestConcept()}</li><li><strong>Today due reviews:</strong> ${dueReviewsToday()}</li><li><strong>Weekly consistency:</strong> ${weeklyConsistency()}</li>`;
+}
+
+function reward(correct=true){
+  if(correct){ state.xp += 20; state.quest = Math.min(5, state.quest+1); Object.keys(state.weak).forEach(k=>state.weak[k]=Math.max(10,state.weak[k]-2)); }
+  else { state.xp = Math.max(0, state.xp-5); state.weak.pointers = Math.min(100, state.weak.pointers + 4); }
+  state.level = Math.floor(state.xp/100)+1; save(); renderStats();
+}
+let challengeStartedAt = Date.now();
+function finishAttempt(concept, type, ok){
+  const responseMs = Date.now() - challengeStartedAt;
+  recordAttempt({ concept, type, correct: ok, hintLevel: state.hintLevel, responseMs });
+  reward(ok);
+  save();
+}
+
+function mountMCQ(){ const item = mcqs[Math.floor(Math.random()*mcqs.length)]; challengeStartedAt = Date.now();
+  mcq.innerHTML = `<p>${item.q}</p>` + item.opts.map(o=>`<button class="option">${o}</button>`).join('');
+  [...mcq.querySelectorAll('.option')].forEach(btn=>btn.onclick=()=>{ const ok = btn.textContent===item.a; feedback.innerHTML = ok ? `<span class='ok'>Correct!</span>` : `<span class='err'>Not yet.</span>`; finishAttempt(item.concept,'mcq',ok); });
+}
+function mountParsons(){ const shuffled = [...parsons.lines].sort(()=>Math.random()-0.5); challengeStartedAt = Date.now();
+  parsonsEl.innerHTML = `<p>Tap lines in correct order:</p><div class='codebank'>${shuffled.map(l=>`<button class='option'>${l}</button>`).join('')}</div><div class='dropzone' id='zone'></div><button id='checkP'>Check</button>`;
+  const zone = document.getElementById('zone'); parsonsEl.querySelectorAll('.option').forEach(b=>b.onclick=()=>zone.innerHTML += `<div class='line'>${b.textContent}</div>`);
+  document.getElementById('checkP').onclick = ()=>{ const lines = [...zone.querySelectorAll('.line')].map(n=>n.textContent); const ok = JSON.stringify(lines)===JSON.stringify(parsons.lines); feedback.innerHTML = ok ? `<span class='ok'>Solved!</span>` : `<span class='err'>Order mismatch.</span>`; finishAttempt(parsons.concept,'parsons',ok); };
+}
+function mountDebug(){ challengeStartedAt = Date.now(); debug.innerHTML = `<p>Find and fix the bug:</p><pre class='line'>${debugTask.buggy}</pre><textarea id='fix' rows='4' style='width:100%'></textarea><button id='checkD'>Submit Fix</button>`;
+  document.getElementById('checkD').onclick = ()=>{ const input = document.getElementById('fix').value.trim(); const ok = input.includes('&') && input.includes('int'); feedback.innerHTML = ok ? `<span class='ok'>Great fix.</span>` : `<span class='err'>Segfault risk remains.</span>`; finishAttempt(debugTask.concept,'debug',ok); };
+}
+function mountLab(){ challengeStartedAt = Date.now(); lab.innerHTML = `<p>${labTask.prompt}</p><textarea id='labcode' rows='3' style='width:100%'></textarea><button id='runLab'>Run</button>`;
+  document.getElementById('runLab').onclick = ()=>{ const ok = document.getElementById('labcode').value.includes('printf'); feedback.innerHTML = ok ? `<span class='ok'>Output: Hello</span>` : `<span class='err'>No output function detected.</span>`; finishAttempt(labTask.concept,'lab',ok); };
+}
+
+const modeSelect = document.getElementById('modeSelect'); const feedback = document.getElementById('feedback'); const hintText = document.getElementById('hintText'); const weakList = document.getElementById('weakList');
+const xp = document.getElementById('xp'); const level = document.getElementById('level'); const streak = document.getElementById('streak'); const quest = document.getElementById('quest');
+const mcq = document.getElementById('mcq'); const parsonsEl = document.getElementById('parsons'); const debug = document.getElementById('debug'); const lab = document.getElementById('lab');
+const dashboard = document.createElement('ul'); document.querySelector('.right.card').appendChild(dashboard);
+
+function switchMode(mode){ document.querySelectorAll('.mode').forEach(m=>m.classList.remove('active')); document.getElementById(mode).classList.add('active');
+  title.textContent = modeSelect.options[modeSelect.selectedIndex].text;
+  if(mode==='mcq') mountMCQ(); if(mode==='parsons') mountParsons(); if(mode==='debug') mountDebug(); if(mode==='lab') mountLab(); }
+modeSelect.onchange = () => switchMode(modeSelect.value); nextBtn.onclick = ()=> switchMode(modeSelect.value);
+hintBtn.onclick = ()=>{ state.hintLevel = (state.hintLevel+1)%3; hintText.textContent = ['Hint 1: compare intent?','Hint 2: check operator and init order.','Hint 3: initialize then use =='][state.hintLevel]; save(); };
+themeBtn.onclick = ()=>{ document.documentElement.classList.toggle('light'); state.theme = document.documentElement.classList.contains('light')?'light':'dark'; save(); };
+if(state.theme==='light') document.documentElement.classList.add('light');
+
+exportBtn.onclick = ()=>{ toast('Progress exported'); navigator.clipboard.writeText(btoa(JSON.stringify(state))); };
+importBtn.onclick = ()=>{ const prev = document.getElementById('importErr'); if(prev) prev.remove(); const code = prompt('Paste backup code'); if(!code) return;
+  try{ const parsed = JSON.parse(atob(code)); if(!parsed || typeof parsed !== 'object' || !('xp' in parsed)) throw new Error('Payload must be a valid exported state object.'); Object.assign(state, parsed); save(); renderStats(); switchMode(modeSelect.value); toast('Progress imported'); }
+  catch(e){ const err = document.createElement('p'); err.id='importErr'; err.className='err'; err.textContent = `Import failed: ${e.message}`; document.querySelector('.actions').appendChild(err); }
+};
+
+const lastDateKey = 'cquest_last_day'; const today = new Date().toISOString().slice(0,10); const last = localStorage.getItem(lastDateKey);
+if(last !== today){ state.streak += 1; localStorage.setItem(lastDateKey,today); save(); }
+
+renderStats(); switchMode('mcq');
+</script>
  </body>
  </html>
