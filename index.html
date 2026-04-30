@@ -1,1413 +1,187 @@
 
--<!DOCTYPE html>
-+<!doctype html>
- <html lang="en">
- <head>
--<meta charset="utf-8" />
--<meta name="viewport" content="width=device-width,initial-scale=1" />
--<title>C Academy: The Interactive Adventure</title>
--<style>
--  :root{
--    --bg:#0a0f14;
--    --card:#111820;
--    --surface:#1a232e;
--    --text:#e6edf3;
--    --muted:#8b949e;
--    --accent:#58a6ff;
--    --success:#2ea043;
--    --error:#f85149;
--    --glass: rgba(255,255,255,0.03);
--    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
--    --radius:12px;
--    --gap:16px;
--    --pad:16px;
--  }
--  *{box-sizing:border-box}
--  html,body{height:100%}
--  body{
--    margin:0;
--    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
--    background:linear-gradient(180deg,#071018 0%, #07121a 60%);
--    color:var(--text);
--    padding:18px;
--    -webkit-font-smoothing:antialiased;
--    -moz-osx-font-smoothing:grayscale;
--    display:flex;justify-content:center;
--  }
--  .app{width:100%;max-width:1200px;display:flex;flex-direction:column;gap:18px}
--  header.top{
--    display:flex;align-items:center;justify-content:space-between;gap:12px;
--  }
--  .brand{display:flex;gap:12px;align-items:center}
--  .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#2dd4bf);display:flex;align-items:center;justify-content:center;color:#042018;font-weight:900;font-family:var(--mono)}
--  h1{margin:0;font-size:18px}
--  .status{display:flex;gap:12px;align-items:center;color:var(--muted);font-size:13px}
--  .controls{display:flex;gap:8px;align-items:center}
--  .btn{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--text);padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700}
--  .btn.primary{background:linear-gradient(90deg,var(--accent),#2dd4bf);color:#042018;border:none}
--  .glass-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.04);backdrop-filter: blur(8px);box-shadow:0 12px 40px rgba(2,6,10,0.6)}
--  .layout{display:flex;gap:18px;flex-direction:column}
--  .nav{display:flex;gap:8px;align-items:center}
--  .tabs{display:flex;gap:8px}
--  .tab{padding:10px 14px;border-radius:10px;cursor:pointer;background:transparent;border:1px solid rgba(255,255,255,0.02);color:var(--muted);font-weight:700}
--  .tab.active{background:linear-gradient(90deg,var(--accent),#2dd4bf);color:#042018}
--  .main{display:flex;gap:18px;flex-direction:column}
--  .split{display:flex;gap:18px;flex-direction:column}
--  @media(min-width:900px){ .split{flex-direction:row} }
--  .left{flex:1;display:flex;flex-direction:column;gap:12px}
--  .right{width:360px;min-width:260px;display:flex;flex-direction:column;gap:12px}
--  .world-map{display:flex;flex-wrap:wrap;gap:8px}
--  .chapter{padding:10px;border-radius:10px;background:var(--card);border:1px solid rgba(255,255,255,0.03);cursor:pointer;min-width:140px}
--  .chapter.locked{opacity:0.5}
--  .section{display:flex;flex-direction:column;gap:8px}
--  .code{background:#07121a;border-radius:8px;padding:12px;font-family:var(--mono);font-size:13px;color:#dbeef6;overflow:auto;border:1px solid rgba(255,255,255,0.03)}
--  pre{margin:0;white-space:pre-wrap}
--  .visualizer{display:flex;gap:12px;flex-direction:column}
--  .memory-map{display:flex;gap:8px;flex-wrap:wrap}
--  .mem-box{min-width:80px;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);text-align:center}
--  .ascii{max-height:180px;overflow:auto;background:rgba(255,255,255,0.02);padding:8px;border-radius:8px}
--  .operator-chart{display:flex;flex-direction:column;gap:6px}
--  .practice{display:flex;flex-direction:column;gap:12px}
--  .question-card{padding:12px;border-radius:10px;background:var(--card);border:1px solid rgba(255,255,255,0.03)}
--  .input, textarea{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:10px;border-radius:8px;color:var(--text);font-family:var(--mono);font-size:14px;outline:none}
--  .textarea{min-height:120px;resize:vertical}
--  .small{font-size:13px;color:var(--muted)}
--  .badge{padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.02);color:var(--muted);font-weight:700}
--  .xp-bar{height:10px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
--  .xp-fill{height:100%;background:linear-gradient(90deg,#ffd166,var(--accent));width:0%}
--  .flex-row{display:flex;gap:8px;align-items:center}
--  .hidden{display:none}
--  .fade{transition:all 0.18s ease;opacity:1}
--  .muted{color:var(--muted)}
--  .kbd{background:rgba(255,255,255,0.03);padding:4px 6px;border-radius:6px;font-family:var(--mono);font-size:12px}
--  .badge-success{background:rgba(46,160,67,0.12);color:var(--success);padding:6px;border-radius:8px}
--  .badge-error{background:rgba(248,81,73,0.06);color:var(--error);padding:6px;border-radius:8px}
--  .world-map .chapter{flex:1}
--  .controls .icon{opacity:0.9}
--  .center{display:flex;align-items:center;justify-content:center}
--  /* responsive */
--  @media(max-width:720px){
--    .right{width:100%}
--    .chapter{min-width:120px}
--  }
--  /* subtle hover */
--  .chapter:hover{transform:translateY(-3px);transition:all 0.18s ease}
--  .btn:active{transform:translateY(1px)}
--  /* syntax highlight simple */
--  .tok-key{color:#7dd3fc;font-weight:700}
--  .tok-func{color:#ffd166}
--  .tok-num{color:#fca5a5}
--  .tok-str{color:#a7f3d0}
--  .tok-comment{color:#6b7280;font-style:italic}
--  /* accessibility focus */
--  button:focus,input:focus,textarea:focus{outline:2px solid rgba(88,166,255,0.12);outline-offset:2px}
--</style>
-+  <meta charset="UTF-8" />
-+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-+  <title>C Quest — Learn C by Playing</title>
-+  <style>
-+    :root {
-+      --bg: #0b1020;
-+      --card: #172039;
-+      --panel: #1f2d50;
-+      --text: #eaf1ff;
-+      --muted: #9fb0d9;
-+      --accent: #8b5cf6;
-+      --accent-2: #22d3ee;
-+      --good: #34d399;
-+      --bad: #fb7185;
-+    }
-+    :root.light {
-+      --bg: #edf3ff;
-+      --card: #ffffff;
-+      --panel: #dbe8ff;
-+      --text: #14213d;
-+      --muted: #3d5a80;
-+      --accent: #7c3aed;
-+      --accent-2: #0284c7;
-+      --good: #047857;
-+      --bad: #be123c;
-+    }
-+    *{box-sizing:border-box}
-+    body {
-+      margin: 0;
-+      font-family: Inter, system-ui, Arial, sans-serif;
-+      color: var(--text);
-+      background:
-+      radial-gradient(circle at 10% 10%, rgba(139,92,246,.2), transparent 35%),
-+      radial-gradient(circle at 90% 20%, rgba(34,211,238,.15), transparent 30%),
-+      var(--bg);
-+      min-height: 100vh;
-+    }
-+    .app { max-width: 1100px; margin: 0 auto; padding: 20px; }
-+    .header,.stats,.layout,.actions{display:flex;gap:12px;flex-wrap:wrap}
-+    .header{justify-content:space-between;align-items:center}
-+    .card{background:var(--card);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
-+    .stats .card{flex:1;min-width:150px}
-+    .layout{margin-top:14px}
-+    .left{flex:2;min-width:320px}
-+    .right{flex:1;min-width:260px}
-+    button,select{background:var(--panel);color:var(--text);border:none;border-radius:10px;padding:10px 12px;font-weight:600;cursor:pointer}
-+    button.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2))}
-+    .mode{display:none}
-+    .mode.active{display:block}
-+    .option{display:block;width:100%;text-align:left;margin:8px 0;padding:10px;border-radius:10px;background:var(--panel)}
-+    .codebank,.dropzone{display:grid;gap:8px}
-+    .line{padding:10px;border-radius:8px;background:var(--panel)}
-+    .dropzone{min-height:130px;border:1px dashed var(--muted);padding:8px;border-radius:10px}
-+    .hint{color:var(--muted)}
-+    .ok{color:var(--good);font-weight:700}
-+    .err{color:var(--bad);font-weight:700}
-+  </style>
- </head>
- <body>
--<div class="app" id="app" role="application" aria-labelledby="title">
--  <header class="top">
--    <div class="brand">
--      <div class="logo" aria-hidden="true">CA</div>
--      <div>
--        <h1 id="title">C Academy: The Interactive Adventure</h1>
--        <div class="status">
--          <div class="small">Level <span id="level">1</span></div>
--          <div class="small">XP: <span id="xp">0</span></div>
--          <div class="small">Gold: <span id="gold">0</span></div>
--        </div>
-+  <div class="app">
-+    <div class="header">
-+      <h1>🎮 C Quest: College Beginner Edition</h1>
-+      <div class="actions">
-+        <button id="themeBtn">Toggle Light/Dark</button>
-+        <button id="exportBtn">Export Progress</button>
-+        <button id="importBtn">Import Progress</button>
-       </div>
-     </div>
--    <div class="controls">
--      <div class="small">Streak: <strong id="streak">0</strong></div>
--      <button class="btn" id="resetBtn">Reset Progress</button>
--      <button class="btn" id="exportBtn">Export</button>
--    </div>
--  </header>
- 
--  <div class="layout">
--    <nav class="glass-card nav" aria-label="Navigation">
--      <div class="tabs" role="tablist" aria-label="Main tabs">
--        <button class="tab active" data-tab="read" role="tab" id="tab-read">📖 Read Theory</button>
--        <button class="tab" data-tab="visual" role="tab" id="tab-visual">👁️ Visualizer</button>
--        <button class="tab" data-tab="practice" role="tab" id="tab-practice">🎮 Practice</button>
--      </div>
--      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
--        <div class="small muted">Mode</div>
--        <select id="modeSelect" class="input" style="width:140px;padding:6px 8px">
--          <option value="adventure">Adventure</option>
--          <option value="practice">Practice</option>
--          <option value="review">Review</option>
--        </select>
--      </div>
--    </nav>
-+    <div class="stats">
-+      <div class="card">Level <strong id="level">1</strong></div>
-+      <div class="card">XP <strong id="xp">0</strong></div>
-+      <div class="card">Streak <strong id="streak">0</strong> days</div>
-+      <div class="card">Daily Quest <strong id="quest">0/5</strong></div>
-+    </div>
- 
--    <main class="main split">
--      <section class="left">
--        <div class="glass-card section">
--          <div style="display:flex;justify-content:space-between;align-items:center">
--            <div>
--              <div class="small muted">World Map</div>
--              <div style="font-weight:800">Chapters</div>
--            </div>
--            <div class="small muted">Progress: <span id="progressPercent">0%</span></div>
--          </div>
--          <div class="world-map" id="worldMap" style="margin-top:12px"></div>
-+    <div class="layout">
-+      <section class="left card">
-+        <h2 id="title">MCQ Trap</h2>
-+        <p class="hint" id="sub">Do → Feedback → Tiny explanation → Next challenge.</p>
-+
-+        <div>
-+          <label>Mode:</label>
-+          <select id="modeSelect">
-+            <option value="mcq">MCQ Trap</option>
-+            <option value="parsons">Parsons Puzzle</option>
-+            <option value="debug">Debug Detective</option>
-+            <option value="lab">Mini Code Lab</option>
-+          </select>
-         </div>
- 
--        <div id="contentArea" class="glass-card section" style="min-height:320px">
--          <!-- dynamic content: read/visual/practice -->
--        </div>
-+        <div id="mcq" class="mode active"></div>
-+        <div id="parsons" class="mode"></div>
-+        <div id="debug" class="mode"></div>
-+        <div id="lab" class="mode"></div>
- 
--        <div class="glass-card section small" style="display:flex;justify-content:space-between;align-items:center">
--          <div>Keyboard: <span class="kbd">Shift+Enter</span> newline • <span class="kbd">Ctrl/Cmd+Enter</span> submit • <span class="kbd">Enter</span> does nothing</div>
--          <div class="small muted">Offline • Single-file</div>
--        </div>
-+        <p id="feedback"></p>
-+        <button class="primary" id="nextBtn">Next Challenge</button>
-       </section>
- 
--      <aside class="right">
--        <div class="glass-card section">
--          <div style="display:flex;justify-content:space-between;align-items:center">
--            <div><strong>Lesson Info</strong></div>
--            <div class="small muted" id="topicTag">Basics</div>
--          </div>
--          <div style="margin-top:8px">
--            <div class="small muted">Topic</div>
--            <div style="font-weight:800" id="topicTitle">Select a chapter</div>
--            <div style="margin-top:8px" class="small">XP Bar</div>
--            <div class="xp-bar" style="margin-top:6px"><div id="xpFill" class="xp-fill" style="width:0%"></div></div>
--            <div style="display:flex;justify-content:space-between;margin-top:8px">
--              <div class="small">XP: <strong id="xpSmall">0</strong></div>
--              <div class="small">Level: <strong id="levelSmall">1</strong></div>
--            </div>
--          </div>
--        </div>
-+      <aside class="right card">
-+        <h3>Adaptive Focus</h3>
-+        <p class="hint">Weakest concepts come first.</p>
-+        <ul id="weakList"></ul>
- 
--        <div class="glass-card section">
--          <div style="display:flex;justify-content:space-between;align-items:center">
--            <div><strong>Badges</strong></div>
--            <div class="small muted">Earned</div>
--          </div>
--          <div id="badges" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"></div>
--        </div>
-+        <h3>Socratic Hint</h3>
-+        <p id="hintText" class="hint">Hint level 1: What value enters the loop first?</p>
-+        <button id="hintBtn">Next Hint</button>
- 
--        <div class="glass-card section small">
--          <div><strong>Quick Practice</strong></div>
--          <div style="margin-top:8px;display:flex;flex-direction:column;gap:8px">
--            <button class="btn primary" id="quickPractice">Start Quick Challenge</button>
--            <button class="btn" id="openVisualizer">Open Visualizer</button>
--            <button class="btn" id="openRead">Open Theory</button>
--          </div>
--        </div>
-+        <h3>Error Translator</h3>
-+        <p class="hint">segmentation fault → “you touched memory you don’t own”.</p>
-       </aside>
--    </main>
-+    </div>
-   </div>
- 
--  <footer style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
--    <div class="small muted">C Academy — Offline • Dark Mode • Single-file</div>
--    <div class="small muted">Made for focused learning</div>
--  </footer>
--</div>
--
- <script>
--/*
--  C Academy: The Interactive Adventure
--  Single-file offline-first learning app.
--  - Modular structure inside IIFE to avoid global pollution.
--  - LocalStorage persistence.
--  - Tabs: Read, Visualizer, Practice.
--  - World map with chapters and topics.
--  - Visual variable tracker, ASCII table, operator chart.
--  - Practice engine with MCQ, predict, debug, pattern.
--  - Gamification: XP, Level, Badges, Streak.
--  - Keyboard shortcuts and editor niceties.
--*/
--
--(function(){
--  'use strict';
--
--  /* -------------------------
--     Data: Chapters & Topics
--     Each chapter contains lessons (topics).
--     Each topic includes theory, visual examples, and practice items.
--     ------------------------- */
--
--  const curriculum = [
--    {
--      id:1, title:'Chapter 1: Basics', tag:'basics',
--      lessons:[
--        {
--          id:'1-1', title:'Printing & Escape Sequences',
--          theory: `Printing text uses printf from stdio.h. Use escape sequences like \\n for newline and \\t for tab.`,
--          analogy: `Think of printf as a stamp; \\n moves the paper to the next line.`,
--          syntax: `#include <stdio.h>\nint main(){\n    printf("Hello\\n");\n    return 0;\n}`,
--          proTips: ['Use %d for integers, %f for floats, %c for chars','\\n moves to new line; \\t adds a tab'],
--          visualExamples: [
--            {code:'printf("A\\nB\\n");', trace:['printf prints A then newline','printf prints B then newline']},
--            {code:'printf("1\\t2\\n");', trace:['prints 1, tab, 2, newline']}
--          ],
--          practice:[
--            {type:'predict', prompt:'What does printf("Hi\\nThere\\n"); print?', answer:'Hi There'},
--            {type:'mcq', prompt:'Which escape sequence creates a new line?', options:['\\n','\\t','\\\\','\\0'], answer:'\\n'}
--          ]
--        },
--        {
--          id:'1-2', title:'Variables: int, float, char',
--          theory: `Variables are labeled containers in memory that hold values. int for integers, float for decimals, char for single characters.`,
--          analogy: `Variables = labeled boxes in memory.`,
--          syntax: `int x = 5;\nfloat f = 3.14;\nchar c = 'a';`,
--          proTips: ['Variable names cannot start with digits','Initialize variables before use'],
--          visualExamples:[
--            {code:'int x = 5;', trace:['x box created with value 5']},
--            {code:'x = x + 6;', trace:['read x (5), compute 5+6=11, store 11 in x']}
--          ],
--          practice:[
--            {type:'predict', prompt:'Given int x=2; x = x + 3; printf("%d", x); What prints?', answer:'5'},
--            {type:'mcq', prompt:'Which type stores a single character?', options:['int','float','char','double'], answer:'char'}
--          ]
--        },
--        {
--          id:'1-3', title:'Variable Naming Rules & Keywords',
--          theory: `Identifiers must start with a letter or underscore and cannot be C keywords like int, return.`,
--          analogy: `Variable names are like file names with rules.`,
--          syntax: `int _count = 10;\nint totalCount = 5;`,
--          proTips: ['Avoid using keywords as names','Use meaningful names'],
--          visualExamples:[],
--          practice:[
--            {type:'mcq', prompt:'Which is invalid?', options:['_value','2nd','value2','total_sum'], answer:'2nd'}
--          ]
--        },
--        {
--          id:'1-4', title:'Comments & Documentation',
--          theory: `Comments explain code and are ignored by compiler. Use // for single-line and /* */ for multi-line.`,
--          analogy: `Comments are sticky notes for humans.`,
--          syntax: `// single-line comment\n/* multi-line comment */`,
--          proTips: ['Keep comments concise','Explain why, not what'],
--          visualExamples:[],
--          practice:[
--            {type:'predict', prompt:'Does a comment affect program output?', answer:'no'}
--          ]
--        },
--        {
--          id:'1-5', title:'Input with scanf and & operator',
--          theory: `scanf reads input; pass variable addresses using & so scanf can store values in memory.`,
--          analogy: `scanf needs the box address to put the typed value into the correct box.`,
--          syntax: `int n; scanf("%d", &n);`,
--          proTips: ['Omitting & causes undefined behavior','Use %d for int, %f for float'],
--          visualExamples:[
--            {code:'int n; scanf("%d", &n);', trace:['scanf reads value and stores at address of n']}
--          ],
--          practice:[
--            {type:'error-find', prompt:'Find the bug: scanf("%d", n);', answer:'Missing & before n'}
--          ]
--        },
--        {
--          id:'1-6', title:'Modulus Operator %',
--          theory: `% returns remainder after integer division.`,
--          analogy: `Leftover candies after dividing into piles.`,
--          syntax: `int r = a % b;`,
--          proTips: ['Use n%2 to check even/odd'],
--          visualExamples:[
--            {code:'17 % 5', trace:['17 divided by 5 is 3 remainder 2 → result 2']}
--          ],
--          practice:[
--            {type:'predict', prompt:'What is 17 % 5?', answer:'2'}
--          ]
--        },
--        {
--          id:'1-7', title:'Typecasting & Integer Division',
--          theory: `Casting converts types. Casting float to int truncates decimals. Integer division drops fractional part.`,
--          analogy: `Pouring from wide cup to small cup spills fraction.`,
--          syntax: `int x = (int)3.9; // x=3\nint y = 5/2; // y=2`,
--          proTips: ['Use (float) to force float division'],
--          visualExamples:[
--            {code:'float f=5.9; int x=(int)f;', trace:['f=5.9; cast to int → 5']},
--            {code:'5/2', trace:['integer division → 2']}
--          ],
--          practice:[
--            {type:'predict', prompt:'What is result of 5/2 when both are ints?', answer:'2'}
--          ]
--        },
--        {
--          id:'1-8', title:'Char & ASCII Values',
--          theory: `char stores a single character; it maps to ASCII numeric codes (a=97).`,
--          analogy: `A char is a tiny box holding a letter with a numeric code.`,
--          syntax: `char c='a'; printf("%c %d", c, c);`,
--          proTips: ['%c prints char, %d prints ASCII code'],
--          visualExamples:[
--            {code:"char c='a'; printf(\"%c %d\", c, c);", trace:["prints a and 97"]}
--          ],
--          practice:[
--            {type:'predict', prompt:"What does printf(\"%c %d\", 'a', 'a'); print?", answer:'a 97'}
--          ]
--        }
--      ]
--    },
--
--    {
--      id:2, title:'Chapter 2: Conditionals', tag:'conditionals',
--      lessons:[
--        {
--          id:'2-1', title:'if / if-else',
--          theory:'if executes block when condition is true (non-zero). Use else for alternative.',
--          analogy:'A gate that opens only when condition satisfied.',
--          syntax:'if (x>0) { ... } else { ... }',
--          proTips:['Use == for comparison, not ='],
--          visualExamples:[{code:'if(x>0) printf("pos"); else printf("non-pos");', trace:['check condition, branch accordingly']}],
--          practice:[{type:'predict', prompt:'If x=4 and if(x>3) printf("Yes"); what prints?', answer:'Yes'}]
--        },
--        {
--          id:'2-2', title:'Nested if-else & else-if ladder',
--          theory:'Use nested ifs or else-if ladder for multiple checks.',
--          analogy:'A ladder of checks: climb until one rung matches.',
--          syntax:'if(...){} else if(...){} else {}',
--          proTips:['Only first true branch runs in else-if ladder'],
--          visualExamples:[],
--          practice:[{type:'predict', prompt:'n=3; else-if ladder checks n==3 prints?', answer:'three'}]
--        },
--        {
--          id:'2-3', title:'Ternary Operator',
--          theory:'condition ? expr1 : expr2 is shorthand for simple if-else.',
--          analogy:'Quick decision: pick left if true else right.',
--          syntax:'int b = (a>0)?a:-a;',
--          proTips:['Keep ternary simple and readable'],
--          visualExamples:[],
--          practice:[{type:'mcq', prompt:'What does (a>0)?a:-a compute?', options:['Absolute value','Sign','Negation','Square'], answer:'Absolute value'}]
--        },
--        {
--          id:'2-4', title:'switch statement',
--          theory:'switch selects a case based on integer expression; use break to avoid fall-through.',
--          analogy:'Menu selection.',
--          syntax:'switch(x){case 1:...;break;default:...;}',
--          proTips:['Use default for fallback'],
--          visualExamples:[],
--          practice:[{type:'predict', prompt:'x=2; case 2 prints?', answer:'two'}]
--        },
--        {
--          id:'2-5', title:'Logical & Relational Operators',
--          theory:'Use && (AND), || (OR), ! (NOT) and relational operators ==, !=, <, >, <=, >=.',
--          analogy:'AND needs both keys; OR accepts either key.',
--          syntax:'if(a<10 && b>5) ...',
--          proTips:['Use parentheses to clarify complex conditions'],
--          visualExamples:[],
--          practice:[{type:'mcq', prompt:'Which is true: 0 or -1?', options:['0','-1','both','none'], answer:'-1'}]
--        },
--        {
--          id:'2-6', title:'Practical: Even/Odd, Leap Year',
--          theory:'Use modulus and logical operators to solve practical checks.',
--          analogy:'Remainder tells leftover items.',
--          syntax:'if(n%2==0) even else odd',
--          proTips:['Leap year rules: divisible by 4, not by 100 unless by 400'],
--          visualExamples:[],
--          practice:[
--            {type:'predict', prompt:'Is 2000 a leap year?', answer:'yes'},
--            {type:'predict', prompt:'Is 1900 a leap year?', answer:'no'}
--          ]
--        }
--      ]
--    },
--
--    {
--      id:3, title:'Chapter 3: Loops', tag:'loops',
--      lessons:[
--        {
--          id:'3-1', title:'for loop',
--          theory:'for(init; cond; incr) runs a block repeatedly while cond true.',
--          analogy:'Recipe step repeated for each ingredient.',
--          syntax:'for(int i=0;i<n;i++){}',
--          proTips:['Avoid off-by-one errors'],
--          visualExamples:[{code:'for(int i=0;i<3;i++) printf("%d ",i);', trace:['prints 0 1 2']}],
--          practice:[{type:'predict', prompt:'What prints for i=0;i<3;i++ printf("%d ",i);', answer:'0 1 2'}]
--        },
--        {
--          id:'3-2', title:'while vs do-while',
--          theory:'while checks before; do-while runs body at least once.',
--          analogy:'Try once then decide to repeat.',
--          syntax:'do{...}while(cond);',
--          proTips:['Ensure loop variable changes to avoid infinite loop'],
--          visualExamples:[],
--          practice:[{type:'predict', prompt:'do {print 0; i++;} while(i<1); prints?', answer:'0'}]
--        },
--        {
--          id:'3-3', title:'break & continue',
--          theory:'break exits loop; continue skips to next iteration.',
--          analogy:'break leaves the room; continue skips this turn.',
--          syntax:'if(cond) break; if(cond) continue;',
--          proTips:['Use sparingly for clarity'],
--          visualExamples:[],
--          practice:[{type:'predict', prompt:'Loop with if(i==1) continue; prints 0 2?', answer:'0 2'}]
--        },
--        {
--          id:'3-4', title:'Pattern Printing & Nested Loops',
--          theory:'Nested loops control rows and columns for patterns.',
--          analogy:'Printer head moves row by row.',
--          syntax:'for(i) for(j) printf("*");',
--          proTips:['Visualize rows and columns'],
--          visualExamples:[{code:'for(i=1;i<=4;i++){for(j=1;j<=i;j++) printf("*"); printf("\\n");}', trace:['prints triangle pattern']}],
--          practice:[{type:'pattern', prompt:'What pattern prints for i<=3 inner j<=i?', answer:'*\\n**\\n***'}]
--        }
--      ]
--    },
--
--    {
--      id:4, title:'Chapter 4: Functions & Pointers', tag:'functions',
--      lessons:[
--        {
--          id:'4-1', title:'Function Syntax & Return Types',
--          theory:'Functions encapsulate logic; declare return type and parameters.',
--          analogy:'Functions are machines: feed inputs, get outputs.',
--          syntax:'int add(int a,int b){return a+b;}',
--          proTips:['Keep functions small and focused'],
--          visualExamples:[],
--          practice:[{type:'predict', prompt:'add(2,3) returns?', answer:'5'}]
--        },
--        {
--          id:'4-2', title:'Pass-by-value vs Pass-by-reference',
--          theory:'C passes by value; use pointers to modify caller variables.',
--          analogy:'Passing a copy vs giving the address to edit original.',
--          syntax:'void inc(int *p){*p = *p + 1;}',
--          proTips:['Use & to pass address, * to dereference'],
--          visualExamples:[{code:'int a=5; inc(&a); // a becomes 6', trace:['inc receives address, increments value at address']}],
--          practice:[{type:'predict', prompt:'After inc(&a) where a=5, what is a?', answer:'6'}]
--        },
--        {
--          id:'4-3', title:'Pointer Basics & Arithmetic',
--          theory:'Pointers store addresses; pointer arithmetic moves by element size.',
--          analogy:'Pointer is a sticky note with an address.',
--          syntax:'int *p = &x; *(p+1) accesses next element',
--          proTips:['Pointer arithmetic depends on type size'],
--          visualExamples:[],
--          practice:[{type:'predict', prompt:'*(p+1) for int a[]={10,20,30}; p=a; prints?', answer:'20'}]
--        },
--        {
--          id:'4-4', title:'Recursion Basics',
--          theory:'Recursion solves problems by calling function itself with smaller input; needs base case.',
--          analogy:'Climbing down stairs until ground floor.',
--          syntax:'int fact(int n){ if(n==0) return 1; return n*fact(n-1);} ',
--          proTips:['Ensure base case to avoid infinite recursion'],
--          visualExamples:[],
--          practice:[{type:'predict', prompt:'fact(4) returns?', answer:'24'}]
--        }
--      ]
--    },
--
--    {
--      id:5, title:'Chapter 5: Arrays & Strings', tag:'arrays',
--      lessons:[
--        {
--          id:'5-1', title:'1D Arrays & Indexing',
--          theory:'Arrays are sequences indexed from 0.',
--          analogy:'Row of boxes numbered from 0.',
--          syntax:'int a[3] = {2,4,6}; a[1] is 4',
--          proTips:['Avoid out-of-bounds access'],
--          visualExamples:[],
--          practice:[{type:'predict', prompt:'a[1] for {2,4,6}?', answer:'4'}]
--        },
--        {
--          id:'5-2', title:'Strings & Null Terminator',
--          theory:'Strings are char arrays ending with \\0.',
--          analogy:'Stop sign at end of chain.',
--          syntax:'char s[] = "hi"; // h i \\0',
--          proTips:['strlen counts before \\0'],
--          visualExamples:[],
--          practice:[{type:'predict', prompt:'strlen("hi")?', answer:'2'}]
--        },
--        {
--          id:'5-3', title:'string.h Functions',
--          theory:'Use strlen, strcpy, strcat for common string ops.',
--          analogy:'Library of helpers for strings.',
--          syntax:'#include <string.h>',
--          proTips:['Ensure destination buffers are large enough'],
--          visualExamples:[],
--          practice:[{type:'mcq', prompt:'Which copies strings?', options:['strlen','strcpy','strcmp','strcat'], answer:'strcpy'}]
--        },
--        {
--          id:'5-4', title:'2D Arrays / Matrices',
--          theory:'2D arrays are arrays of arrays with row/column indexing.',
--          analogy:'Spreadsheet rows and columns.',
--          syntax:'int m[2][2] = {{1,2},{3,4}}; m[1][0] is 3',
--          proTips:['Remember row-major order in C'],
--          visualExamples:[],
--          practice:[{type:'predict', prompt:'m[1][0] for {{1,2},{3,4}}?', answer:'3'}]
--        }
--      ]
--    },
--
--    {
--      id:6, title:'Chapter 6: Structures & Advanced', tag:'structs',
--      lessons:[
--        {
--          id:'6-1', title:'struct Basics',
--          theory:'struct groups related fields into one type.',
--          analogy:'A form with labeled fields.',
--          syntax:'struct Point { int x; int y; };',
--          proTips:['Use typedef for convenience'],
--          visualExamples:[],
--          practice:[{type:'predict', prompt:'p.x for Point p={3,4}?', answer:'3'}]
--        },
--        {
--          id:'6-2', title:'typedef & Nested structs',
--          theory:'typedef creates alias; structs can nest other structs.',
--          analogy:'Named templates for grouped data.',
--          syntax:'typedef struct {int x; int y;} Point;',
--          proTips:['Use clear names for readability'],
--          visualExamples:[],
--          practice:[{type:'mcq', prompt:'What does typedef do?', options:['Creates alias','Allocates memory','Defines function','None'], answer:'Creates alias'}]
--        },
--        {
--          id:'6-3', title:'File I/O Basics',
--          theory:'Use fopen, fprintf, fscanf to read/write files.',
--          analogy:'Open notebook, write, close.',
--          syntax:'FILE *f = fopen("out.txt","w"); fprintf(f,"%d",9); fclose(f);',
--          proTips:['Always check fopen result'],
--          visualExamples:[],
--          practice:[{type:'predict', prompt:'What prints if printf("%d",9); executed?', answer:'9'}]
--        },
--        {
--          id:'6-4', title:'Dynamic Memory: malloc & free',
--          theory:'malloc allocates memory at runtime; free releases it.',
--          analogy:'Rent a box from warehouse and return it.',
--          syntax:'int *p = malloc(sizeof(int)); *p=11; free(p);',
--          proTips:['Avoid use-after-free and memory leaks'],
--          visualExamples:[],
--          practice:[{type:'predict', prompt:'What prints for *p after *p=11?', answer:'11'}]
--        }
--      ]
--    }
--  ];
--
--  /* -------------------------
--     State & Persistence
--     ------------------------- */
--
--  const STORAGE_KEY = 'cacademy_state_v1';
--  let state = {
--    currentChapter: 1,
--    currentLessonId: null,
--    xp: 0,
--    level: 1,
--    gold: 0,
--    streak: 0,
--    lastVisit: null,
--    badges: [],
--    answers: {}, // lessonId -> {attempts, correct}
--    mode: 'adventure' // or practice/review
-+const storageKey = 'cquest_v1';
-+const baseState = { xp:0, level:1, streak:0, quest:0, weak:{loops:60,pointers:70,arrays:50,conditions:45,functions:55}, theme:'dark', hintLevel:0 };
-+const state = {...baseState, ...(JSON.parse(localStorage.getItem(storageKey) || '{}'))};
-+
-+const mcqs = [
-+  {q:'Which operator compares values in C?',opts:['=','==','!=','<='],a:'=='},
-+  {q:'What is the first index of an array?',opts:['0','1','-1','depends'],a:'0'}
-+];
-+const parsons = { lines:['int sum = 0;','for(int i=0;i<3;i++){','sum += i;','}'], answer:[0,1,2,3] };
-+const debugTask = { buggy:'int *p;\n*p = 4;', fix:'int x=4; int *p=&x;' };
-+const labTask = { prompt:'Write one line to print Hello', expected:'printf("Hello");' };
-+
-+function save(){ localStorage.setItem(storageKey, JSON.stringify(state)); }
-+function renderStats(){
-+  xp.textContent = state.xp; level.textContent = state.level; streak.textContent = state.streak; quest.textContent = `${state.quest}/5`;
-+  weakList.innerHTML = Object.entries(state.weak).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<li>${k}: ${v}% weak</li>`).join('');
-+}
-+function reward(correct=true){
-+  if(correct){ state.xp += 20; state.quest = Math.min(5, state.quest+1); Object.keys(state.weak).forEach(k=>state.weak[k]=Math.max(10,state.weak[k]-2)); }
-+  else { state.xp = Math.max(0, state.xp-5); state.weak.pointers = Math.min(100, state.weak.pointers + 4); }
-+  state.level = Math.floor(state.xp/100)+1; save(); renderStats();
-+}
-+
-+function mountMCQ(){
-+  const item = mcqs[Math.floor(Math.random()*mcqs.length)];
-+  mcq.innerHTML = `<p>${item.q}</p>` + item.opts.map(o=>`<button class="option">${o}</button>`).join('');
-+  [...mcq.querySelectorAll('.option')].forEach(btn=>btn.onclick=()=>{
-+    const ok = btn.textContent===item.a;
-+    feedback.innerHTML = ok ? `<span class='ok'>Correct!</span> Tiny explanation: == compares values.` : `<span class='err'>Not yet.</span> Tiny explanation: = assigns, it doesn't compare.`;
-+    reward(ok);
-+  });
-+}
-+function mountParsons(){
-+  const shuffled = [...parsons.lines].sort(()=>Math.random()-0.5);
-+  parsonsEl.innerHTML = `<p>Tap lines in correct order:</p><div class='codebank'>${shuffled.map(l=>`<button class='option'>${l}</button>`).join('')}</div><div class='dropzone' id='zone'></div><button id='checkP'>Check</button>`;
-+  const zone = document.getElementById('zone');
-+  parsonsEl.querySelectorAll('.option').forEach(b=>b.onclick=()=>zone.innerHTML += `<div class='line'>${b.textContent}</div>`);
-+  document.getElementById('checkP').onclick = ()=>{
-+    const lines = [...zone.querySelectorAll('.line')].map(n=>n.textContent);
-+    const ok = JSON.stringify(lines)===JSON.stringify(parsons.lines);
-+    feedback.innerHTML = ok ? `<span class='ok'>Solved!</span> You formed a valid loop structure.` : `<span class='err'>Order mismatch.</span> Hint: initialization should come before loop.`;
-+    reward(ok);
-   };
--
--  function loadState(){
--    try{
--      const raw = localStorage.getItem(STORAGE_KEY);
--      if(raw){
--        const parsed = JSON.parse(raw);
--        if(parsed && typeof parsed === 'object'){
--          state = Object.assign(state, parsed);
--        }
--      }
--    }catch(e){
--      console.warn('loadState error', e);
--    }
--  }
--  function saveState(){
--    try{
--      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
--      renderStatus();
--    }catch(e){
--      console.warn('saveState error', e);
--    }
--  }
--
--  function resetState(){
--    if(!confirm('Reset all progress?')) return;
--    state = {
--      currentChapter:1,currentLessonId:null,xp:0,level:1,gold:0,streak:0,lastVisit:null,badges:[],answers:{},mode:'adventure'
--    };
--    saveState();
--    renderAll();
--  }
--
--  function exportState(){
--    try{
--      const data = JSON.stringify(state, null, 2);
--      const blob = new Blob([data], {type:'application/json'});
--      const url = URL.createObjectURL(blob);
--      const a = document.createElement('a');
--      a.href = url; a.download = 'cacademy_progress.json';
--      document.body.appendChild(a); a.click(); a.remove();
--      URL.revokeObjectURL(url);
--    }catch(e){
--      alert('Export failed');
--    }
--  }
--
--  /* Streak logic */
--  function updateStreak(){
--    const today = new Date().toDateString();
--    if(state.lastVisit === today) return;
--    const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
--    if(state.lastVisit === yesterday.toDateString()){
--      state.streak = (state.streak || 0) + 1;
--    } else {
--      state.streak = 1;
--    }
--    state.lastVisit = today;
--    saveState();
--  }
--
--  /* XP & Level */
--  function addXP(amount){
--    state.xp = (state.xp || 0) + amount;
--    // level up every 100 XP
--    const newLevel = Math.floor(state.xp / 100) + 1;
--    if(newLevel > state.level){
--      state.level = newLevel;
--      state.gold = (state.gold || 0) + 10 * (newLevel - state.level + 1);
--      // award level badge
--      awardBadge('Level ' + newLevel);
--    }
--    saveState();
--  }
--
--  function awardBadge(name){
--    if(!state.badges.includes(name)){
--      state.badges.push(name);
--      saveState();
--    }
--  }
--
--  /* -------------------------
--     Rendering
--     ------------------------- */
--
--  const el = id => document.getElementById(id);
--
--  function renderWorldMap(){
--    const container = el('worldMap');
--    container.innerHTML = '';
--    curriculum.forEach(ch=>{
--      const div = document.createElement('div');
--      div.className = 'chapter';
--      div.tabIndex = 0;
--      div.innerHTML = `<div style="font-weight:800">${ch.title}</div><div class="small muted">${ch.lessons.length} lessons</div>`;
--      div.addEventListener('click', ()=>{ openChapter(ch.id); });
--      container.appendChild(div);
--    });
--  }
--
--  function openChapter(chapterId){
--    state.currentChapter = chapterId;
--    // default to first lesson
--    const ch = curriculum.find(c=>c.id===chapterId);
--    if(ch && ch.lessons && ch.lessons.length) state.currentLessonId = ch.lessons[0].id;
--    saveState();
--    renderAll();
--  }
--
--  function renderAll(){
--    renderWorldMap();
--    renderContent();
--    renderRightPanel();
--    renderStatus();
--  }
--
--  function renderStatus(){
--    el('xp').textContent = state.xp;
--    el('level').textContent = state.level;
--    el('gold').textContent = state.gold;
--    el('streak').textContent = state.streak;
--    el('xpSmall').textContent = state.xp;
--    el('levelSmall').textContent = state.level;
--    const xpPct = Math.min(100, (state.xp % 100));
--    el('xpFill').style.width = xpPct + '%';
--    el('progressPercent').textContent = Math.round(computeProgress()) + '%';
--    // badges
--    const badges = el('badges'); badges.innerHTML = '';
--    state.badges.forEach(b=>{
--      const d = document.createElement('div'); d.className='badge'; d.textContent = b; badges.appendChild(d);
--    });
--  }
--
--  function computeProgress(){
--    const totalLessons = curriculum.reduce((s,c)=>s+c.lessons.length,0);
--    const done = Object.keys(state.answers).length;
--    return totalLessons ? (done/totalLessons)*100 : 0;
--  }
--
--  function renderRightPanel(){
--    const ch = curriculum.find(c=>c.id===state.currentChapter);
--    el('topicTag').textContent = ch ? ch.tag : '';
--    el('topicTitle').textContent = ch ? ch.title : 'Select a chapter';
--  }
--
--  /* -------------------------
--     Content rendering per tab
--     ------------------------- */
--
--  let activeTab = 'read';
--  function setActiveTab(tab){
--    activeTab = tab;
--    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
--    renderContent();
--  }
--
--  function renderContent(){
--    const area = el('contentArea');
--    area.innerHTML = '';
--    const ch = curriculum.find(c=>c.id===state.currentChapter);
--    if(!ch){ area.innerHTML = '<div class="small">Select a chapter to begin.</div>'; return; }
--    const lesson = ch.lessons.find(l=>l.id===state.currentLessonId) || ch.lessons[0];
--    state.currentLessonId = lesson.id;
--    // header
--    const header = document.createElement('div'); header.style.display='flex'; header.style.justifyContent='space-between'; header.style.alignItems='center';
--    header.innerHTML = `<div><div class="small muted">${ch.title}</div><div style="font-weight:900">${lesson.title}</div></div><div class="small muted">Tag: ${ch.tag}</div>`;
--    area.appendChild(header);
--
--    if(activeTab === 'read'){
--      renderRead(area, lesson);
--    } else if(activeTab === 'visual'){
--      renderVisual(area, lesson);
--    } else if(activeTab === 'practice'){
--      renderPractice(area, lesson);
--    }
--  }
--
--  function renderRead(container, lesson){
--    const div = document.createElement('div'); div.className='section';
--    const theory = document.createElement('div'); theory.innerHTML = `<div style="font-weight:800">Theory</div><div class="small" style="margin-top:6px">${lesson.theory}</div>`;
--    div.appendChild(theory);
--    if(lesson.analogy){
--      const ana = document.createElement('div'); ana.innerHTML = `<div style="font-weight:800;margin-top:8px">Analogy</div><div class="small" style="margin-top:6px">${lesson.analogy}</div>`;
--      div.appendChild(ana);
--    }
--    if(lesson.syntax){
--      const syn = document.createElement('div'); syn.innerHTML = `<div style="font-weight:800;margin-top:8px">Syntax</div><div class="code" style="margin-top:6px">${highlightC(lesson.syntax)}</div>`;
--      div.appendChild(syn);
--    }
--    if(lesson.proTips && lesson.proTips.length){
--      const tips = document.createElement('div'); tips.innerHTML = `<div style="font-weight:800;margin-top:8px">Pro-Tips</div>`;
--      const ul = document.createElement('ul'); ul.className='small';
--      lesson.proTips.forEach(t=>{ const li=document.createElement('li'); li.textContent=t; ul.appendChild(li); });
--      tips.appendChild(ul); div.appendChild(tips);
--    }
--    container.appendChild(div);
--  }
--
--  function renderVisual(container, lesson){
--    const div = document.createElement('div'); div.className='visualizer';
--    // code examples
--    const codeWrap = document.createElement('div'); codeWrap.innerHTML = `<div style="font-weight:800">Interactive Example</div>`;
--    const codeBox = document.createElement('div'); codeBox.className='code'; codeBox.id='visualCode';
--    const example = (lesson.visualExamples && lesson.visualExamples[0]) || {code: lesson.syntax || '// example', trace: []};
--    codeBox.innerHTML = `<pre>${escapeHtml(example.code)}</pre>`;
--    codeWrap.appendChild(codeBox);
--    const controls = document.createElement('div'); controls.style.display='flex'; controls.style.gap='8px'; controls.style.marginTop='8px';
--    const runBtn = document.createElement('button'); runBtn.className='btn primary'; runBtn.textContent='Run Visual Trace';
--    const stepBtn = document.createElement('button'); stepBtn.className='btn'; stepBtn.textContent='Step';
--    controls.appendChild(runBtn); controls.appendChild(stepBtn);
--    codeWrap.appendChild(controls);
--    div.appendChild(codeWrap);
--
--    // memory map
--    const memWrap = document.createElement('div'); memWrap.innerHTML = `<div style="font-weight:800;margin-top:12px">Memory Map</div>`;
--    const memMap = document.createElement('div'); memMap.className='memory-map'; memMap.id='memoryMap';
--    memWrap.appendChild(memMap);
--    div.appendChild(memWrap);
--
--    // ascii & operator chart
--    const refWrap = document.createElement('div'); refWrap.style.display='flex'; refWrap.style.gap='12px'; refWrap.style.marginTop='12px';
--    const ascii = document.createElement('div'); ascii.style.flex='1'; ascii.innerHTML = `<div style="font-weight:800">ASCII Reference</div><div class="ascii small" id="asciiRef">${generateAsciiMini()}</div>`;
--    const op = document.createElement('div'); op.style.width='220px'; op.innerHTML = `<div style="font-weight:800">Operator Precedence</div><div class="operator-chart small" id="opChart">${generateOpChart()}</div>`;
--    refWrap.appendChild(ascii); refWrap.appendChild(op);
--    div.appendChild(refWrap);
--
--    container.appendChild(div);
--
--    // visual trace logic
--    let trace = example.trace || [];
--    let step = 0;
--    function renderMemory(stateObj){
--      memMap.innerHTML = '';
--      Object.keys(stateObj).forEach(k=>{
--        const box = document.createElement('div'); box.className='mem-box';
--        box.innerHTML = `<div style="font-weight:800">${k}</div><div style="font-size:14px">${stateObj[k]}</div>`;
--        memMap.appendChild(box);
--      });
--    }
--    runBtn.addEventListener('click', ()=>{
--      // animate trace
--      step = 0;
--      const mem = {};
--      renderMemory(mem);
--      if(trace.length===0){ alert('No trace available for this example'); return; }
--      const interval = setInterval(()=>{
--        if(step >= trace.length){ clearInterval(interval); return; }
--        const t = trace[step];
--        // simple parse: "x = 5" or "store x=5" or "remove 5 add 11"
--        applyTraceStep(t, mem);
--        renderMemory(mem);
--        step++;
--      }, 700);
--    });
--    stepBtn.addEventListener('click', ()=>{
--      const mem = {}; // reconstruct from previous steps
--      for(let i=0;i<=step && i<trace.length;i++) applyTraceStep(trace[i], mem);
--      renderMemory(mem);
--      step = Math.min(step+1, trace.length);
--    });
--  }
--
--  function applyTraceStep(text, mem){
--    // heuristics: "x = 5", "y = x + 3", "store x=5", "remove 5 add 11"
--    const t = text.toString();
--    const assign = t.match(/([A-Za-z_]\w*)\s*=\s*([0-9]+)/);
--    if(assign){ mem[assign[1]] = assign[2]; return; }
--    const store = t.match(/store\s+([A-Za-z_]\w*)\s+([0-9]+)/i);
--    if(store){ mem[store[1]] = store[2]; return; }
--    const change = t.match(/([A-Za-z_]\w*)\s*→\s*([0-9]+)/);
--    if(change){ mem[change[1]] = change[2]; return; }
--    // fallback: show message as pseudo variable
--    mem['step'] = t;
--  }
--
--  function renderPractice(container, lesson){
--    const div = document.createElement('div'); div.className='practice';
--    const qWrap = document.createElement('div'); qWrap.className='question-card';
--    const qTitle = document.createElement('div'); qTitle.innerHTML = `<div style="font-weight:800">Practice</div><div class="small muted" style="margin-top:6px">Attempt questions to earn XP</div>`;
--    qWrap.appendChild(qTitle);
--
--    // pick a practice item (rotate)
--    const item = (lesson.practice && lesson.practice[0]) || null;
--    if(!item){
--      qWrap.innerHTML += '<div class="small muted" style="margin-top:8px">No practice items for this lesson.</div>';
--      div.appendChild(qWrap); container.appendChild(div); return;
--    }
--
--    const prompt = document.createElement('div'); prompt.style.marginTop='8px'; prompt.innerHTML = `<div class="small muted">Question</div><div style="font-weight:800;margin-top:6px">${item.prompt}</div>`;
--    qWrap.appendChild(prompt);
--
--    // render input based on type
--    let inputEl = null;
--    if(item.type === 'mcq'){
--      const opts = item.options || [];
--      const form = document.createElement('div'); form.style.display='flex'; form.style.flexDirection='column'; form.style.gap='8px'; form.style.marginTop='8px';
--      opts.forEach((o,i)=>{
--        const row = document.createElement('label'); row.style.display='flex'; row.style.alignItems='center'; row.style.gap='8px';
--        const r = document.createElement('input'); r.type='radio'; r.name='mcq'; r.value=o;
--        row.appendChild(r); row.appendChild(document.createTextNode(o));
--        form.appendChild(row);
--      });
--      qWrap.appendChild(form);
--      inputEl = form;
--    } else if(item.type === 'predict' || item.type === 'pattern'){
--      const inp = document.createElement('input'); inp.className='input'; inp.placeholder='Type exact output, e.g., 6 5 or pattern';
--      qWrap.appendChild(inp); inputEl = inp;
--      setupEditorShortcuts(inp);
--    } else if(item.type === 'error-find'){
--      const ta = document.createElement('textarea'); ta.className='textarea'; ta.placeholder='Describe the error or line number';
--      qWrap.appendChild(ta); inputEl = ta; setupEditorShortcuts(ta);
--    } else if(item.type === 'code-complete'){
--      const ta = document.createElement('textarea'); ta.className='textarea'; ta.value = item.starter || '';
--      qWrap.appendChild(ta); inputEl = ta; setupEditorShortcuts(ta);
--    } else {
--      const ta = document.createElement('textarea'); ta.className='textarea';
--      qWrap.appendChild(ta); inputEl = ta; setupEditorShortcuts(ta);
--    }
--
--    const actions = document.createElement('div'); actions.style.display='flex'; actions.style.gap='8px'; actions.style.marginTop='8px';
--    const checkBtn = document.createElement('button'); checkBtn.className='btn primary'; checkBtn.textContent='Check Answer';
--    const hintBtn = document.createElement('button'); hintBtn.className='btn'; hintBtn.textContent='Hint';
--    actions.appendChild(checkBtn); actions.appendChild(hintBtn);
--    qWrap.appendChild(actions);
--
--    const feedback = document.createElement('div'); feedback.style.marginTop='8px'; qWrap.appendChild(feedback);
--
--    checkBtn.addEventListener('click', ()=>{
--      let userVal = '';
--      if(item.type === 'mcq'){
--        const sel = qWrap.querySelector('input[name="mcq"]:checked');
--        if(!sel){ alert('Select an option'); return; }
--        userVal = sel.value;
--      } else {
--        userVal = (inputEl && inputEl.value) || '';
--        if(!userVal.trim()){ alert('Enter an answer'); return; }
--      }
--      const correct = validatePracticeAnswer(item, userVal);
--      if(correct){
--        feedback.innerHTML = `<div class="badge-success">✅ Correct! +10 XP</div>`;
--        addXP(10);
--        state.answers[lesson.id] = state.answers[lesson.id] || {attempts:0,correct:false};
--        state.answers[lesson.id].attempts += 1;
--        state.answers[lesson.id].correct = true;
--        awardBadge(lesson.title.split(' ')[0] + ' Master');
--        saveState();
--      } else {
--        feedback.innerHTML = `<div class="badge-error">❌ Not quite. Try again or view explanation.</div>`;
--        state.answers[lesson.id] = state.answers[lesson.id] || {attempts:0,correct:false};
--        state.answers[lesson.id].attempts += 1;
--        saveState();
--      }
--      renderStatus();
--    });
--
--    hintBtn.addEventListener('click', ()=>{
--      const hintText = lesson.proTips && lesson.proTips[0] ? lesson.proTips[0] : 'Think about how values change in memory.';
--      alert('Hint: ' + hintText);
--    });
--
--    div.appendChild(qWrap);
--    container.appendChild(div);
--  }
--
--  function validatePracticeAnswer(item, userVal){
--    const normalize = s => (s||'').toString().trim().toLowerCase().replace(/,/g,' ').replace(/\s+/g,' ');
--    if(item.type === 'mcq') return normalize(userVal) === normalize(item.answer);
--    return normalize(userVal) === normalize(item.answer);
--  }
--
--  /* -------------------------
--     Utilities: syntax highlight, ascii, op chart
--     ------------------------- */
--
--  function highlightC(code){
--    // very simple regex-based highlighting
--    const esc = escapeHtml(code);
--    return esc
--      .replace(/(\/\/.*?$)/gm, '<span class="tok-comment">$1</span>')
--      .replace(/(".*?")/g, '<span class="tok-str">$1</span>')
--      .replace(/\b(int|float|double|char|return|if|else|for|while|do|struct|typedef|switch|case|break|continue|void|sizeof)\b/g, '<span class="tok-key">$1</span>')
--      .replace(/\b([0-9]+)\b/g, '<span class="tok-num">$1</span>');
--  }
--
--  function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
--
--  function generateAsciiMini(){
--    // show a small subset
--    const rows = [];
--    const chars = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','a','b','c','d','e','f',' ','!','"',"'",'(',')'];
--    chars.forEach(ch=>{
--      rows.push(`${ch} : ${ch.charCodeAt(0)}`);
--    });
--    return rows.join('  |  ');
--  }
--
--  function generateOpChart(){
--    const levels = [
--      '() [] -> .',
--      '! ~ ++ -- + - (type) * & sizeof',
--      '* / %',
--      '+ -',
--      '<< >>',
--      '< <= > >=',
--      '== !=',
--      '&',
--      '^',
--      '|',
--      '&&',
--      '||',
--      '? :',
--      '= += -= *= /= %=',
--      ','
--    ];
--    return levels.map(l=>`<div>${l}</div>`).join('');
--  }
--
--  /* -------------------------
--     Keyboard & Editor niceties
--     - Shift+Enter inserts newline
--     - Ctrl/Cmd+Enter triggers check (clicks first primary button)
--     - Enter alone does nothing
--     - Auto-close brackets and quotes
--     - Smart backspace
--     ------------------------- */
--
--  function setupGlobalShortcuts(){
--    document.addEventListener('keydown', function(e){
--      // Ctrl/Cmd+Enter -> click primary visible button
--      if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
--        e.preventDefault();
--        const primary = document.querySelector('.btn.primary');
--        if(primary) primary.click();
--        return;
--      }
--      // Enter alone does nothing globally
--      if(e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey){
--        // prevent accidental form submits
--        const active = document.activeElement;
--        if(active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')){
--          e.preventDefault();
--        }
--      }
--    });
--  }
--
--  function setupEditorShortcuts(input){
--    if(!input) return;
--    input.addEventListener('keydown', function(e){
--      // Shift+Enter -> newline
--      if(e.key === 'Enter' && e.shiftKey){
--        e.preventDefault();
--        const start = input.selectionStart;
--        const val = input.value;
--        input.value = val.slice(0,start) + '\n' + val.slice(input.selectionEnd);
--        input.selectionStart = input.selectionEnd = start + 1;
--        input.dispatchEvent(new Event('input'));
--        return;
--      }
--      // Ctrl/Cmd+Enter -> submit
--      if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
--        e.preventDefault();
--        const primary = document.querySelector('.btn.primary');
--        if(primary) primary.click();
--        return;
--      }
--      // Auto-close
--      const openers = {'(':')','[':']','{':'}','"':'"',"'" : "'"};
--      if(openers[e.key] && !e.ctrlKey && !e.metaKey && !e.altKey){
--        e.preventDefault();
--        const start = input.selectionStart;
--        const end = input.selectionEnd;
--        const val = input.value;
--        const close = openers[e.key];
--        input.value = val.slice(0,start) + e.key + close + val.slice(end);
--        input.selectionStart = input.selectionEnd = start + 1;
--        input.dispatchEvent(new Event('input'));
--        return;
--      }
--      // Smart backspace
--      if(e.key === 'Backspace'){
--        const start = input.selectionStart;
--        const val = input.value;
--        if(start>0 && val[start-1] && val[start]){
--          const prev = val[start-1];
--          const next = val[start];
--          const pairs = {'(':')','[':']','{':'}','"':'"',"'" : "'"};
--          if(pairs[prev] === next){
--            e.preventDefault();
--            input.value = val.slice(0,start-1) + val.slice(start+1);
--            input.selectionStart = input.selectionEnd = start-1;
--            input.dispatchEvent(new Event('input'));
--            return;
--          }
--        }
--      }
--    });
--  }
--
--  /* -------------------------
--     Simple static analysis for debugging practice items
--     Heuristics:
--     - Missing semicolons
--     - Unbalanced braces/parentheses
--     - scanf missing &
--     - common typos
--     - assignment in condition
--     ------------------------- */
--
--  function analyzeCode(code){
--    const issues = [];
--    if(!code) return issues;
--    const lines = code.split(/\r?\n/);
--    lines.forEach((ln,i)=>{
--      const t = ln.trim();
--      if(!t) return;
--      if(t.startsWith('#') || t.startsWith('//') || t.startsWith('/*') || t.endsWith('{') || t.endsWith('}')) return;
--      if(/[A-Za-z0-9\)\"]$/.test(t) && !t.endsWith(';') && !t.endsWith(')') && !t.includes('for(') && !t.includes('if(') && !t.includes('while(')){
--        // avoid function headers
--        if(!/^\w+\s+\w+\s*\(.*\)\s*$/.test(t)){
--          issues.push({line:i+1,type:'syntax',message:'Possible missing semicolon.'});
--        }
--      }
--      if(/scanf\s*\(.*[^\&]\)/.test(t) && /scanf/.test(t) && !t.includes('&')){
--        issues.push({line:i+1,type:'logic',message:'scanf likely missing & before variable.'});
--      }
--      if(/if\s*\(.*=[^=].*\)/.test(t)){
--        issues.push({line:i+1,type:'logic',message:'Assignment = used in conditional; did you mean == ?'});
--      }
--      const typos = ['prinft','scanff','retun','intg','floatt'];
--      typos.forEach(tp=>{ if(t.includes(tp)) issues.push({line:i+1,type:'typo',message:'Possible typo: '+tp}); });
--    });
--    // unbalanced braces/parens
--    const opens = {'{':0,'(':0,'[':0};
--    for(const ch of code){
--      if(ch==='{') opens['{']++; if(ch==='}') opens['{']--;
--      if(ch==='(') opens['(']++; if(ch===')') opens['(']--;
--      if(ch==='[') opens['[']++; if(ch===']') opens['[']--;
--    }
--    if(opens['{']!==0) issues.push({line:null,type:'syntax',message:'Unbalanced braces detected.'});
--    if(opens['(']!==0) issues.push({line:null,type:'syntax',message:'Unbalanced parentheses detected.'});
--    if(opens['[']!==0) issues.push({line:null,type:'syntax',message:'Unbalanced brackets detected.'});
--    return issues;
--  }
--
--  /* -------------------------
--     Event bindings
--     ------------------------- */
--
--  function attachEvents(){
--    document.querySelectorAll('.tab').forEach(t=>{
--      t.addEventListener('click', ()=>{ setActiveTab(t.dataset.tab); });
--    });
--    el('resetBtn').addEventListener('click', resetState);
--    el('exportBtn').addEventListener('click', exportState);
--    el('quickPractice').addEventListener('click', ()=>{
--      // open first chapter practice
--      state.currentChapter = 1; state.currentLessonId = curriculum[0].lessons[0].id; setActiveTab('practice'); renderAll();
--    });
--    el('openVisualizer').addEventListener('click', ()=>{ setActiveTab('visual'); renderAll(); });
--    el('openRead').addEventListener('click', ()=>{ setActiveTab('read'); renderAll(); });
--    el('modeSelect').addEventListener('change', (e)=>{ state.mode = e.target.value; saveState(); });
--    // global keyboard
--    setupGlobalShortcuts();
--    // initial editor shortcuts for dynamic inputs will be attached when inputs are created
--  }
--
--  /* -------------------------
--     Initialization
--     ------------------------- */
--
--  function init(){
--    loadState();
--    updateStreak();
--    attachEvents();
--    renderAll();
--    // set default tab
--    setActiveTab('read');
--    // ensure no console errors on load
--    window.addEventListener('error', function(e){ /* swallow to keep console clean for learners */ });
--  }
--
--  /* -------------------------
--     Helper: validate practice answers (simple)
--     ------------------------- */
--
--  function validatePracticeAnswer(item, userVal){
--    const normalize = s => (s||'').toString().trim().toLowerCase().replace(/,/g,' ').replace(/\s+/g,' ');
--    if(item.type === 'mcq') return normalize(userVal) === normalize(item.answer);
--    return normalize(userVal) === normalize(item.answer);
--  }
--
--  /* -------------------------
--     Start
--     ------------------------- */
--
--  init();
--
--  /* Expose some functions for debugging in dev console (safe) */
--  window.CAcademy = {
--    state, curriculum, analyzeCode, addXP, awardBadge
-+}
-+function mountDebug(){
-+  debug.innerHTML = `<p>Find and fix the bug:</p><pre class='line'>${debugTask.buggy}</pre><textarea id='fix' rows='4' style='width:100%'></textarea><button id='checkD'>Submit Fix</button>`;
-+  document.getElementById('checkD').onclick = ()=>{
-+    const input = document.getElementById('fix').value.trim();
-+    const ok = input.includes('&') && input.includes('int');
-+    feedback.innerHTML = ok ? `<span class='ok'>Great fix.</span> You initialized memory before dereference.` : `<span class='err'>Segfault risk remains.</span> Create a real variable and point to it.`;
-+    reward(ok);
-   };
--
--})();
-+}
-+function mountLab(){
-+  lab.innerHTML = `<p>${labTask.prompt}</p><textarea id='labcode' rows='3' style='width:100%'></textarea><button id='runLab'>Run</button>`;
-+  document.getElementById('runLab').onclick = ()=>{
-+    const ok = document.getElementById('labcode').value.includes('printf');
-+    feedback.innerHTML = ok ? `<span class='ok'>Output: Hello</span> Nice start.` : `<span class='err'>No output function detected.</span> Try printf.`;
-+    reward(ok);
-+  };
-+}
-+
-+const modeSelect = document.getElementById('modeSelect');
-+const feedback = document.getElementById('feedback');
-+const hintText = document.getElementById('hintText');
-+const weakList = document.getElementById('weakList');
-+const xp = document.getElementById('xp');
-+const level = document.getElementById('level');
-+const streak = document.getElementById('streak');
-+const quest = document.getElementById('quest');
-+const mcq = document.getElementById('mcq');
-+const parsonsEl = document.getElementById('parsons');
-+const debug = document.getElementById('debug');
-+const lab = document.getElementById('lab');
-+
-+function switchMode(mode){
-+  document.querySelectorAll('.mode').forEach(m=>m.classList.remove('active'));
-+  document.getElementById(mode).classList.add('active');
-+  title.textContent = modeSelect.options[modeSelect.selectedIndex].text;
-+  if(mode==='mcq') mountMCQ();
-+  if(mode==='parsons') mountParsons();
-+  if(mode==='debug') mountDebug();
-+  if(mode==='lab') mountLab();
-+}
-+
-+modeSelect.onchange = () => switchMode(modeSelect.value);
-+nextBtn.onclick = ()=> switchMode(modeSelect.value);
-+hintBtn.onclick = ()=>{
-+  state.hintLevel = (state.hintLevel+1)%3;
-+  hintText.textContent = [
-+    'Hint 1: What does this line intend to compare?',
-+    'Hint 2: Check operator choice and initialization order.',
-+    'Hint 3: Initialize variable, then compare with == not =.'
-+  ][state.hintLevel];
-+  save();
-+};
-+
-+themeBtn.onclick = ()=>{ document.documentElement.classList.toggle('light'); state.theme = document.documentElement.classList.contains('light')?'light':'dark'; save(); };
-+if(state.theme==='light') document.documentElement.classList.add('light');
-+
-+exportBtn.onclick = ()=> alert(btoa(JSON.stringify(state)));
-+importBtn.onclick = ()=>{
-+  const code = prompt('Paste backup code');
-+  if(!code) return;
-+  try { Object.assign(state, JSON.parse(atob(code))); save(); renderStats(); switchMode(modeSelect.value); }
-+  catch { alert('Invalid backup code'); }
-+};
-+
-+const lastDateKey = 'cquest_last_day';
-+const today = new Date().toISOString().slice(0,10);
-+const last = localStorage.getItem(lastDateKey);
-+if(last !== today){ state.streak += 1; localStorage.setItem(lastDateKey,today); save(); }
-+
-+renderStats();
-+switchMode('mcq');
- </script>
- </body>
- </html>
+<!doctype html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>C Quest — Learn C by Playing</title>
+  <link rel="stylesheet" href="styles.css" />
+
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <h1>🎮 C Quest: College Beginner Edition</h1>
+      <div class="actions">
+        <button id="themeBtn">Toggle Light/Dark</button>
+        <button id="exportBtn">Export Progress</button>
+        <button id="importBtn">Import Progress</button>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="card">Level <strong id="level">1</strong></div>
+      <div class="card">XP <strong id="xp">0</strong></div>
+      <div class="card">Streak <strong id="streak">0</strong> days</div>
+      <div class="card">Daily Quest <strong id="quest">0/5</strong></div>
+    </div>
+
+    <div class="layout">
+      <section class="left card">
+        <h2 id="title">MCQ Trap</h2>
+        <p class="hint" id="sub">Do → Feedback → Tiny explanation → Next challenge.</p>
+
+        <div>
+          <label>Mode:</label>
+          <select id="modeSelect">
+            <option value="mcq">MCQ Trap</option>
+            <option value="parsons">Parsons Puzzle</option>
+            <option value="debug">Debug Detective</option>
+            <option value="lab">Mini Code Lab</option>
+          </select>
+        </div>
+
+        <div id="mcq" class="mode active"></div>
+        <div id="parsons" class="mode"></div>
+        <div id="debug" class="mode"></div>
+        <div id="lab" class="mode"></div>
+
+        <p id="feedback"></p>
+        <button class="primary" id="nextBtn">Next Challenge</button>
+      </section>
+
+      <aside class="right card">
+        <h3>Adaptive Focus</h3>
+        <p class="hint">Weakest concepts come first.</p>
+        <ul id="weakList"></ul>
+
+        <h3>Socratic Hint</h3>
+        <p id="hintText" class="hint">Hint level 1: What value enters the loop first?</p>
+        <button id="hintBtn">Next Hint</button>
+
+        <h3>Error Translator</h3>
+        <p class="hint">segmentation fault → “you touched memory you don’t own”.</p>
+      </aside>
+    </div>
+  </div>
+
+<script>
+const storageKey = 'cquest_v1';
+const baseState = { xp:0, level:1, streak:0, quest:0, weak:{loops:60,pointers:70,arrays:50,conditions:45,functions:55}, theme:'dark', hintLevel:0 };
+const state = {...baseState, ...(JSON.parse(localStorage.getItem(storageKey) || '{}'))};
+
+const mcqs = [
+  {q:'Which operator compares values in C?',opts:['=','==','!=','<='],a:'=='},
+  {q:'What is the first index of an array?',opts:['0','1','-1','depends'],a:'0'}
+];
+const parsons = { lines:['int sum = 0;','for(int i=0;i<3;i++){','sum += i;','}'], answer:[0,1,2,3] };
+const debugTask = { buggy:'int *p;\n*p = 4;', fix:'int x=4; int *p=&x;' };
+const labTask = { prompt:'Write one line to print Hello', expected:'printf("Hello");' };
+
+function save(){ localStorage.setItem(storageKey, JSON.stringify(state)); }
+function renderStats(){
+  xp.textContent = state.xp; level.textContent = state.level; streak.textContent = state.streak; quest.textContent = `${state.quest}/5`;
+  weakList.innerHTML = Object.entries(state.weak).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<li>${k}: ${v}% weak</li>`).join('');
+}
+function reward(correct=true){
+  if(correct){ state.xp += 20; state.quest = Math.min(5, state.quest+1); Object.keys(state.weak).forEach(k=>state.weak[k]=Math.max(10,state.weak[k]-2)); }
+  else { state.xp = Math.max(0, state.xp-5); state.weak.pointers = Math.min(100, state.weak.pointers + 4); }
+  state.level = Math.floor(state.xp/100)+1; save(); renderStats();
+}
+
+function mountMCQ(){
+  const item = mcqs[Math.floor(Math.random()*mcqs.length)];
+  mcq.innerHTML = `<p>${item.q}</p>` + item.opts.map(o=>`<button class="option">${o}</button>`).join('');
+  [...mcq.querySelectorAll('.option')].forEach(btn=>btn.onclick=()=>{
+    const ok = btn.textContent===item.a;
+    feedback.innerHTML = ok ? `<span class='ok'>Correct!</span> Tiny explanation: == compares values.` : `<span class='err'>Not yet.</span> Tiny explanation: = assigns, it doesn't compare.`;
+    reward(ok);
+  });
+}
+function mountParsons(){
+  const shuffled = [...parsons.lines].sort(()=>Math.random()-0.5);
+  parsonsEl.innerHTML = `<p>Tap lines in correct order:</p><div class='codebank'>${shuffled.map(l=>`<button class='option'>${l}</button>`).join('')}</div><div class='dropzone' id='zone'></div><button id='checkP'>Check</button>`;
+  const zone = document.getElementById('zone');
+  parsonsEl.querySelectorAll('.option').forEach(b=>b.onclick=()=>zone.innerHTML += `<div class='line'>${b.textContent}</div>`);
+  document.getElementById('checkP').onclick = ()=>{
+    const lines = [...zone.querySelectorAll('.line')].map(n=>n.textContent);
+    const ok = JSON.stringify(lines)===JSON.stringify(parsons.lines);
+    feedback.innerHTML = ok ? `<span class='ok'>Solved!</span> You formed a valid loop structure.` : `<span class='err'>Order mismatch.</span> Hint: initialization should come before loop.`;
+    reward(ok);
+  };
+}
+function mountDebug(){
+  debug.innerHTML = `<p>Find and fix the bug:</p><pre class='line'>${debugTask.buggy}</pre><textarea id='fix' rows='4' style='width:100%'></textarea><button id='checkD'>Submit Fix</button>`;
+  document.getElementById('checkD').onclick = ()=>{
+    const input = document.getElementById('fix').value.trim();
+    const ok = input.includes('&') && input.includes('int');
+    feedback.innerHTML = ok ? `<span class='ok'>Great fix.</span> You initialized memory before dereference.` : `<span class='err'>Segfault risk remains.</span> Create a real variable and point to it.`;
+    reward(ok);
+  };
+}
+function mountLab(){
+  lab.innerHTML = `<p>${labTask.prompt}</p><textarea id='labcode' rows='3' style='width:100%'></textarea><button id='runLab'>Run</button>`;
+  document.getElementById('runLab').onclick = ()=>{
+    const ok = document.getElementById('labcode').value.includes('printf');
+    feedback.innerHTML = ok ? `<span class='ok'>Output: Hello</span> Nice start.` : `<span class='err'>No output function detected.</span> Try printf.`;
+    reward(ok);
+  };
+}
+
+const modeSelect = document.getElementById('modeSelect');
+const feedback = document.getElementById('feedback');
+const hintText = document.getElementById('hintText');
+const weakList = document.getElementById('weakList');
+const xp = document.getElementById('xp');
+const level = document.getElementById('level');
+const streak = document.getElementById('streak');
+const quest = document.getElementById('quest');
+const mcq = document.getElementById('mcq');
+const parsonsEl = document.getElementById('parsons');
+const debug = document.getElementById('debug');
+const lab = document.getElementById('lab');
+
+function switchMode(mode){
+  document.querySelectorAll('.mode').forEach(m=>m.classList.remove('active'));
+  document.getElementById(mode).classList.add('active');
+  title.textContent = modeSelect.options[modeSelect.selectedIndex].text;
+  if(mode==='mcq') mountMCQ();
+  if(mode==='parsons') mountParsons();
+  if(mode==='debug') mountDebug();
+  if(mode==='lab') mountLab();
+}
+
+modeSelect.onchange = () => switchMode(modeSelect.value);
+nextBtn.onclick = ()=> switchMode(modeSelect.value);
+hintBtn.onclick = ()=>{
+  state.hintLevel = (state.hintLevel+1)%3;
+  hintText.textContent = [
+    'Hint 1: What does this line intend to compare?',
+    'Hint 2: Check operator choice and initialization order.',
+    'Hint 3: Initialize variable, then compare with == not =.'
+  ][state.hintLevel];
+  save();
+};
+
+themeBtn.onclick = ()=>{ document.body.classList.toggle('dark'); state.theme = document.body.classList.contains('dark')?'dark':'light'; save(); };
+if(state.theme==='dark') document.body.classList.add('dark');
+
+exportBtn.onclick = ()=> alert(btoa(JSON.stringify(state)));
+importBtn.onclick = ()=>{
+  const code = prompt('Paste backup code');
+  if(!code) return;
+  try { Object.assign(state, JSON.parse(atob(code))); save(); renderStats(); switchMode(modeSelect.value); }
+  catch { alert('Invalid backup code'); }
+};
+
+const lastDateKey = 'cquest_last_day';
+const today = new Date().toISOString().slice(0,10);
+const last = localStorage.getItem(lastDateKey);
+if(last !== today){ state.streak += 1; localStorage.setItem(lastDateKey,today); save(); }
+
+renderStats();
+switchMode('mcq');
+</script>
+</body>
+</html>
