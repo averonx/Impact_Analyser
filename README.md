@@ -23,6 +23,9 @@ Single-file web app prototype for a gamified C-learning experience focused on co
    ```
 2. Open: `http://localhost:8000/index.html`
 
-### If you still see broken/old UI
-- Hard refresh the browser (`Ctrl+Shift+R` or `Cmd+Shift+R`).
-- Make sure you are opening the local server URL above (not an old cached hosted page).
+### GitHub Pages fix (important)
+If the hosted URL still shows old `+` / `-` diff text, the Pages source is likely stale.
+
+1. In GitHub repo settings, set **Pages → Build and deployment → Source = GitHub Actions**.
+2. Push this branch so `.github/workflows/pages.yml` deploys the current `index.html`.
+3. After deployment completes, hard refresh (`Ctrl+Shift+R` or `Cmd+Shift+R`).
