@@ -16,5 +16,13 @@ Single-file web app prototype for a gamified C-learning experience focused on co
 - Guest mode persistence via localStorage
 - Export/Import progress backup code
 
-### Run
-Open `index.html` directly in your browser.
+### Run locally
+1. Start a local server:
+   ```bash
+   python3 -m http.server 8000
+   ```
+2. Open: `http://localhost:8000/index.html`
+
+### If you still see broken/old UI
+- Hard refresh the browser (`Ctrl+Shift+R` or `Cmd+Shift+R`).
+- Make sure you are opening the local server URL above (not an old cached hosted page).

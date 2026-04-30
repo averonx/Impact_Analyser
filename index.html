@@ -5,154 +5,77 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>C Quest Academy</title>
   <style>
-    :root {
-      --bg: #f4f5ff;
-      --surface: #ffffff;
-      --text: #1a1b36;
-      --muted: #59607a;
-      --accent: #7c3aed;
-      --accent2: #06b6d4;
-      --ok: #059669;
-      --bad: #dc2626;
-    }
-    body.dark {
-      --bg: #0c1024;
-      --surface: #141a33;
-      --text: #ecf1ff;
-      --muted: #a8b2d9;
-      --accent: #c084fc;
-      --accent2: #22d3ee;
-      --ok: #34d399;
-      --bad: #f87171;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; font-family: Inter, system-ui, sans-serif; color: var(--text); background: var(--bg);
-      background-image: radial-gradient(circle at 10% 10%, #ffb4e622 0 180px, transparent 181px), radial-gradient(circle at 90% 20%, #7dd3fc22 0 200px, transparent 201px);
-    }
-    .app { max-width: 1100px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
-    .card { background: var(--surface); border: 1px solid #ffffff33; border-radius: 14px; padding: 14px; box-shadow: 0 10px 30px #00000012; }
-    .top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-    .stats { display: flex; gap: 10px; flex-wrap: wrap; }
-    .badge { padding: 6px 10px; border-radius: 999px; background: #00000012; font-size: 13px; }
-    .btn { border: none; background: linear-gradient(90deg, var(--accent), var(--accent2)); color: #fff; padding: 10px 12px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-    .btn.ghost { background: transparent; color: var(--text); border: 1px solid #00000022; }
-    .layout { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
-    @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
-    .options { display: grid; gap: 8px; margin: 10px 0; }
-    .option { padding: 10px; border: 1px solid #00000022; border-radius: 10px; cursor: pointer; }
-    .option.selected { border-color: var(--accent); background: #a78bfa1a; }
-    .dropzone { min-height: 130px; border: 2px dashed #0000003a; border-radius: 10px; padding: 8px; }
-    .line { background: #0000000f; border-radius: 8px; padding: 8px; margin: 6px 0; cursor: move; }
-    textarea, input { width: 100%; border: 1px solid #00000033; border-radius: 10px; padding: 10px; background: transparent; color: var(--text); }
-    .hint { color: var(--muted); font-size: 14px; }
-    .good { color: var(--ok); }
-    .bad { color: var(--bad); }
-    .progress { height: 10px; border-radius: 999px; background: #0000001f; overflow: hidden; }
-    .fill { height: 100%; background: linear-gradient(90deg, #f59e0b, #10b981); }
+    :root { --bg:#f4f5ff; --surface:#fff; --text:#1a1b36; --muted:#59607a; --accent:#7c3aed; --accent2:#06b6d4; --ok:#059669; --bad:#dc2626; }
+    body.dark { --bg:#0c1024; --surface:#141a33; --text:#ecf1ff; --muted:#a8b2d9; --accent:#c084fc; --accent2:#22d3ee; --ok:#34d399; --bad:#f87171; }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--text);background:var(--bg);background-image:radial-gradient(circle at 10% 10%,#ffb4e622 0 180px,transparent 181px),radial-gradient(circle at 90% 20%,#7dd3fc22 0 200px,transparent 201px)}
+    .app{max-width:1100px;margin:0 auto;padding:16px;display:grid;gap:16px}.card{background:var(--surface);border:1px solid #ffffff33;border-radius:14px;padding:14px;box-shadow:0 10px 30px #00000012}
+    .top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}.stats{display:flex;gap:10px;flex-wrap:wrap}.badge{padding:6px 10px;border-radius:999px;background:#00000012;font-size:13px}
+    .btn{border:none;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;padding:10px 12px;border-radius:10px;font-weight:700;cursor:pointer}.btn.ghost{background:transparent;color:var(--text);border:1px solid #00000022}
+    .layout{display:grid;grid-template-columns:2fr 1fr;gap:16px}@media(max-width:860px){.layout{grid-template-columns:1fr}}
+    .options{display:grid;gap:8px;margin:10px 0}.option{padding:10px;border:1px solid #00000022;border-radius:10px;cursor:pointer}.option.selected{border-color:var(--accent);background:#a78bfa1a}
+    .dropzone{min-height:130px;border:2px dashed #0000003a;border-radius:10px;padding:8px}.line{background:#0000000f;border-radius:8px;padding:8px;margin:6px 0;cursor:pointer}
+    textarea,input{width:100%;border:1px solid #00000033;border-radius:10px;padding:10px;background:transparent;color:var(--text)}.hint{color:var(--muted);font-size:14px}
+    .good{color:var(--ok)}.bad{color:var(--bad)}.progress{height:10px;border-radius:999px;background:#0000001f;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,#f59e0b,#10b981)}
   </style>
 </head>
 <body>
   <div class="app">
     <div class="card top">
-      <div>
-        <h2 style="margin:0">⚔️ C Quest Academy</h2>
-        <small>Do → Feedback → Tiny explanation → Next challenge</small>
-      </div>
-      <div class="stats">
-        <span class="badge">XP: <b id="xp">0</b></span>
-        <span class="badge">Level: <b id="level">1</b></span>
-        <span class="badge">Streak: <b id="streak">0</b>🔥</span>
-        <span class="badge">Quest: <b id="quest">0/5</b></span>
-      </div>
-      <div>
-        <button class="btn ghost" id="theme">Toggle Theme</button>
-        <button class="btn ghost" id="export">Export</button>
-        <button class="btn ghost" id="import">Import</button>
-      </div>
+      <div><h2 style="margin:0">⚔️ C Quest Academy</h2><small>Do → Feedback → Tiny explanation → Next challenge</small></div>
+      <div class="stats"><span class="badge">XP: <b id="xp">0</b></span><span class="badge">Level: <b id="level">1</b></span><span class="badge">Streak: <b id="streak">0</b>🔥</span><span class="badge">Quest: <b id="quest">0/5</b></span></div>
+      <div><button class="btn ghost" id="theme">Toggle Theme</button> <button class="btn ghost" id="export">Export</button> <button class="btn ghost" id="import">Import</button></div>
     </div>
-
     <div class="layout">
       <div class="card">
-        <h3 id="title"></h3>
-        <p id="prompt"></p>
-        <div id="challenge"></div>
-        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-          <button class="btn" id="check">Check</button>
-          <button class="btn ghost" id="hint">Hint</button>
-          <button class="btn ghost" id="next">Next</button>
-        </div>
+        <h3 id="title"></h3><p id="prompt"></p><div id="challenge"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn" id="check">Check</button><button class="btn ghost" id="hint">Hint</button><button class="btn ghost" id="next">Next</button></div>
         <p id="feedback"></p>
       </div>
-
       <div class="card">
-        <h3>Adaptive Coach</h3>
-        <p class="hint">Weak concepts resurface automatically every day.</p>
-        <div id="concepts"></div>
-        <h4>Improvement</h4>
-        <div class="progress"><div class="fill" id="improve" style="width:0%"></div></div>
+        <h3>Adaptive Coach</h3><p class="hint">Weak concepts resurface automatically every day.</p><div id="concepts"></div>
+        <h4>Improvement</h4><div class="progress"><div class="fill" id="improve" style="width:0%"></div></div>
         <p class="hint">No login mode: progress stored on this device.</p>
       </div>
     </div>
   </div>
-
 <script>
 const state = JSON.parse(localStorage.getItem('cquest_v1') || '{}');
 state.xp ??= 0; state.level ??= 1; state.streak ??= 0; state.lastDay ??= ''; state.quest ??= 0; state.dark ??= false;
-state.mastery ??= {loops:40,pointers:20,arrays:30,conditions:50,functions:30};
-state.weakQueue ??= [];
-
+state.mastery ??= { loops:40, pointers:20, arrays:30, conditions:50, functions:30 };
 const bank = [
-  {type:'mcq', concept:'conditions', title:'MCQ Trap', prompt:'What is true in C?', options:['0 is true','Any non-zero is true','Only 1 is true'], answer:'Any non-zero is true', explain:'In C conditionals, 0 is false and any non-zero value is true.'},
-  {type:'parsons', concept:'loops', title:'Parsons Puzzle', prompt:'Arrange lines to print 1 to 3', lines:['printf("%d\\n", i);','for(int i=1;i<=3;i++){','}'], order:[1,0,2], explain:'Loop starts, prints each i, then closes.'},
-  {type:'debug', concept:'pointers', title:'Debug Detective', prompt:'Fix this crash-prone code', buggy:'int *p;\n*p = 7;\nprintf("%d", *p);', answer:'initialize pointer to valid memory', explain:'p points nowhere. It must hold a valid address before dereference.'},
-  {type:'lab', concept:'functions', title:'Mini Code Lab', prompt:'Complete function to return square of n', starter:'int square(int n){\n  // TODO\n}', answer:'return n*n;', explain:'A function returns computed value with return statement.'}
+  {type:'mcq',concept:'conditions',title:'MCQ Trap',prompt:'What is true in C?',options:['0 is true','Any non-zero is true','Only 1 is true'],answer:'Any non-zero is true',explain:'In C conditionals, 0 is false and any non-zero value is true.'},
+  {type:'parsons',concept:'loops',title:'Parsons Puzzle',prompt:'Arrange lines to print 1 to 3',lines:['printf("%d\\n", i);','for(int i=1;i<=3;i++){','}'],order:[1,0,2],explain:'Loop starts, prints each i, then closes.'},
+  {type:'debug',concept:'pointers',title:'Debug Detective',prompt:'Fix this crash-prone code',buggy:'int *p;\n*p = 7;\nprintf("%d", *p);',explain:'p points nowhere. It must hold a valid address before dereference.'},
+  {type:'lab',concept:'functions',title:'Mini Code Lab',prompt:'Complete function to return square of n',starter:'int square(int n){\n  // TODO\n}',answer:'return n*n;',explain:'A function returns computed value with return statement.'}
 ];
-
 let current = null, selected = null, hintLevel = 0;
-
-function save(){ localStorage.setItem('cquest_v1', JSON.stringify(state)); }
-function today(){ return new Date().toISOString().slice(0,10); }
-function updateStreak(){ if(state.lastDay!==today()){ state.streak += 1; state.lastDay=today(); }}
-function adaptivePick(){
-  const weak = Object.entries(state.mastery).sort((a,b)=>a[1]-b[1])[0][0];
-  const options = bank.filter(x=>x.concept===weak);
-  return (options[0] || bank[Math.floor(Math.random()*bank.length)]);
-}
-
+const $ = (id) => document.getElementById(id);
+const save = () => localStorage.setItem('cquest_v1', JSON.stringify(state));
+const today = () => new Date().toISOString().slice(0,10);
+function updateStreak(){ if(state.lastDay !== today()){ state.streak += 1; state.lastDay = today(); } }
+function adaptivePick(){ const weak = Object.entries(state.mastery).sort((a,b)=>a[1]-b[1])[0][0]; return bank.find(x => x.concept===weak) || bank[Math.floor(Math.random()*bank.length)]; }
 function render(){
   document.body.classList.toggle('dark', state.dark);
-  document.getElementById('xp').textContent = state.xp;
-  document.getElementById('level').textContent = state.level;
-  document.getElementById('streak').textContent = state.streak;
-  document.getElementById('quest').textContent = `${state.quest}/5`;
-  const c = document.getElementById('concepts');
-  c.innerHTML = Object.entries(state.mastery).map(([k,v])=>`<div>${k}: <b>${Math.round(v)}</b></div>`).join('');
-  const avg = Object.values(state.mastery).reduce((a,b)=>a+b,0)/Object.keys(state.mastery).length;
-  document.getElementById('improve').style.width = `${avg}%`;
+  $('xp').textContent = state.xp; $('level').textContent = state.level; $('streak').textContent = state.streak; $('quest').textContent = `${state.quest}/5`;
+  $('concepts').innerHTML = Object.entries(state.mastery).map(([k,v]) => `<div>${k}: <b>${Math.round(v)}</b></div>`).join('');
+  const avg = Object.values(state.mastery).reduce((a,b)=>a+b,0)/Object.keys(state.mastery).length; $('improve').style.width = `${avg}%`;
 }
-
 function mountChallenge(){
-  current = adaptivePick(); hintLevel = 0; selected = null;
-  document.getElementById('title').textContent = `${current.title} • ${current.concept}`;
-  document.getElementById('prompt').textContent = current.prompt;
-  const root = document.getElementById('challenge');
+  current = adaptivePick(); hintLevel = 0; selected = null; $('feedback').textContent = '';
+  $('title').textContent = `${current.title} • ${current.concept}`; $('prompt').textContent = current.prompt;
   if(current.type==='mcq'){
-    root.innerHTML = `<div class='options'>${current.options.map(o=>`<div class='option' data-o="${o}">${o}</div>`).join('')}</div>`;
-    root.querySelectorAll('.option').forEach(el=>el.onclick=()=>{root.querySelectorAll('.option').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');selected=el.dataset.o;});
+    $('challenge').innerHTML = `<div class='options'>${current.options.map(o=>`<div class='option' data-o="${o}">${o}</div>`).join('')}</div>`;
+    document.querySelectorAll('.option').forEach(el => el.onclick = () => { document.querySelectorAll('.option').forEach(x=>x.classList.remove('selected')); el.classList.add('selected'); selected = el.dataset.o; });
   } else if(current.type==='parsons'){
     const shuffled = [...current.lines].sort(()=>Math.random()-0.5);
-    root.innerHTML = `<div class='dropzone' id='dz'></div><p class='hint'>Click lines in the correct order:</p>${shuffled.map(l=>`<div class='line'>${l}</div>`).join('')}`;
-    const dz = root.querySelector('#dz');
-    root.querySelectorAll('.line').forEach(line=>line.onclick=()=>dz.appendChild(line.cloneNode(true)));
-  } else if(current.type==='debug'){
-    root.innerHTML = `<textarea rows='6'>${current.buggy}</textarea><input id='ans' placeholder='What is the bug and fix?'/>`;
+    $('challenge').innerHTML = `<div class='dropzone' id='dz'></div><p class='hint'>Click lines in the correct order:</p>${shuffled.map(l=>`<div class='line'>${l}</div>`).join('')}`;
+    document.querySelectorAll('.line').forEach(line => line.onclick = () => $('dz').appendChild(line.cloneNode(true)));
+  } else if(current.type==='debug') {
+    $('challenge').innerHTML = `<textarea rows='6'>${current.buggy}</textarea><input id='ans' placeholder='What is the bug and fix?'/>`;
   } else {
-    root.innerHTML = `<textarea rows='7'>${current.starter}</textarea><input id='ans' placeholder='Write the missing line'/>`;
+    $('challenge').innerHTML = `<textarea rows='7'>${current.starter}</textarea><input id='ans' placeholder='Write the missing line'/>`;
   }
-  document.getElementById('feedback').textContent='';
 }
-
 function grade(){
   let correct = false;
   if(current.type==='mcq') correct = selected===current.answer;
@@ -161,45 +84,18 @@ function grade(){
     const target = current.order.map(i=>current.lines[i]);
     correct = JSON.stringify(user)===JSON.stringify(target);
   }
-  if(current.type==='debug'){
-    const v = document.getElementById('ans').value.toLowerCase();
-    correct = v.includes('pointer') || v.includes('address') || v.includes('malloc');
-  }
-  if(current.type==='lab'){
-    const v = document.getElementById('ans').value.replace(/\s+/g,'');
-    correct = v.includes('returnn*n;');
-  }
-
-  const fb = document.getElementById('feedback');
-  if(correct){
-    state.xp += Math.max(6, 12 - hintLevel*2); state.quest += 1;
-    state.mastery[current.concept] = Math.min(100, state.mastery[current.concept] + 8);
-    fb.innerHTML = `<span class='good'>✅ Correct.</span> ${current.explain}`;
-  } else {
-    state.mastery[current.concept] = Math.max(0, state.mastery[current.concept] - 4);
-    fb.innerHTML = `<span class='bad'>❌ Not yet.</span> ${current.explain}`;
-  }
-  state.level = Math.floor(state.xp / 60) + 1;
-  if(state.quest>=5) state.quest=5;
-  save(); render();
+  if(current.type==='debug'){ const v = $('ans').value.toLowerCase(); correct = v.includes('pointer') || v.includes('address') || v.includes('malloc'); }
+  if(current.type==='lab'){ const v = $('ans').value.replace(/\s+/g,''); correct = v.includes('returnn*n;'); }
+  if(correct){ state.xp += Math.max(6,12-hintLevel*2); state.quest = Math.min(5,state.quest+1); state.mastery[current.concept] = Math.min(100,state.mastery[current.concept]+8); $('feedback').innerHTML = `<span class='good'>✅ Correct.</span> ${current.explain}`; }
+  else { state.mastery[current.concept] = Math.max(0,state.mastery[current.concept]-4); $('feedback').innerHTML = `<span class='bad'>❌ Not yet.</span> ${current.explain}`; }
+  state.level = Math.floor(state.xp/60)+1; save(); render();
 }
-
-document.getElementById('check').onclick = grade;
-document.getElementById('next').onclick = ()=>{ mountChallenge(); };
-document.getElementById('hint').onclick = ()=>{
-  hintLevel += 1;
-  const hints = [
-    'Direction hint: think about memory/value flow line by line.',
-    `Concept hint: focus on ${current.concept} fundamentals before syntax polish.`,
-    'Near-answer hint: compare your answer to the expected output or valid pointer rule.'
-  ];
-  document.getElementById('feedback').innerHTML = `<span class='hint'>${hints[Math.min(2,hintLevel-1)]}</span>`;
-};
-
-document.getElementById('theme').onclick = ()=>{ state.dark=!state.dark; save(); render(); };
-document.getElementById('export').onclick = ()=>{ navigator.clipboard.writeText(btoa(JSON.stringify(state))); alert('Progress code copied.'); };
-document.getElementById('import').onclick = ()=>{ const s=prompt('Paste progress code'); if(!s) return; try{Object.assign(state, JSON.parse(atob(s))); save(); render(); mountChallenge();}catch{alert('Invalid code');}};
-
+$('check').onclick = grade;
+$('next').onclick = mountChallenge;
+$('hint').onclick = () => { hintLevel += 1; const hints = ['Direction hint: think about memory/value flow line by line.','Concept hint: focus on fundamentals before syntax polish.','Near-answer hint: compare your answer to expected output and pointer safety rules.']; $('feedback').innerHTML = `<span class='hint'>${hints[Math.min(2,hintLevel-1)]}</span>`; };
+$('theme').onclick = () => { state.dark=!state.dark; save(); render(); };
+$('export').onclick = async () => { const payload = btoa(JSON.stringify(state)); try { await navigator.clipboard.writeText(payload); alert('Progress code copied.'); } catch { prompt('Copy your progress code:', payload); } };
+$('import').onclick = () => { const s = prompt('Paste progress code'); if(!s) return; try { Object.assign(state, JSON.parse(atob(s))); save(); render(); mountChallenge(); } catch { alert('Invalid code'); } };
 updateStreak(); save(); render(); mountChallenge();
 </script>
 </body>
